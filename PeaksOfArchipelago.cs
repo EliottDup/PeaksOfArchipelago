@@ -7,17 +7,15 @@ using UnityEngine;
 using BepInEx.Logging;
 
 using HarmonyLib;
-using System.Runtime.CompilerServices;
 using Archipelago.MultiClient.Net;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection.Emit;
+using UnityEngine.SceneManagement;
 
 namespace PeaksOfArchipelago;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 [BepInDependency("Data.POKManager")]
-public class Plugin : BaseUnityPlugin
+public class PeaksOfArchipelago : BaseUnityPlugin
 {
     internal static new ManualLogSource Logger;
         
@@ -27,40 +25,36 @@ public class Plugin : BaseUnityPlugin
         Logger = base.Logger;
 
         Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
-        POKManager.RegisterMod(new PeaksOfArchipelago(), MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION, "An Archipelago Implementation for Peaks Of Yore!", UseEditableAttributeOnly: true);
+        POKManager.RegisterMod(new PeaksOfArchipelagoMod(), MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION, "An Archipelago Implementation for Peaks Of Yore!", UseEditableAttributeOnly: true);
         Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded2!");
 
     }
 }
 
-public class PeaksOfArchipelago : ModClass {
+public class PeaksOfArchipelagoMod : ModClass {
     [Editable] public string Hostname {get; set;} = "archipelago.gg";
     [Editable] public string Port {get; set;} = "";
     [Editable] public string SlotName {get; set;} = "";
     [Editable] public string Password {get; set;} = "";
     [Editable] public bool AutoConnect {get; set;} = false;
     [Editable] public UnityEvent Connect {get; set;} = new UnityEvent();
+
     Harmony harmony = new Harmony(MyPluginInfo.PLUGIN_GUID); 
 
     public ArchipelagoSession session = null;
 
-    public static PeaksOfArchipelago Instance = null; 
-
     public override void OnEnabled(){
-        Instance = this;
         harmony.PatchAll();
         Connect.AddListener(OnConnect);
         if(AutoConnect){
             ConnectFunc();
         }
-        
         Debug.Log("Loaded Peaks of Archipelago!");
     }
 
     public override void Start() {
-        // Debug.Log(GameManager.)
-        GameManager.control.rope = true;
-        GameManager.control.ropesCollected = 128;
+        // DO NOT PUT GAMEMANAGER.SAVE HERE IT FUCKED UP MY SAVES LOL
+        Debug.Log("Now in scene: " + SceneManager.GetActiveScene().name);
     }
 
     public override void OnDisabled() {
@@ -96,16 +90,40 @@ public class PeaksOfArchipelago : ModClass {
         }
     }
 
-    [HarmonyPatch(typeof(ArtefactOnPeak), "SaveGrabbedItem")]
+    [HarmonyPatch(typeof(FallingEvent), "FellToDeath")]
+    public class FellToDeathPatch(){
+        static void Postfix(){
+            Debug.Log("Died");
+        }
+    }
+
+    [HarmonyPatch(typeof(EnterPeakScene), "Awake")]
+    public class EnterPeakScenePatch{
+        static void Postfix(EnterPeakScene __instance){
+            Debug.Log("Entering: " + GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString());
+        }
+    }
+
+    [HarmonyPatch(typeof(ArtefactOnPeak), "PickUpItem")]
     public class ArtefactOnPeakPatch{
         static void Postfix(ArtefactOnPeak __instance){
             Debug.Log("Picked Up: " + __instance.peakArtefact);
+            ArtefactOnPeak.Artefacts artefact = __instance.peakArtefact;
+        }
+    }
+
+    [HarmonyPatch(typeof(RopeCollectable), "PickUpRope")]
+    public class RopeCollectablePatch(){
+        static void Postfix(RopeCollectable __instance){
+            Ropes rope = Utils.GetRopeCollectable(__instance);    //CHECK FOR ROPE
+            Debug.Log("Picked Up rope: " + rope);
         }
     }
 
     [HarmonyPatch(typeof(RopeAnchor), "Start")]
     public class StartTranspiler(){
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions){
+            Debug.Log("Transpiling RopeAnchor.Start");
             var codes = new List<CodeInstruction>(instructions);
             for (int i = 0; i < codes.Count; i++){
                 if (i == 76 || i == 77  || i == 78){
@@ -115,20 +133,12 @@ public class PeaksOfArchipelago : ModClass {
                 yield return codes[i];
             }
         }
-
-        static void Prefix(){
-            Debug.Log(GameManager.control.ropesCollected + " ropes!");
-        }
-        
-        static void Postfix(){
-            Debug.Log(GameManager.control.ropesCollected + " ropes!");
-        }
     }
 
     [HarmonyPatch(typeof(RopeAnchor), "DetachThenAttachToNew", MethodType.Enumerator)]
     public class DetachThenAttachToNewTranspiler(){
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions){
-            Debug.Log("transpiling DetachThenAttachToNew");
+            Debug.Log("Transpiling DetachThenAttachToNew");
             var codes = new List<CodeInstruction>(instructions);
             for (int i = 0; i < codes.Count; i++){
                 if (i == 120 || i == 121 || i == 122 || i == 123){
@@ -143,7 +153,7 @@ public class PeaksOfArchipelago : ModClass {
         [HarmonyPatch(typeof(RopeAnchor), "PullOutAnchor", MethodType.Enumerator)]
     public class PullOutAnchorTranspiler(){
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions){
-            Debug.Log("transpiling PullOutAnchor");
+            Debug.Log("Transpiling PullOutAnchor");
             var codes = new List<CodeInstruction>(instructions);
             for (int i = 0; i < codes.Count; i++){
                 if (i == 79 || i == 80 || i == 81 || i == 82){
@@ -153,16 +163,12 @@ public class PeaksOfArchipelago : ModClass {
                 yield return codes[i];
             }
         }
-
-        static void Postfix(){
-            GameManager.control.ropesCollected = 50;
-        }
-
     }
 
     [HarmonyPatch(typeof(RopeCollectable), "CheckRope")]
     public class CheckRopeTranspiler(){
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions){
+            Debug.Log("Transpiling CheckRope");
             var codes = new List<CodeInstruction>(instructions);
             for (int i = 0; i < codes.Count; i++){
                 if (i == 267 || i == 268 || i == 269 || i == 270){
@@ -172,21 +178,5 @@ public class PeaksOfArchipelago : ModClass {
                 yield return codes[i];
             }
         }
-
-        static void Prefix(){
-            Debug.Log(GameManager.control.ropesCollected + " ropes!");
-        }
-        
-        static void Postfix(){
-            Debug.Log(GameManager.control.ropesCollected + " ropes!");
-        }
     }
-
-    [HarmonyPatch(typeof(FallingEvent), "FellToDeath")]
-    public class FelToDeathPatch(){
-        static void Postfix(){
-            Debug.Log("Died");
-        }
-    }
-
 }
