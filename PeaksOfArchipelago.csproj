@@ -33,14 +33,10 @@
 
   <ItemGroup>
   <Reference Include="POKManager">
-    <HintPath>E:\Program Files (x86)\Steam\steamapps\common\Peaks of Yore\BepInEx\plugins\POKManager.dll</HintPath>
+    <HintPath>lib\POKManager.dll</HintPath>
   </Reference>
   <Reference Include="Assembly-CSharp">
-    <HintPath>E:\Program Files (x86)\Steam\steamapps\common\Peaks of Yore\Peaks of Yore_Data\Managed\Assembly-CSharp.dll</HintPath>
-  </Reference>
-
-    <Reference Include="Rewired_Core">
-    <HintPath>E:\Program Files (x86)\Steam\steamapps\common\Peaks of Yore\Peaks of Yore_Data\Managed\Rewired_Core.dll</HintPath>
+    <HintPath>lib/Assembly-CSharp.dll</HintPath>
   </Reference>
 </ItemGroup>
 </Project>
