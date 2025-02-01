@@ -5,33 +5,32 @@ using UnityEngine;
 namespace PeaksOfArchipelago;
 
 public enum Ropes
-    {
-        WaltersCrag,
-        WalkersPillar,
-        GreatGaol,
-        StHaelga,
-        ExtraFirst,
-		ExtraSecond,
-		ExtraThird,
-		ExtraFourth,
-		Extra5,
-		Extra6,
-		Extra7,
-		Extra8,
-		Extra9,
-		Extra10,
-		Extra11,
-		Extra12,
-        None
-    }
-
-public enum Checks {
-
+{
+    WaltersCrag,
+    WalkersPillar,
+    GreatGaol,
+    StHaelga,
+    ExtraFirst,
+    ExtraSecond,
+    ExtraThird,
+    ExtraFourth,
+    Extra5,
+    Extra6,
+    Extra7,
+    Extra8,
+    Extra9,
+    Extra10,
+    Extra11,
+    Extra12,
+    None
 }
 
-class Utils{
-    static public Ropes GetRopeCollectable(RopeCollectable ropeCollectable){
-        if (!ropeCollectable.isSingleRope){
+class Utils
+{
+    static public Ropes GetRopeCollectable(RopeCollectable ropeCollectable)
+    {
+        if (!ropeCollectable.isSingleRope)
+        {
             return (Ropes)ropeCollectable.extraRopeNumber;
         }
         if (ropeCollectable.isWaltersCrag) return Ropes.WaltersCrag;
