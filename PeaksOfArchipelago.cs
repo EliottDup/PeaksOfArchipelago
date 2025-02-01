@@ -10,10 +10,11 @@ using HarmonyLib;
 using Archipelago.MultiClient.Net;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using System.Reflection;
 
 namespace PeaksOfArchipelago;
 
-[BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+[BepInPlugin(ModInfo.MOD_GUID, ModInfo.MOD_NAME, ModInfo.MOD_VERSION)]
 [BepInDependency("Data.POKManager")]
 public class PeaksOfArchipelago : BaseUnityPlugin
 {
@@ -24,17 +25,16 @@ public class PeaksOfArchipelago : BaseUnityPlugin
         // Plugin startup logic
         Logger = base.Logger;
 
-        Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
-        POKManager.RegisterMod(new PeaksOfArchipelagoMod(), MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION, "An Archipelago Implementation for Peaks Of Yore!", UseEditableAttributeOnly: true);
-        Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded2!");
-
+        Logger.LogInfo($"Plugin {ModInfo.MOD_GUID} is loaded!");
+        POKManager.RegisterMod(new PeaksOfArchipelagoMod(), ModInfo.MOD_NAME, ModInfo.MOD_VERSION, ModInfo.MOD_DESC, UseEditableAttributeOnly: true);
+        Logger.LogInfo($"Plugin {ModInfo.MOD_GUID} is loaded2!");
     }
 }
 
 public class PeaksOfArchipelagoMod : ModClass
 {
     [Editable] public string Hostname { get; set; } = "archipelago.gg";
-    [Editable] public string Port { get; set; } = "";
+    [Editable] public string Port { get; set; } = "123456";
     [Editable] public string SlotName { get; set; } = "";
     [Editable] public string Password { get; set; } = "";
     [Editable] public bool AutoConnect { get; set; } = false;
@@ -118,8 +118,7 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static void Postfix(ArtefactOnPeak __instance)
         {
-            Debug.Log("Picked Up: " + __instance.peakArtefact);
-            ArtefactOnPeak.Artefacts artefact = __instance.peakArtefact;
+            session.CompleteArtefactCheck(__instance);
         }
     }
 
@@ -128,10 +127,7 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static void Postfix(RopeCollectable __instance)
         {
-            LocationCheck loc = Utils.GetLocationFromRope(__instance);
-            session.CompleteLocationCheck(loc);
-            RopeLocation rope = Utils.GetRopeLocation(__instance);    //CHECK FOR ROPE
-            Debug.Log("Picked Up rope: " + rope);
+            session.CompleteRopeCheck(__instance);
         }
     }
 
@@ -153,6 +149,8 @@ public class PeaksOfArchipelagoMod : ModClass
             }
         }
     }
+
+
 
     //------------------------- Harmony Transpilers -------------------------
     //! THESE ARE THE THINGS THAT MIGHT BREAK WHEN UPDATING THE GAME!!
