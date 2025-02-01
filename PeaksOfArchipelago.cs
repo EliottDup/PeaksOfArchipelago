@@ -42,23 +42,18 @@ public class PeaksOfArchipelagoMod : ModClass
 
     Harmony harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
 
-    public ArchipelagoSession session = null;
+    private static POASession session;
 
-    public override void OnEnabled()
+    public override void OnEnabled()    // Runs when the mod is enabled, and completely at the start
     {
+        session = new POASession();
         harmony.PatchAll();
         Connect.AddListener(OnConnect);
         if (AutoConnect)
         {
-            ConnectFunc();
+            OnConnect();
         }
         Debug.Log("Loaded Peaks of Archipelago!");
-    }
-
-    public override void Start()
-    {
-        // DO NOT PUT GAMEMANAGER.SAVE HERE IT FUCKED UP MY SAVES LOL
-        Debug.Log("Now in scene: " + SceneManager.GetActiveScene().name);
     }
 
     public override void OnDisabled()
@@ -66,26 +61,25 @@ public class PeaksOfArchipelagoMod : ModClass
         harmony.UnpatchSelf();
     }
 
-    private void OnConnect()
+    public override void Start()        // Runs every time a new scene is launched (whenever "Start" would be ran on a normal unity object)
     {
-        ConnectFunc();
+        // DO NOT PUT GAMEMANAGER.SAVE HERE IT FUCKED UP MY SAVES LOL
+        Debug.Log("Now in scene: " + SceneManager.GetActiveScene().name);
     }
 
-    private bool ConnectFunc()
-    {
-        Debug.Log("Connecting to " + GetHostNamePort());
-        session = ArchipelagoSessionFactory.CreateSession(GetHostNamePort());
-        session.SetClientState(Archipelago.MultiClient.Net.Enums.ArchipelagoClientState.ClientReady);
-        LoginResult result = session.TryConnectAndLogin("Peaks Of Yore", SlotName, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems, password: Password);
-        return false;
-    }
-
-    private string GetHostNamePort()
+    private string GetUri()
     {
         return Hostname + ":" + Port;
     }
 
-    // Harmony Patches
+    private void OnConnect()
+    {
+        session.Connect(GetUri(), SlotName, Password);
+    }
+
+
+    //------------------------- Harmony Patches -------------------------
+
     [HarmonyPatch(typeof(StamperPeakSummit), "StampJournal")]
     public class PeakSummitedPatch
     {
@@ -106,7 +100,7 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static void Postfix()
         {
-            Debug.Log("Died");
+            session.HandleDeath();
         }
     }
 
@@ -134,7 +128,9 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static void Postfix(RopeCollectable __instance)
         {
-            Ropes rope = Utils.GetRopeCollectable(__instance);    //CHECK FOR ROPE
+            LocationCheck loc = Utils.GetLocationFromRope(__instance);
+            session.CompleteLocationCheck(loc);
+            RopeLocation rope = Utils.GetRopeLocation(__instance);    //CHECK FOR ROPE
             Debug.Log("Picked Up rope: " + rope);
         }
     }
@@ -157,6 +153,9 @@ public class PeaksOfArchipelagoMod : ModClass
             }
         }
     }
+
+    //------------------------- Harmony Transpilers -------------------------
+    //! THESE ARE THE THINGS THAT MIGHT BREAK WHEN UPDATING THE GAME!!
 
     [HarmonyPatch(typeof(RopeAnchor), "DetachThenAttachToNew", MethodType.Enumerator)]
     public class DetachThenAttachToNewTranspiler
