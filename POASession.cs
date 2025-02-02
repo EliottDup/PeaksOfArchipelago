@@ -112,7 +112,7 @@ class POASession
         if (session == null) return (Ropes)(-1);
 
         Ropes rope = Utils.GetRopeFromCollectable(ropeCollectable);
-        session.Locations.CompleteLocationChecks(Utils.GetLocationFromRope(rope));  // send check complete to multiworld
+        session.Locations.CompleteLocationChecks(Utils.RopeToId(rope));  // send check complete to multiworld
 
         playerData.locations.ropes.SetCheck(rope, true);                            // save rope check
 
@@ -126,7 +126,7 @@ class POASession
         if (session == null) return (Artefacts)(-1);
 
         Artefacts artefact = Utils.GetArtefactFromCollectable(artefactOnPeak);
-        session.Locations.CompleteLocationChecks(Utils.GetLocationFromArtefact(artefact));
+        session.Locations.CompleteLocationChecks(Utils.ArtefactToId(artefact));
 
         playerData.locations.artefacts.SetCheck(artefact, true);
 
@@ -140,7 +140,7 @@ class POASession
         if (session == null) return (Peaks)(-1);
 
         Peaks peak = Utils.GetPeakFromCollectable(peakStamper);
-        session.Locations.CompleteLocationChecks(Utils.GetLocationFromPeak(peak));
+        session.Locations.CompleteLocationChecks(Utils.PeakToId(peak));
 
         playerData.locations.peaks.SetCheck(peak, true);
 

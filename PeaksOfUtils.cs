@@ -177,11 +177,12 @@ class CheckList<T> where T : struct, Enum   // I would use enum flags, but they 
 
 public static class Utils
 {
-    private static int peakOffset = 0;
-    private static int ropeOffset = 100;
-    private static int artefactOffset = 200;
-    private static int bookOffset = 300;
-    private static int extraItemOffset = 400;
+    //id offsets (surely 100 is enough)
+    private const int peakOffset = 0;
+    private const int ropeOffset = 100;
+    private const int artefactOffset = 200;
+    private const int bookOffset = 300;
+    private const int extraItemOffset = 400;
 
     public static Peaks GetPeakFromCollectable(StamperPeakSummit peakStamper)
     {
@@ -207,18 +208,44 @@ public static class Utils
         return (Artefacts)v;
     }
 
-    public static int GetLocationFromArtefact(Artefacts artefact)
+    //Converters Type -> ID
+    public static int ArtefactToId(Artefacts artefact)
     {
         return (int)artefact + artefactOffset;
     }
 
-    public static int GetLocationFromRope(Ropes rope)
+    public static int RopeToId(Ropes rope)
     {
         return (int)rope + ropeOffset;
     }
 
-    public static int GetLocationFromPeak(Peaks peak)
+    public static int PeakToId(Peaks peak)
     {
         return (int)peak + peakOffset;
+    }
+
+    public static int BookToId(Books book)
+    {
+        return (int)book + bookOffset;
+    }
+
+    public static Peaks IdtoPeak(long id)
+    {
+        return (Peaks)(id - peakOffset);
+    }
+
+    public static Ropes IdtoRope(long id)
+    {
+        return (Ropes)(id - ropeOffset);
+    }
+
+    public static Artefacts IdtoArtefact(long id)
+    {
+        return (Artefacts)(id - artefactOffset);
+    }
+
+    public static ExtraItems IdToExtraItem(long id)
+    {
+        return (ExtraItems)(id - extraItemOffset);
     }
 }

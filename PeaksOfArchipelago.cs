@@ -102,7 +102,7 @@ public class PeaksOfArchipelagoMod : ModClass
         static void Postfix(ArtefactOnPeak __instance)
         {
             Artefacts artefact = session.CompleteArtefactCheck(__instance);
-            SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.GetLocationFromArtefact(artefact));
+            SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.ArtefactToId(artefact));
             UnityUtils.SetArtefactText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName + " uwu");
         }
     }
@@ -113,7 +113,7 @@ public class PeaksOfArchipelagoMod : ModClass
         static void Prefix(RopeCollectable __instance)
         {
             Ropes rope = session.CompleteRopeCheck(__instance);
-            SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.GetLocationFromRope(rope));
+            SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.RopeToId(rope));
             UnityUtils.SetRopeText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
         }
     }
