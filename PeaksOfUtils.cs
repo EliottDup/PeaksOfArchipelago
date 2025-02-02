@@ -47,12 +47,71 @@ public enum Artefacts
     Belt,
     Pants,
     Underwear,
-    ClimberStatue0,
+    ClimberStatue0
 }
 
 public enum Peaks
 {
+    GreenhornsTop,
+    PaltryPeak,
+    OldMill,
+    GrayGully,
+    Lighthouse,
+    OldManOfSjor,
+    GiantsShelf,
+    EvergreensEnd,
+    TheTwins,
+    OldGrovesSkelf,
+    LandsEnd,
+    HangmansLeap,
+    OldLangr,
+    AldrGrotto,
+    ThreeBrothers,
+    WaltersCrag,
+    GreatCrevice,
+    OldHagger,
+    UgsomeStorr,
+    WutheringCrest,
+    PortersBoulders,
+    JotunnsThumb,
+    OldSkerry,
+    HamarrStone,
+    GiantsNose,
+    WaltersBoulder,
+    SunderedSons,
+    OldWealdsBoulder,
+    LeaningSpire,
+    Cromlech,
+    WalkersPillar,
+    Eldenhorn,
+    GreatGaol,
+    StHaelga,
+    YmirsShadow,
+    IceWaterFallDemo,
+    GreatBulwark,
+    SolemnTempest
+}
 
+public enum Books
+{
+    Fundamentals,
+    Intermediate,
+    Advanced,
+    Expert
+}
+
+public enum ExtraItems
+{
+    ExtraRope,
+    ExtraChalk,
+    ExtraCoffee,
+    ExtraSeed
+}
+
+struct SimpleItemInfo
+{
+    public string playerName;
+    public string itemName;
 }
 
 class CheckList<T> where T : struct, Enum   // I would use enum flags, but they be a bit funny sometimes so no.
@@ -115,11 +174,20 @@ class CheckList<T> where T : struct, Enum   // I would use enum flags, but they 
 
 }
 
+
 public static class Utils
 {
     private static int peakOffset = 0;
-    private static int ropeOffset = Enum.GetValues(typeof(Peaks)).Length;
-    private static int artefactOffset = ropeOffset + Enum.GetValues(typeof(Ropes)).Length;
+    private static int ropeOffset = 100;
+    private static int artefactOffset = 200;
+    private static int bookOffset = 300;
+    private static int extraItemOffset = 400;
+
+    public static Peaks GetPeakFromCollectable(StamperPeakSummit peakStamper)
+    {
+        return (Peaks)(peakStamper.peakNames - 1);
+    }
+
     public static Ropes GetRopeFromCollectable(RopeCollectable ropeCollectable)
     {
         if (!ropeCollectable.isSingleRope)
@@ -133,19 +201,24 @@ public static class Utils
         throw new Exception("unknown rope");
     }
 
-    public static int GetLocationFromRope(Ropes rope)
-    {
-        return (int)rope + ropeOffset;
-    }
-
     public static Artefacts GetArtefactFromCollectable(ArtefactOnPeak artefactOnPeak)
     {
         int v = (int)artefactOnPeak.peakArtefact - 1;
-        return Artefacts.Hat1;
+        return (Artefacts)v;
     }
 
     public static int GetLocationFromArtefact(Artefacts artefact)
     {
         return (int)artefact + artefactOffset;
+    }
+
+    public static int GetLocationFromRope(Ropes rope)
+    {
+        return (int)rope + ropeOffset;
+    }
+
+    public static int GetLocationFromPeak(Peaks peak)
+    {
+        return (int)peak + peakOffset;
     }
 }
