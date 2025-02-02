@@ -4,20 +4,27 @@ namespace PeaksOfArchipelago;
 
 class PlayerData
 {
-    class Checks
+    public class Locations
     {
-        private CheckList<Ropes> ropes = new CheckList<Ropes>();
-        private CheckList<Artefacts> artefacts = new();
-        private CheckList<Peaks> peaks = new();
+        public CheckList<Ropes> ropes = new();
+        public CheckList<Artefacts> artefacts = new();
+        public CheckList<Peaks> peaks = new();
     }
 
-    class Items
+    public class Items
     {
+        public CheckList<Ropes> ropes = new();
+        public CheckList<Artefacts> artefacts = new();
+        public CheckList<Books> books = new();
 
+        public int extraropeItemCount = 0;
+        public int extraChalkItemCount = 0;
+        public int extraCoffeeItemCount = 0;
+        public int extraSeedItemCount = 0;
     }
 
-    Checks checks = new();
-    Items items = new();
+    public Locations locations = new();
+    public Items items = new();
 
 }
 

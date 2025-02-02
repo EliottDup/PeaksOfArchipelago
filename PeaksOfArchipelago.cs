@@ -11,6 +11,10 @@ using Archipelago.MultiClient.Net;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using UnityEngine.TextCore;
+using UnityEngine.UI;
+using Archipelago.MultiClient.Net.Models;
 
 namespace PeaksOfArchipelago;
 
@@ -41,12 +45,15 @@ public class PeaksOfArchipelagoMod : ModClass
     [Editable] public UnityEvent Connect { get; set; } = new UnityEvent();
 
     Harmony harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
+    PlayerData playerData;
 
+    public static bool blockTextVis = false;
     private static POASession session;
 
     public override void OnEnabled()    // Runs when the mod is enabled, and completely at the start
     {
-        session = new POASession();
+        playerData = new PlayerData();
+        session = new POASession(playerData);
         harmony.PatchAll();
         Connect.AddListener(OnConnect);
         if (AutoConnect)
@@ -83,15 +90,31 @@ public class PeaksOfArchipelagoMod : ModClass
     [HarmonyPatch(typeof(StamperPeakSummit), "StampJournal")]
     public class PeakSummitedPatch
     {
-        static void Prefix(StamperPeakSummit __instance)
-        {
-            Debug.Log("stamping: " + __instance.peakNames.ToString());
-
-        }
-
         static void Postfix(StamperPeakSummit __instance)
         {
-            Debug.Log("done stamping: " + __instance.peakNames.ToString());
+            Peaks peak = session.CompletePeakCheck(__instance);
+        }
+    }
+
+    [HarmonyPatch(typeof(ArtefactOnPeak), "PickUpItem")]
+    public class ArtefactOnPeakPatch
+    {
+        static void Postfix(ArtefactOnPeak __instance)
+        {
+            Artefacts artefact = session.CompleteArtefactCheck(__instance);
+            SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.GetLocationFromArtefact(artefact));
+            UnityUtils.SetArtefactText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName + " uwu");
+        }
+    }
+
+    [HarmonyPatch(typeof(RopeCollectable), "PickUpRope")]
+    public class RopeCollectablePatch
+    {
+        static void Prefix(RopeCollectable __instance)
+        {
+            Ropes rope = session.CompleteRopeCheck(__instance);
+            SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.GetLocationFromRope(rope));
+            UnityUtils.SetRopeText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
         }
     }
 
@@ -110,26 +133,23 @@ public class PeaksOfArchipelagoMod : ModClass
         static void Postfix(EnterPeakScene __instance)
         {
             Debug.Log("Entering: " + GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString());
+
+            Debug.Log("texts:");
+            foreach (Text text in GameObject.FindObjectsOfType<Text>())  //Leaving this in case some text is ever misbehaving
+            {
+                if (text.gameObject.name != "txt") continue;
+                Debug.Log("TextMesh: " + text.gameObject.name + " : " + text.text);
+                Debug.Log(text.transform.parent.name);
+                foreach (Transform child in text.transform.parent)
+                {
+                    Debug.Log("    " + child.name);
+                }
+            }
         }
     }
 
-    [HarmonyPatch(typeof(ArtefactOnPeak), "PickUpItem")]
-    public class ArtefactOnPeakPatch
-    {
-        static void Postfix(ArtefactOnPeak __instance)
-        {
-            session.CompleteArtefactCheck(__instance);
-        }
-    }
-
-    [HarmonyPatch(typeof(RopeCollectable), "PickUpRope")]
-    public class RopeCollectablePatch
-    {
-        static void Postfix(RopeCollectable __instance)
-        {
-            session.CompleteRopeCheck(__instance);
-        }
-    }
+    //------------------------- Harmony Transpilers -------------------------
+    //! THESE ARE THE THINGS THAT MIGHT BREAK WHEN UPDATING THE GAME!!
 
     [HarmonyPatch(typeof(RopeAnchor), "Start")]
     public class StartTranspiler
@@ -149,11 +169,6 @@ public class PeaksOfArchipelagoMod : ModClass
             }
         }
     }
-
-
-
-    //------------------------- Harmony Transpilers -------------------------
-    //! THESE ARE THE THINGS THAT MIGHT BREAK WHEN UPDATING THE GAME!!
 
     [HarmonyPatch(typeof(RopeAnchor), "DetachThenAttachToNew", MethodType.Enumerator)]
     public class DetachThenAttachToNewTranspiler
