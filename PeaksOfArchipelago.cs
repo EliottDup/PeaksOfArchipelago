@@ -1,5 +1,4 @@
 ﻿using BepInEx;
-using System;
 using POKModManager;
 
 using UnityEngine.Events;
@@ -7,14 +6,10 @@ using UnityEngine;
 using BepInEx.Logging;
 
 using HarmonyLib;
-using Archipelago.MultiClient.Net;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using UnityEngine.TextCore;
 using UnityEngine.UI;
-using Archipelago.MultiClient.Net.Models;
+using System.Collections;
 
 namespace PeaksOfArchipelago;
 
@@ -47,7 +42,6 @@ public class PeaksOfArchipelagoMod : ModClass
     Harmony harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
     PlayerData playerData;
 
-    public static bool blockTextVis = false;
     private static POASession session;
 
     public override void OnEnabled()    // Runs when the mod is enabled, and completely at the start
@@ -112,9 +106,26 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static void Prefix(RopeCollectable __instance)
         {
+            Debug.Log("prefixing");
             Ropes rope = session.CompleteRopeCheck(__instance);
             SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.RopeToId(rope));
             UnityUtils.SetRopeText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+        }
+
+        static void Postfix(ref IEnumerator __result, RopeCollectable __instance)
+        {
+            __result = MyWrapper(__result, __instance);
+        }
+
+        static IEnumerator MyWrapper(IEnumerator original, RopeCollectable __instance)
+        {
+            while (original.MoveNext())
+            {
+                yield return original.Current;
+            }
+
+            UnityUtils.UndoRopeProgress(__instance);
+            yield return null;
         }
     }
 
@@ -124,6 +135,16 @@ public class PeaksOfArchipelagoMod : ModClass
         static void Postfix()
         {
             session.HandleDeath();
+        }
+    }
+
+    [HarmonyPatch(typeof(ArtefactLoaderCabin), "Start")]
+    public class ArtefactLoaderPatch
+    {
+        public static bool Prefix(ArtefactLoaderCabin __instance)
+        {
+            session.LoadArtefacts(__instance);
+            return false;   // stop normal execution of LoadArtefacts
         }
     }
 

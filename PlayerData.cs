@@ -1,5 +1,3 @@
-using System;
-
 namespace PeaksOfArchipelago;
 
 class PlayerData
@@ -25,6 +23,5 @@ class PlayerData
 
     public Locations locations = new();
     public Items items = new();
-
 }
 

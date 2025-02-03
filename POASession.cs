@@ -1,30 +1,22 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
-using Archipelago.MultiClient.Net.Packets;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace PeaksOfArchipelago;
 
-class POASession
+class POASession(PlayerData playerData)
 {
     ArchipelagoSession session;
     DeathLinkService deathLinkService;
     bool playerKilled = false;
     Dictionary<long, ScoutedItemInfo> scoutedItems;
-    PlayerData playerData;
-
-    public POASession(PlayerData playerData)
-    {
-        this.playerData = playerData;
-    }
+    readonly PlayerData playerData = playerData;
 
     public bool Connect(string uri, string SlotName, string Password)
     {
@@ -109,29 +101,26 @@ class POASession
 
     public Ropes CompleteRopeCheck(RopeCollectable ropeCollectable)
     {
-        if (session == null) return (Ropes)(-1);
 
         Ropes rope = Utils.GetRopeFromCollectable(ropeCollectable);
-        session.Locations.CompleteLocationChecks(Utils.RopeToId(rope));  // send check complete to multiworld
 
         playerData.locations.ropes.SetCheck(rope, true);                            // save rope check
+        Debug.Log("Completing rope " + rope.ToString());
 
-        Debug.Log("Completing rope " + rope.ToString());    // TODO: BLOCK UNLOCKING OF ROPE IN-GAME
-        Debug.Log("TODO: Block rope pick up in-game");
+        if (session == null) return (Ropes)(-1);
+        session.Locations.CompleteLocationChecks(Utils.RopeToId(rope));  // send check complete to multiworld
         return rope;
     }
 
     public Artefacts CompleteArtefactCheck(ArtefactOnPeak artefactOnPeak)
     {
-        if (session == null) return (Artefacts)(-1);
-
         Artefacts artefact = Utils.GetArtefactFromCollectable(artefactOnPeak);
-        session.Locations.CompleteLocationChecks(Utils.ArtefactToId(artefact));
-
+        Debug.Log("Completing artefact " + artefact.ToString());
         playerData.locations.artefacts.SetCheck(artefact, true);
 
-        Debug.Log("Completing artefact " + artefact.ToString());    // TODO: BLOCK UNLOCKING OF ARTEFACT IN-GAME
-        Debug.Log("TODO: Block artefact pick up in-game");
+        if (session == null) return (Artefacts)(-1);
+        session.Locations.CompleteLocationChecks(Utils.ArtefactToId(artefact));
+
         return artefact;
     }
 
@@ -147,5 +136,26 @@ class POASession
         Debug.Log("Completing peak " + peak.ToString());
         // DONE!
         return peak;
+    }
+
+    internal void LoadArtefacts(ArtefactLoaderCabin instance)
+    {
+        CheckList<Artefacts> savestate = new();
+        foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
+        {
+            Debug.Log("setting " + artefact + " to " + playerData.items.artefacts.IsChecked(artefact));
+
+            savestate.SetCheck(artefact, UnityUtils.GetGameManagerArtefactCollected(artefact));
+            UnityUtils.SetGameManagerArtefactCollected(artefact, playerData.items.artefacts.IsChecked(artefact));
+        }
+        Debug.Log("loading Artefacts");
+        instance.LoadArtefacts();
+        Debug.Log("loaded Artefacts");
+
+        foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
+        {
+            Debug.Log("resetting " + artefact + " to " + savestate.IsChecked(artefact));
+            UnityUtils.SetGameManagerArtefactCollected(artefact, savestate.IsChecked(artefact));    // reset gamemanager to default state
+        }
     }
 }
