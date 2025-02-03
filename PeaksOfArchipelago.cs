@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
+using System.Linq;
 
 namespace PeaksOfArchipelago;
 
@@ -97,7 +98,7 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             Artefacts artefact = session.CompleteArtefactCheck(__instance);
             SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.ArtefactToId(artefact));
-            UnityUtils.SetArtefactText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName + " uwu");
+            UnityUtils.SetArtefactText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
         }
     }
 
@@ -148,6 +149,86 @@ public class PeaksOfArchipelagoMod : ModClass
         }
     }
 
+    [HarmonyPatch(typeof(NPCEvents), "CheckProgress")]
+    public class CheckProgressPatch
+    {
+        public static void Postfix(NPCEvents __instance)
+        {
+            ItemEventsPatch.isCustomEvent = false;
+            if (session.recievedItems.Length != 0 && !__instance.runningEvent)
+            {
+                ItemEventsPatch.isCustomEvent = true;
+                __instance.eventName = "AllArtefacts";
+                __instance.StartCoroutine("GlowDoorEvent");
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(NPCEvents), "ItemEvents")]
+    public class ItemEventsPatch
+    {
+        public static bool isCustomEvent;
+        static bool hasAllArtefacts = false;
+        static string tempText = "";
+        static Text textElement;
+        static void Prefix(NPCEvents __instance)
+        {
+            hasAllArtefacts = GameManager.control.allArtefactsUnlocked;
+            Text text = __instance.allArtefactsInfo.GetComponentInChildren<Text>();
+            tempText = text.text;
+            textElement = text;
+
+            string msg = "You got: ";
+
+            long last = session.recievedItems.Last();
+            foreach (long id in session.recievedItems)
+            {
+                Debug.Log("id: " + id + " belongs to item: " + Utils.GetNameById(id));
+                msg += Utils.GetNameById(id);
+                if (id != last)
+                {
+                    msg += ", ";
+                }
+            }
+            text.text = msg;
+        }
+
+        static void Postfix(ref IEnumerator __result, NPCEvents __instance)
+        {
+            __result = MyWrapper(__result, __instance);
+        }
+
+        static IEnumerator MyWrapper(IEnumerator original, NPCEvents __instance)
+        {
+            while (original.MoveNext())
+            {
+                yield return original.Current;
+            }
+
+            if (isCustomEvent)
+            {
+                isCustomEvent = false;  //reset to what they were before
+                GameManager.control.allArtefactsUnlocked = hasAllArtefacts;
+                GameManager.control.ropesCollected -= 5;
+                GameManager.control.extraCoffeeUses -= 999999999;
+                GameManager.control.extraChalkUses -= 999999999;
+                textElement.text = tempText;
+
+
+                long[] items = session.recievedItems;
+                session.recievedItems = [];
+                foreach (long id in items)
+                {
+                    session.UnlockById(id);
+                }
+                foreach (RopeCabinDescription ropeCabinDescription in GameObject.FindObjectsOfType<RopeCabinDescription>())
+                    ropeCabinDescription.UpdateCoffeeChalk();
+                GameObject.FindObjectOfType<ArtefactLoaderCabin>()?.LoadArtefacts();
+            }
+            yield return null;
+        }
+    }
+
     [HarmonyPatch(typeof(EnterPeakScene), "Awake")]
     public class EnterPeakScenePatch
     {
@@ -190,6 +271,27 @@ public class PeaksOfArchipelagoMod : ModClass
             }
         }
     }
+
+
+    // [HarmonyPatch(typeof(NPCEvents), "ItemEvents", MethodType.Enumerator)]
+    // public class ItemEventsTranspiler
+    // {
+    //     static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    //     {
+    //         CodeMatcher codeMatcher = new CodeMatcher(instructions);
+    //         codeMatcher.Start().MatchForward(false,
+    //             new CodeMatch(OpCodes.Br_S, 445)
+    //         ).Repeat(
+    //             matcher =>
+    //                 matcher.;
+    //         );
+    //         // .MatchForward(false,
+
+    //         //     new CodeMatch(OpCodes.Ldloc_1),
+    //         //     new CodeMatch(i => i.opcode == OpCodes.Ldloc_1)
+    //         // );
+    //     }
+    // }
 
     [HarmonyPatch(typeof(RopeAnchor), "DetachThenAttachToNew", MethodType.Enumerator)]
     public class DetachThenAttachToNewTranspiler

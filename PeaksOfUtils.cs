@@ -170,11 +170,11 @@ class CheckList<T> where T : struct, Enum   // I would use enum flags, but they 
 public static class Utils
 {
     //id offsets (surely 100 is enough)
-    private const int peakOffset = 0;
-    private const int ropeOffset = 100;
-    private const int artefactOffset = 200;
-    private const int bookOffset = 300;
-    private const int extraItemOffset = 400;
+    public const int peakOffset = 0;
+    public const int ropeOffset = 100;
+    public const int artefactOffset = 200;
+    public const int bookOffset = 300;
+    public const int extraItemOffset = 400;
 
     public readonly static Dictionary<Artefacts, string> artefactToVariableName = new()
     {
@@ -263,5 +263,27 @@ public static class Utils
     public static ExtraItems IdToExtraItem(long id)
     {
         return (ExtraItems)(id - extraItemOffset);
+    }
+
+    public static Books IdToBook(long id)
+    {
+        return (Books)(id - bookOffset);
+    }
+
+    public static string GetNameById(long id)
+    {
+        if (id < Utils.artefactOffset)
+        {
+            return IdtoRope(id).ToString();
+        }
+        if (id < Utils.bookOffset)
+        {
+            return IdtoArtefact(id).ToString();
+        }
+        if (id < Utils.extraItemOffset)
+        {
+            return IdToBook(id).ToString();
+        }
+        return IdToExtraItem(id).ToString();
     }
 }

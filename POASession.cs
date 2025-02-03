@@ -18,6 +18,8 @@ class POASession(PlayerData playerData)
     Dictionary<long, ScoutedItemInfo> scoutedItems;
     readonly PlayerData playerData = playerData;
 
+    public long[] recievedItems = [];
+
     public bool Connect(string uri, string SlotName, string Password)
     {
         session = ArchipelagoSessionFactory.CreateSession(uri);
@@ -143,10 +145,9 @@ class POASession(PlayerData playerData)
         CheckList<Artefacts> savestate = new();
         foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
         {
-            Debug.Log("setting " + artefact + " to " + playerData.items.artefacts.IsChecked(artefact));
-
             savestate.SetCheck(artefact, UnityUtils.GetGameManagerArtefactCollected(artefact));
             UnityUtils.SetGameManagerArtefactCollected(artefact, playerData.items.artefacts.IsChecked(artefact));
+            UnityUtils.SetGameManagerArtefactDirty(artefact, false);
         }
         Debug.Log("loading Artefacts");
         instance.LoadArtefacts();
@@ -154,8 +155,104 @@ class POASession(PlayerData playerData)
 
         foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
         {
-            Debug.Log("resetting " + artefact + " to " + savestate.IsChecked(artefact));
             UnityUtils.SetGameManagerArtefactCollected(artefact, savestate.IsChecked(artefact));    // reset gamemanager to default state
         }
+    }
+
+    internal string UnlockById(long id)
+    {
+        if (id < Utils.artefactOffset)
+        {
+            Ropes rope = Utils.IdtoRope(id);
+            UnlockRope(rope);
+            return rope.ToString();
+        }
+        if (id < Utils.bookOffset)
+        {
+            Artefacts artefact = Utils.IdtoArtefact(id);
+            UnlockArtefact(artefact);
+            return artefact.ToString();
+        }
+        if (id < Utils.extraItemOffset)
+        {
+            Books book = Utils.IdToBook(id);
+            UnlockBook(book);
+            return book.ToString();
+        }
+        ExtraItems extraItem = Utils.IdToExtraItem(id);
+        UnlockExtraItem(extraItem);
+        return extraItem.ToString();
+    }
+
+    private void UnlockRope(Ropes rope)
+    {
+        playerData.items.ropes.SetCheck(rope, true);
+        GameManager.control.rope = true;
+        if (rope < Ropes.ExtraFirst)
+        {
+            GameManager.control.ropesCollected++;
+        }
+        else
+        {
+            GameManager.control.ropesCollected += 2;
+        }
+        GameManager.control.Save();
+    }
+
+    private void UnlockArtefact(Artefacts artefact)
+    {
+        playerData.items.artefacts.SetCheck(artefact, true);
+        UnityUtils.SetGameManagerArtefactCollected(artefact, true);
+        // UnityUtils.SetGameManagerArtefactDirty(artefact, true);
+        GameObject.FindObjectOfType<ArtefactLoaderCabin>()?.LoadArtefacts();
+        GameManager.control.Save();
+    }
+
+    private void UnlockBook(Books book)
+    {
+        playerData.items.books.SetCheck(book, true);
+        NPCEvents npcEvents = GameObject.FindObjectOfType<NPCEvents>();
+        switch (book)
+        {
+            case Books.Intermediate:
+                GameManager.control.category_2_unlocked = true;
+                npcEvents.cabin_Category2.SetActive(true);
+                break;
+            case Books.Advanced:
+                GameManager.control.category_3_unlocked = true;
+                npcEvents.cabin_Category3.SetActive(true);
+                break;
+            case Books.Expert:
+                GameManager.control.category_4_unlocked = true;
+                npcEvents.cabinIceaxes.SetActive(true);
+                GameManager.control.iceAxes = true;
+                npcEvents.category4Ticket.StartCoroutine("GlowTicket");
+                break;
+        }
+        GameManager.control.Save();
+    }
+
+    private void UnlockExtraItem(ExtraItems extraItem)
+    {
+        switch (extraItem)
+        {
+            case ExtraItems.ExtraRope:
+                playerData.items.extraropeItemCount++;
+                GameManager.control.ropesCollected++;
+                break;
+            case ExtraItems.ExtraCoffee:
+                playerData.items.extraCoffeeItemCount++;
+                GameManager.control.extraCoffeeUses++;
+                break;
+            case ExtraItems.ExtraChalk:
+                playerData.items.extraChalkItemCount++;
+                GameManager.control.extraChalkUses++;
+                break;
+            case ExtraItems.ExtraSeed:
+                playerData.items.extraSeedItemCount++;
+                GameManager.control.extraBirdSeedUses++;
+                break;
+        }
+        GameManager.control.Save();
     }
 }

@@ -41,12 +41,6 @@ static class UnityUtils
         }
     }
 
-    internal static void UndoArtefactProgress(ArtefactOnPeak instance)
-    {   //BEHOLD: THE ABOMINATION hang on maybe not
-        Artefacts artefact = Utils.GetArtefactFromCollectable(instance);
-
-    }
-
     internal static void LoadArtefacts(ArtefactLoaderCabin instance)
     {
         // foreach (Artefacts artefact in )
@@ -56,6 +50,18 @@ static class UnityUtils
     public static void SetGameManagerArtefactCollected(Artefacts artefact, bool value)
     {
         string fieldname = "hasArtefact_" + Utils.artefactToVariableName[artefact];
+        FieldInfo field = typeof(GameManager).GetField(fieldname, BindingFlags.Instance | BindingFlags.Public);
+        if (field != null && field.FieldType == typeof(bool))
+        {
+            field.SetValue(GameManager.control, value);
+            return;
+        }
+        throw new Exception("No boolean field " + fieldname + "found in GameManager");
+    }
+
+    public static void SetGameManagerArtefactDirty(Artefacts artefact, bool value)
+    {
+        string fieldname = "artefact_" + Utils.artefactToVariableName[artefact] + "_IsDirty";
         FieldInfo field = typeof(GameManager).GetField(fieldname, BindingFlags.Instance | BindingFlags.Public);
         if (field != null && field.FieldType == typeof(bool))
         {
