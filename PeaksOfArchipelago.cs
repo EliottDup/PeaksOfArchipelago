@@ -67,6 +67,7 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         // DO NOT PUT GAMEMANAGER.SAVE HERE IT FUCKED UP MY SAVES LOL
         Debug.Log("Now in scene: " + SceneManager.GetActiveScene().name);
+        session.currentScene = SceneManager.GetActiveScene().name;
     }
 
     private string GetUri()
@@ -155,7 +156,7 @@ public class PeaksOfArchipelagoMod : ModClass
         public static void Postfix(NPCEvents __instance)
         {
             ItemEventsPatch.isCustomEvent = false;
-            if (session.recievedItems.Length != 0 && !__instance.runningEvent)
+            if (session.recievedItems.Length != 0 && !__instance.runningEvent && session.currentScene != "TitleScreen")
             {
                 ItemEventsPatch.isCustomEvent = true;
                 __instance.eventName = "AllArtefacts";
@@ -236,17 +237,30 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             Debug.Log("Entering: " + GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString());
 
-            Debug.Log("texts:");
-            foreach (Text text in GameObject.FindObjectsOfType<Text>())  //Leaving this in case some text is ever misbehaving
-            {
-                if (text.gameObject.name != "txt") continue;
-                Debug.Log("TextMesh: " + text.gameObject.name + " : " + text.text);
-                Debug.Log(text.transform.parent.name);
-                foreach (Transform child in text.transform.parent)
-                {
-                    Debug.Log("    " + child.name);
-                }
-            }
+            // Debug.Log("texts:");
+            // foreach (Text text in GameObject.FindObjectsOfType<Text>())  //Leaving this in case some text is ever misbehaving
+            // {
+            //     if (text.gameObject.name != "txt") continue;
+            //     Debug.Log("TextMesh: " + text.gameObject.name + " : " + text.text);
+            //     Debug.Log(text.transform.parent.name);
+            //     foreach (Transform child in text.transform.parent)
+            //     {
+            //         Debug.Log("    " + child.name);
+            //     }
+            // }
+        }
+    }
+
+    [HarmonyPatch(typeof(StatsAndAchievements), "SetAchievement")]
+    [HarmonyPatch(typeof(StatsAndAchievements), "SetStatFloat")]
+    [HarmonyPatch(typeof(StatsAndAchievements), "SetStatInt")]
+    [HarmonyPatch(typeof(StatsAndAchievements), "ResetStatsAndAchievements")]
+    public class SetAchievementPatch
+    {
+        static bool Prefix()
+        {
+            Debug.Log("Game wants to do something with achievements, but we blocking that shit");
+            return false;
         }
     }
 

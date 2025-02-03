@@ -6,6 +6,7 @@ using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
+using HarmonyLib;
 using UnityEngine;
 
 namespace PeaksOfArchipelago;
@@ -19,6 +20,7 @@ class POASession(PlayerData playerData)
     readonly PlayerData playerData = playerData;
 
     public long[] recievedItems = [];
+    public string currentScene;
 
     public bool Connect(string uri, string SlotName, string Password)
     {
@@ -30,9 +32,9 @@ class POASession(PlayerData playerData)
             return false;
         }
 
-        session.Items.ItemReceived += (item) =>
+        session.Items.ItemReceived += (helper) =>
         {
-            // ITEM LOGIC
+            recievedItems.AddItem(helper.PeekItem().ItemId);
         };
 
         deathLinkService = session.CreateDeathLinkService();
@@ -45,7 +47,7 @@ class POASession(PlayerData playerData)
             KillPlayer();
         };
 
-        //TODO: implement loading of data: rope count etc
+        // TODO: implement loading of data: rope count etc
         //! WARNING: THIS SHOULD BE DONE WHEN ENTERING THE CABIN SCENE, DOING SO EARLIER THAN THAT *WILL* FUCK UP SAVES
         return result.Successful;
     }
