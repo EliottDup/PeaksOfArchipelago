@@ -44,9 +44,6 @@ public enum Artefacts
     Photograph_3,
     Photograph_4,
     PhotographFrame,
-    Belt,
-    Pants,
-    Underwear,
     ClimberStatue0
 }
 
@@ -116,32 +113,35 @@ struct SimpleItemInfo
 
 class CheckList<T> where T : struct, Enum   // I would use enum flags, but they be a bit funny sometimes so no.
 {
-    private readonly bool[] checks;
+    private readonly Dictionary<T, bool> checks;
 
-    public CheckList()
+    public CheckList(bool value = false)
     {
-        checks = new bool[Enum.GetNames(typeof(T)).Length];
+        checks = [];
+        foreach (T entry in Enum.GetValues(typeof(T)))
+        {
+            checks.Add(entry, value);
+        }
     }
 
     public void SetCheck(T value, bool check)
     {
-        checks[GetIndex(value)] = check;
+        checks[value] = check;
     }
 
     public bool IsChecked(T value)
     {
-        return checks[GetIndex(value)];
+        return checks[value];
     }
 
     public T[] GetUncheckedValues()
     {
-        T[] enumValues = (T[])Enum.GetValues(typeof(T));
         List<T> values = [];
-        for (int i = 0; i < checks.Length; i++)
+        foreach (T entry in Enum.GetValues(typeof(T)))
         {
-            if (!checks[i])
+            if (!checks[entry])
             {
-                values.Add(enumValues[i]);
+                values.Add(entry);
             }
         }
         return [.. values];
@@ -149,29 +149,21 @@ class CheckList<T> where T : struct, Enum   // I would use enum flags, but they 
 
     public T[] GetCheckedValues()
     {
-        T[] enumValues = (T[])Enum.GetValues(typeof(T));
         List<T> values = [];
-        for (int i = 0; i < checks.Length; i++)
+        foreach (T entry in Enum.GetValues(typeof(T)))
         {
-            if (checks[i])
+            if (checks[entry])
             {
-                values.Add(enumValues[i]);
+                values.Add(entry);
             }
         }
         return [.. values];
     }
 
-    public bool[] GetChecks()
+    public Dictionary<T, bool> GetChecks()
     {
         return checks;
     }
-
-    private int GetIndex(T value)
-    {
-        T[] values = (T[])Enum.GetValues(typeof(T));
-        return Array.IndexOf(values, value);
-    }
-
 }
 
 
@@ -183,6 +175,30 @@ public static class Utils
     private const int artefactOffset = 200;
     private const int bookOffset = 300;
     private const int extraItemOffset = 400;
+
+    public readonly static Dictionary<Artefacts, string> artefactToVariableName = new()
+    {
+        {Artefacts.Hat1, "Hat1"},
+        {Artefacts.Hat2, "Hat2"},
+        {Artefacts.Helmet, "Helmet"},
+        {Artefacts.Shoe, "Shoe"},
+        {Artefacts.Shovel, "Shovel"},
+        {Artefacts.Sleepingbag, "Sleepingbag"},
+        {Artefacts.Backpack, "Backpack"},
+        {Artefacts.Coffebox_1, "Coffeebox1"},
+        {Artefacts.Coffebox_2, "Coffeebox2"},
+        {Artefacts.Chalkbox_1, "Chalkbox1"},
+        {Artefacts.Chalkbox_2, "Chalkbox2"},
+        {Artefacts.ClimberStatue1, "Statue1"},
+        {Artefacts.ClimberStatue2, "Statue2"},
+        {Artefacts.ClimberStatue3, "Statue3"},
+        {Artefacts.Photograph_1, "Photograph1"},
+        {Artefacts.Photograph_2, "Photograph2"},
+        {Artefacts.Photograph_3, "Photograph3"},
+        {Artefacts.Photograph_4, "Photograph4"},
+        {Artefacts.PhotographFrame, "PhotographFrame"},
+        {Artefacts.ClimberStatue0, "Statue0"}
+    };
 
     public static Peaks GetPeakFromCollectable(StamperPeakSummit peakStamper)
     {
