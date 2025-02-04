@@ -245,6 +245,11 @@ public static class Utils
         return (int)book + bookOffset;
     }
 
+    public static int ExtraItemToId(ExtraItems extraItem)
+    {
+        return (int)extraItem + extraItemOffset;
+    }
+
     public static Peaks IdtoPeak(long id)
     {
         return (Peaks)(id - peakOffset);

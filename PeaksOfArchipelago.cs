@@ -56,6 +56,25 @@ public class PeaksOfArchipelagoMod : ModClass
             OnConnect();
         }
         Debug.Log("Loaded Peaks of Archipelago!");
+        // foreach (Ropes rope in Enum.GetValues(typeof(Ropes)))
+        // {
+        //     Debug.Log($"\"{rope.ToString()}\": PeaksOfYoreItemData(\"Rope\", rope_offset + {(int)rope}, ItemClassification.filler, 1),");
+        // }
+
+        // foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
+        // {
+        //     Debug.Log($"\"{artefact.ToString()}\": PeaksOfYoreItemData(\"Artefact\", artefact_offset + {(int)(artefact)}, ItemClassification.filler, 1),");
+        // }
+
+        // foreach (Books books in Enum.GetValues(typeof(Books)))
+        // {
+        //     Debug.Log($"\"{books.ToString()}\": PeaksOfYoreItemData(\"Book\", book_offset + {(int)(books)}, ItemClassification.filler, 1),");
+        // }
+
+        // foreach (ExtraItems extraItem in Enum.GetValues(typeof(ExtraItems)))
+        // {
+        //     Debug.Log($"\"{extraItem.ToString()}\": PeaksOfYoreItemData(\"Extra\", extra_item_offset + {(int)(extraItem)}, ItemClassification.filler, -1),");
+        // }
     }
 
     public override void OnDisabled()
