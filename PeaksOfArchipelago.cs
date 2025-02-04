@@ -5,12 +5,15 @@ using UnityEngine.Events;
 using UnityEngine;
 using BepInEx.Logging;
 
+using Steamworks;
 using HarmonyLib;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 using System.Linq;
+using System;
+using System.Reflection;
 
 namespace PeaksOfArchipelago;
 
@@ -56,21 +59,19 @@ public class PeaksOfArchipelagoMod : ModClass
             OnConnect();
         }
         Debug.Log("Loaded Peaks of Archipelago!");
+
         // foreach (Ropes rope in Enum.GetValues(typeof(Ropes)))
         // {
         //     Debug.Log($"\"{rope.ToString()}\": PeaksOfYoreItemData(\"Rope\", rope_offset + {(int)rope}, ItemClassification.filler, 1),");
         // }
-
         // foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
         // {
         //     Debug.Log($"\"{artefact.ToString()}\": PeaksOfYoreItemData(\"Artefact\", artefact_offset + {(int)(artefact)}, ItemClassification.filler, 1),");
         // }
-
         // foreach (Books books in Enum.GetValues(typeof(Books)))
         // {
         //     Debug.Log($"\"{books.ToString()}\": PeaksOfYoreItemData(\"Book\", book_offset + {(int)(books)}, ItemClassification.filler, 1),");
         // }
-
         // foreach (ExtraItems extraItem in Enum.GetValues(typeof(ExtraItems)))
         // {
         //     Debug.Log($"\"{extraItem.ToString()}\": PeaksOfYoreItemData(\"Extra\", extra_item_offset + {(int)(extraItem)}, ItemClassification.filler, -1),");
@@ -98,7 +99,6 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         session.Connect(GetUri(), SlotName, Password);
     }
-
 
     //------------------------- Harmony Patches -------------------------
 
@@ -159,13 +159,29 @@ public class PeaksOfArchipelagoMod : ModClass
         }
     }
 
-    [HarmonyPatch(typeof(ArtefactLoaderCabin), "Start")]
+    [HarmonyPatch(typeof(ArtefactLoaderCabin), "LoadArtefacts")]
     public class ArtefactLoaderPatch
     {
-        public static bool Prefix(ArtefactLoaderCabin __instance)
+        static CheckList<Artefacts> savestate = new();
+        public static void Prefix(ArtefactLoaderCabin __instance)
         {
-            session.LoadArtefacts(__instance);
-            return false;   // stop normal execution of LoadArtefacts
+            foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
+            {
+                savestate.SetCheck(artefact, UnityUtils.GetGameManagerArtefactCollected(artefact));
+                UnityUtils.SetGameManagerArtefactCollected(artefact, session.playerData.items.artefacts.IsChecked(artefact));
+                UnityUtils.SetGameManagerArtefactDirty(artefact, false);
+            }
+            Debug.Log("loading Artefacts");
+        }
+
+        public static void Postfix()
+        {
+            Debug.Log("loaded Artefacts");
+
+            foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
+            {
+                UnityUtils.SetGameManagerArtefactCollected(artefact, savestate.IsChecked(artefact));    // reset gamemanager to default state
+            }
         }
     }
 
@@ -174,12 +190,69 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         public static void Postfix(NPCEvents __instance)
         {
+            GameManager.control.monocular = session.playerData.items.monocular;
+
+            if (ItemEventsPatch.isCustomEvent || !__instance.runningEvent) return;
+            switch (__instance.eventName)
+            {
+                case "Rope":
+                case "RopesUpgrade":
+                case "ArtefactMap":
+                case "Pocketwatch":
+                case "Crampons":
+                case "CramponsUpgrade":
+                case "Chalkbag":
+                case "AllArtefacts":
+                case "TimeAttack_Event1":
+                case "Category_2":
+                case "Category_3":
+                case "Category_4":
+                case "Phonograph":
+                    {
+                        __instance.runningEvent = false;
+                        Debug.Log("Stopping: " + __instance.eventName);
+                        __instance.StopCoroutine("GlowDoorEvent");
+                        break;
+                    }
+            }
             ItemEventsPatch.isCustomEvent = false;
             if (session.recievedItems.Length != 0 && !__instance.runningEvent && session.currentScene != "TitleScreen")
             {
                 ItemEventsPatch.isCustomEvent = true;
                 __instance.eventName = "AllArtefacts";
                 __instance.StartCoroutine("GlowDoorEvent");
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(NPCEvents), "GivePlayerMonocular")]
+    public class GivePlayerMonocularPatch
+    {
+        public static void Postfix()
+        {
+            GameManager.control.monocular = session.playerData.items.monocular;
+            GameManager.control.Save();
+        }
+    }
+
+    [HarmonyPatch(typeof(NPCEvents), "GivePlayerRope")]
+    public class GivePlayerRopePatch
+    {
+        public static void Postfix(NPCEvents __instance)
+        {
+            bool isStHaelga = (bool)typeof(NPCEvents).GetField("isStHaelga", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(__instance);
+            bool isGreatGaol = (bool)typeof(NPCEvents).GetField("isGreatGaol", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(__instance);
+            if (isStHaelga)
+            {
+                session.CompleteRopeCheck(Ropes.StHaelgaGiven);
+                GameManager.control.ropesCollected--;
+                GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().anchorsInBackpack--;
+            }
+            if (isGreatGaol)
+            {
+                session.CompleteRopeCheck(Ropes.StHaelgaGiven);
+                GameManager.control.ropesCollected--;
+                GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().anchorsInBackpack--;
             }
         }
     }
@@ -274,6 +347,8 @@ public class PeaksOfArchipelagoMod : ModClass
     [HarmonyPatch(typeof(StatsAndAchievements), "SetStatFloat")]
     [HarmonyPatch(typeof(StatsAndAchievements), "SetStatInt")]
     [HarmonyPatch(typeof(StatsAndAchievements), "ResetStatsAndAchievements")]
+    [HarmonyPatch(typeof(SteamUserStats), "SetAchievement")]
+    [HarmonyPatch(typeof(SteamUserStats), "StoreStats")]
     public class SetAchievementPatch
     {
         static bool Prefix()
