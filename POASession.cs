@@ -17,7 +17,7 @@ class POASession(PlayerData playerData)
     DeathLinkService deathLinkService;
     bool playerKilled = false;
     Dictionary<long, ScoutedItemInfo> scoutedItems;
-    readonly PlayerData playerData = playerData;
+    public readonly PlayerData playerData = playerData;
 
     public long[] recievedItems = [];
     public string currentScene;
@@ -103,11 +103,8 @@ class POASession(PlayerData playerData)
         };
     }
 
-    public Ropes CompleteRopeCheck(RopeCollectable ropeCollectable)
+    public Ropes CompleteRopeCheck(Ropes rope)
     {
-
-        Ropes rope = Utils.GetRopeFromCollectable(ropeCollectable);
-
         playerData.locations.ropes.SetCheck(rope, true);                            // save rope check
         Debug.Log("Completing rope " + rope.ToString());
 
@@ -116,8 +113,20 @@ class POASession(PlayerData playerData)
         return rope;
     }
 
+    public Ropes CompleteRopeCheck(RopeCollectable ropeCollectable)
+    {
+
+        Ropes rope = Utils.GetRopeFromCollectable(ropeCollectable);
+
+        CompleteRopeCheck(rope);    // evil fake recursion
+        return rope;
+    }
+
     public Artefacts CompleteArtefactCheck(ArtefactOnPeak artefactOnPeak)
     {
+        this.recievedItems = [Utils.ArtefactToId(Artefacts.ClimberStatue3), Utils.BookToId(Books.Expert), Utils.RopeToId(Ropes.Extra10)];
+        KillPlayer();
+
         Artefacts artefact = Utils.GetArtefactFromCollectable(artefactOnPeak);
         Debug.Log("Completing artefact " + artefact.ToString());
         playerData.locations.artefacts.SetCheck(artefact, true);
@@ -152,7 +161,9 @@ class POASession(PlayerData playerData)
             UnityUtils.SetGameManagerArtefactDirty(artefact, false);
         }
         Debug.Log("loading Artefacts");
+
         instance.LoadArtefacts();
+
         Debug.Log("loaded Artefacts");
 
         foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
@@ -175,11 +186,21 @@ class POASession(PlayerData playerData)
             UnlockArtefact(artefact);
             return artefact.ToString();
         }
-        if (id < Utils.extraItemOffset)
+        if (id < Utils.birdSeedOffset)
         {
             Books book = Utils.IdToBook(id);
             UnlockBook(book);
             return book.ToString();
+        }
+        if (id < Utils.toolOffset)
+        {
+            BirdSeeds birdSeed = Utils.IdToBirdSeed(id);
+            UnlockBirdSeed(birdSeed);
+        }
+        if (id < Utils.extraItemOffset)
+        {
+            Tools tool = Utils.IdToTool(id);
+            UnlockTool(tool);
         }
         ExtraItems extraItem = Utils.IdToExtraItem(id);
         UnlockExtraItem(extraItem);
@@ -205,9 +226,26 @@ class POASession(PlayerData playerData)
     {
         playerData.items.artefacts.SetCheck(artefact, true);
         UnityUtils.SetGameManagerArtefactCollected(artefact, true);
-        // UnityUtils.SetGameManagerArtefactDirty(artefact, true);
-        GameObject.FindObjectOfType<ArtefactLoaderCabin>()?.LoadArtefacts();
-        GameManager.control.Save();
+        switch (artefact)
+        {
+            case Artefacts.Coffebox_1:
+            case Artefacts.Coffebox_2:
+                {
+                    GameManager.control.extraCoffeeUses += 2;
+                    break;
+                }
+            case Artefacts.Chalkbox_1:
+            case Artefacts.Chalkbox_2:
+                {
+                    GameManager.control.extraChalkUses += 2;
+                    break;
+                }
+
+        }
+
+
+        // GameObject.FindObjectOfType<ArtefactLoaderCabin>()?.LoadArtefacts();
+        // GameManager.control.Save();
     }
 
     private void UnlockBook(Books book)
@@ -232,6 +270,109 @@ class POASession(PlayerData playerData)
                 break;
         }
         GameManager.control.Save();
+    }
+
+    private void UnlockBirdSeed(BirdSeeds birdSeed)
+    {
+        switch (birdSeed)
+        {
+            case BirdSeeds.ExtraSeed1:
+                {
+                    GameManager.control.hasExtraSeed1 = true;
+                    break;
+                }
+            case BirdSeeds.ExtraSeed2:
+                {
+                    GameManager.control.hasExtraSeed2 = true;
+                    break;
+                }
+            case BirdSeeds.ExtraSeed3:
+                {
+                    GameManager.control.hasExtraSeed3 = true;
+                    break;
+                }
+            case BirdSeeds.ExtraSeed4:
+                {
+                    GameManager.control.hasExtraSeed4 = true;
+                    break;
+                }
+            case BirdSeeds.ExtraSeed5:
+                {
+                    GameManager.control.hasExtraSeed5 = true;
+                    break;
+                }
+        }
+        playerData.items.seeds.SetCheck(birdSeed, true);
+    }
+
+    private void UnlockTool(Tools tool)
+    {
+        switch (tool)
+        {
+            case Tools.Pipe:
+                {
+                    GameManager.control.smokingpipe = true;
+                    playerData.items.pipe = true;
+                    break;
+                }
+            case Tools.RopeLengthUpgrade:
+                {
+                    GameManager.control.ropesUpgrade = true;
+                    playerData.items.ropeLengthUpgrade = true;
+                    break;
+                }
+            case Tools.Barometer:
+                {
+                    GameManager.control.barometer = true;
+                    GameManager.control.artefactMap = true;
+                    playerData.items.barometer = true;
+                    break;
+                }
+            case Tools.progressiveCrampons:
+                {
+                    if (playerData.items.progressiveCrampons == 0)
+                    {
+                        playerData.items.progressiveCrampons++;
+                        GameManager.control.crampons = true;
+                    }
+                    else
+                    {
+                        playerData.items.progressiveCrampons++;
+                        GameManager.control.cramponsUpgrade = true;
+                    }
+                    break;
+                }
+            case Tools.Monocular:
+                {
+                    GameManager.control.monocular = true;
+                    playerData.items.monocular = true;
+                    break;
+                }
+            case Tools.Phonograph:
+                {
+                    GameManager.control.phonograph = true;
+                    playerData.items.phonograph = true;
+                    break;
+                }
+            case Tools.Pocketwatch:
+                {
+                    GameManager.control.pocketwatch = true;
+                    playerData.items.pocketwatch = true;
+                    break;
+                }
+            case Tools.Chalkbag:
+                {
+                    GameManager.control.extraChalkUses++;
+                    playerData.items.chalkbag = true;
+                    break;
+                }
+            case Tools.Rope:
+                {
+                    GameManager.control.rope = true;
+                    playerData.items.rope = true;
+                    break;
+                }
+        }
     }
 
     private void UnlockExtraItem(ExtraItems extraItem)

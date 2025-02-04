@@ -43,5 +43,8 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>lib/UnityEngine.UI.dll</HintPath>
     </Reference>
+    <Reference Include="com.rlabrecque.steamworks.net">
+      <HintPath>lib/com.rlabrecque.steamworks.net</HintPath>
+    </Reference>
 </ItemGroup>
 </Project>

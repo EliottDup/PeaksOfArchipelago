@@ -20,7 +20,9 @@ public enum Ropes
     Extra9,
     Extra10,
     Extra11,
-    Extra12
+    Extra12,
+    GreatGaolGiven,
+    StHaelgaGiven
 }
 
 public enum Artefacts
@@ -45,6 +47,15 @@ public enum Artefacts
     Photograph_4,
     PhotographFrame,
     ClimberStatue0
+}
+
+public enum BirdSeeds
+{
+    ExtraSeed1,
+    ExtraSeed2,
+    ExtraSeed3,
+    ExtraSeed4,
+    ExtraSeed5
 }
 
 public enum Peaks
@@ -97,6 +108,19 @@ public enum Books
     Expert
 }
 
+public enum Tools
+{
+    Pipe,
+    RopeLengthUpgrade,
+    Barometer,
+    progressiveCrampons,
+    Monocular,
+    Phonograph,
+    Pocketwatch,
+    Chalkbag,
+    Rope
+}
+
 public enum ExtraItems
 {
     ExtraRope,
@@ -104,6 +128,8 @@ public enum ExtraItems
     ExtraCoffee,
     ExtraSeed
 }
+
+
 
 struct SimpleItemInfo
 {
@@ -174,7 +200,9 @@ public static class Utils
     public const int ropeOffset = 100;
     public const int artefactOffset = 200;
     public const int bookOffset = 300;
-    public const int extraItemOffset = 400;
+    public const int birdSeedOffset = 400;
+    public const int toolOffset = 500;
+    public const int extraItemOffset = 600;
 
     public readonly static Dictionary<Artefacts, string> artefactToVariableName = new()
     {
@@ -245,6 +273,16 @@ public static class Utils
         return (int)book + bookOffset;
     }
 
+    public static int BirdSeedToId(BirdSeeds birdSeed)
+    {
+        return (int)birdSeed + birdSeedOffset;
+    }
+
+    public static int ToolToId(Tools tool)
+    {
+        return (int)tool + birdSeedOffset;
+    }
+
     public static int ExtraItemToId(ExtraItems extraItem)
     {
         return (int)extraItem + extraItemOffset;
@@ -265,15 +303,26 @@ public static class Utils
         return (Artefacts)(id - artefactOffset);
     }
 
+    public static Books IdToBook(long id)
+    {
+        return (Books)(id - bookOffset);
+    }
+
+    public static BirdSeeds IdToBirdSeed(long id)
+    {
+        return (BirdSeeds)(id - birdSeedOffset);
+    }
+
+    public static Tools IdToTool(long id)
+    {
+        return (Tools)(id - toolOffset);
+    }
+
     public static ExtraItems IdToExtraItem(long id)
     {
         return (ExtraItems)(id - extraItemOffset);
     }
 
-    public static Books IdToBook(long id)
-    {
-        return (Books)(id - bookOffset);
-    }
 
     public static string GetNameById(long id)
     {
