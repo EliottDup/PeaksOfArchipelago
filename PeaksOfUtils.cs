@@ -129,12 +129,11 @@ public enum ExtraItems
     ExtraSeed
 }
 
-
-
 struct SimpleItemInfo
 {
     public string playerName;
     public string itemName;
+    public long id;
 }
 
 class CheckList<T> where T : struct, Enum   // I would use enum flags, but they be a bit funny sometimes so no.

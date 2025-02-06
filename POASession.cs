@@ -19,7 +19,7 @@ class POASession(PlayerData playerData)
     Dictionary<long, ScoutedItemInfo> scoutedItems;
     public readonly PlayerData playerData = playerData;
 
-    public long[] recievedItems = [];
+    public SimpleItemInfo[] recievedItems = [];
     public string currentScene;
 
     public bool Connect(string uri, string SlotName, string Password)
@@ -34,7 +34,13 @@ class POASession(PlayerData playerData)
 
         session.Items.ItemReceived += (helper) =>
         {
-            recievedItems.AddItem(helper.PeekItem().ItemId);
+            ItemInfo info = helper.DequeueItem();
+            recievedItems.AddItem(new SimpleItemInfo
+            {
+                playerName = info.Player.Name,
+                itemName = info.ItemName,
+                id = info.ItemId
+            });
         };
 
         deathLinkService = session.CreateDeathLinkService();
@@ -115,7 +121,6 @@ class POASession(PlayerData playerData)
 
     public Ropes CompleteRopeCheck(RopeCollectable ropeCollectable)
     {
-
         Ropes rope = Utils.GetRopeFromCollectable(ropeCollectable);
 
         CompleteRopeCheck(rope);    // evil fake recursion
@@ -124,9 +129,6 @@ class POASession(PlayerData playerData)
 
     public Artefacts CompleteArtefactCheck(ArtefactOnPeak artefactOnPeak)
     {
-        this.recievedItems = [Utils.ArtefactToId(Artefacts.ClimberStatue3), Utils.BookToId(Books.Expert), Utils.RopeToId(Ropes.Extra10)];
-        KillPlayer();
-
         Artefacts artefact = Utils.GetArtefactFromCollectable(artefactOnPeak);
         Debug.Log("Completing artefact " + artefact.ToString());
         playerData.locations.artefacts.SetCheck(artefact, true);

@@ -62,19 +62,52 @@ public class PeaksOfArchipelagoMod : ModClass
 
         // foreach (Ropes rope in Enum.GetValues(typeof(Ropes)))
         // {
-        //     Debug.Log($"\"{rope.ToString()}\": PeaksOfYoreItemData(\"Rope\", rope_offset + {(int)rope}, ItemClassification.filler, 1),");
+        //     Debug.Log($"\"{rope.ToString()}\" : {Utils.RopeToId(rope)},");
+        // }
+        // foreach (Peaks peak in Enum.GetValues(typeof(Peaks)))
+        // {
+        //     Debug.Log($"\"{peak.ToString()}\" : {Utils.PeakToId(peak)},");
         // }
         // foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
         // {
-        //     Debug.Log($"\"{artefact.ToString()}\": PeaksOfYoreItemData(\"Artefact\", artefact_offset + {(int)(artefact)}, ItemClassification.filler, 1),");
+        //     Debug.Log($"\"{artefact.ToString()}\" : {Utils.ArtefactToId(artefact)},");
+        // }
+        // foreach (Books book in Enum.GetValues(typeof(Books)))
+        // {
+        //     Debug.Log($"\"{book.ToString()}\" : {Utils.BookToId(book)},");
+        // }
+        // foreach (BirdSeeds birdSeed in Enum.GetValues(typeof(BirdSeeds)))
+        // {
+        //     Debug.Log($"\"{birdSeed.ToString()}\" : {Utils.BirdSeedToId(birdSeed)},");
+        // }
+        // foreach (Tools tool in Enum.GetValues(typeof(Tools)))
+        // {
+        //     Debug.Log($"\"{tool.ToString()}\" : {Utils.ToolToId(tool)},");
+        // }
+        // foreach (ExtraItems extraItem in Enum.GetValues(typeof(ExtraItems)))
+        // {
+        //     Debug.Log($"\"{extraItem.ToString()}\" : {Utils.ExtraItemToId(extraItem)},");
+        // }
+
+        // foreach (Ropes rope in Enum.GetValues(typeof(Ropes)))
+        // {
+        //     Debug.Log($"\"{rope.ToString()}\": PeaksOfYoreItemData(\"Rope\", rope_offset + {(int)rope}, ItemClassification.skip_balancing, 1),");
+        // }
+        // foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
+        // {
+        //     Debug.Log($"\"{artefact.ToString()}\": PeaksOfYoreItemData(\"Artefact\", artefact_offset + {(int)(artefact)}, ItemClassification.skip_balancing, 1),");
         // }
         // foreach (Books books in Enum.GetValues(typeof(Books)))
         // {
-        //     Debug.Log($"\"{books.ToString()}\": PeaksOfYoreItemData(\"Book\", book_offset + {(int)(books)}, ItemClassification.filler, 1),");
+        //     Debug.Log($"\"{books.ToString()}\": PeaksOfYoreItemData(\"Book\", book_offset + {(int)(books)}, ItemClassification.progression | ItemClassification.useful, 1),");
         // }
         // foreach (ExtraItems extraItem in Enum.GetValues(typeof(ExtraItems)))
         // {
         //     Debug.Log($"\"{extraItem.ToString()}\": PeaksOfYoreItemData(\"Extra\", extra_item_offset + {(int)(extraItem)}, ItemClassification.filler, -1),");
+        // }
+        // foreach (Tools tool in Enum.GetValues(typeof(Tools)))
+        // {
+        //     Debug.Log($"\"{tool.ToString()}\": PeaksOfYoreItemData(\"Extra\", extra_item_offset + {(int)(tool)}, ItemClassification.progression | ItemClassification.useful, -1),");
         // }
     }
 
@@ -225,7 +258,7 @@ public class PeaksOfArchipelagoMod : ModClass
         }
     }
 
-    [HarmonyPatch(typeof(NPCEvents), "GivePlayerMonocular")]
+    [HarmonyPatch(typeof(NPCSystem), "GivePlayerMonocular")]
     public class GivePlayerMonocularPatch
     {
         public static void Postfix()
@@ -235,7 +268,7 @@ public class PeaksOfArchipelagoMod : ModClass
         }
     }
 
-    [HarmonyPatch(typeof(NPCEvents), "GivePlayerRope")]
+    [HarmonyPatch(typeof(NPCSystem), "GivePlayerRope")]
     public class GivePlayerRopePatch
     {
         public static void Postfix(NPCEvents __instance)
@@ -273,12 +306,12 @@ public class PeaksOfArchipelagoMod : ModClass
 
             string msg = "You got: ";
 
-            long last = session.recievedItems.Last();
-            foreach (long id in session.recievedItems)
+            SimpleItemInfo last = session.recievedItems.Last();
+            foreach (SimpleItemInfo info in session.recievedItems)
             {
-                Debug.Log("id: " + id + " belongs to item: " + Utils.GetNameById(id));
-                msg += Utils.GetNameById(id);
-                if (id != last)
+                Debug.Log("id: " + info.id + " belongs to item: " + info.itemName);
+                msg += info.itemName;
+                if (info.id != last.id || info.itemName != last.itemName || info.playerName != last.playerName)
                 {
                     msg += ", ";
                 }
@@ -308,11 +341,11 @@ public class PeaksOfArchipelagoMod : ModClass
                 textElement.text = tempText;
 
 
-                long[] items = session.recievedItems;
+                SimpleItemInfo[] items = session.recievedItems;
                 session.recievedItems = [];
-                foreach (long id in items)
+                foreach (SimpleItemInfo item in items)
                 {
-                    session.UnlockById(id);
+                    session.UnlockById(item.id);
                 }
                 foreach (RopeCabinDescription ropeCabinDescription in GameObject.FindObjectsOfType<RopeCabinDescription>())
                     ropeCabinDescription.UpdateCoffeeChalk();
