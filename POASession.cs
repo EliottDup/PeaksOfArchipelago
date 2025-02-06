@@ -26,11 +26,11 @@ class POASession(PlayerData playerData)
     {
         session = ArchipelagoSessionFactory.CreateSession(uri);
         LoginResult result = session.TryConnectAndLogin("Peaks Of Yore", SlotName, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems, password: Password);
-        if (session.DataStorage["version"] != ModInfo.MOD_VERSION)
-        {
-            Debug.Log("Version Incompatible");
-            return false;
-        }
+        // if (session.DataStorage["version"] != ModInfo.MOD_VERSION && session.DataStorage["version"])
+        // {
+        //     Debug.Log("Version Incompatible");
+        //     return false;
+        // }
 
         session.Items.ItemReceived += (helper) =>
         {
