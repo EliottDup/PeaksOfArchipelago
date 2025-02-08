@@ -243,7 +243,6 @@ class POASession(PlayerData playerData)
     private void UnlockRope(Ropes rope)
     {
         playerData.items.ropes.SetCheck(rope, true);
-        GameManager.control.rope = true;
         if (rope < Ropes.ExtraFirst)
         {
             GameManager.control.ropesCollected++;
@@ -264,6 +263,7 @@ class POASession(PlayerData playerData)
             case Artefacts.Coffebox_1:
             case Artefacts.Coffebox_2:
                 {
+                    GameManager.control.coffee = true;
                     GameManager.control.extraCoffeeUses += 2;
                     break;
                 }
@@ -428,6 +428,7 @@ class POASession(PlayerData playerData)
                 GameManager.control.ropesCollected++;
                 break;
             case ExtraItems.ExtraCoffee:
+                GameManager.control.coffee = true;
                 playerData.items.extraCoffeeItemCount++;
                 GameManager.control.extraCoffeeUses++;
                 break;
