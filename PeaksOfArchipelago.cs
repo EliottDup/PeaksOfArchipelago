@@ -82,7 +82,7 @@ public class PeaksOfArchipelagoMod : ModClass
 
     private void OnConnect()
     {
-        session.Connect(GetUri(), SlotName, Password);
+        _ = session.Connect(GetUri(), SlotName, Password);
     }
 
     //------------------------- Harmony Patches -------------------------
