@@ -175,6 +175,8 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         public static void Postfix(NPCEvents __instance)
         {
+            session.fundamentalsBook = GameObject.Find("PEAKJOURNAL");
+            session.SetFundamentalsBookActive(session.playerData.items.books.IsChecked(Books.Fundamentals));
             GameManager.control.monocular = session.playerData.items.monocular;
 
             Debug.Log($"Checking Progress");
@@ -210,7 +212,8 @@ public class PeaksOfArchipelagoMod : ModClass
                 Debug.Log("starting custom event");
                 ItemEventsPatch.isCustomEvent = true;
                 __instance.eventName = "AllArtefacts";
-                __instance.StartCoroutine("GlowDoorEvent");
+                // __instance.StartCoroutine("GlowDoorEvent");
+                __instance.npcParcelDeliverySystem.StartCoroutine("FadeScreenAndStartUnpackEvent");
             }
         }
     }
