@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>nl.eliott.PeaksOfArchipelago</AssemblyName>
+    <AssemblyName>PeaksOfArchipelago</AssemblyName>
     <Product>Peaks Of Archipelago</Product>
     <Version>0.2.2</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
