@@ -135,6 +135,33 @@ public class PeaksOfArchipelagoMod : ModClass
         }
     }
 
+    [HarmonyPatch(typeof(BirdSeedCollectable), "PickUpBirdSeed")]
+    public class BirdSeedCollectablePatch
+    {
+        static void Prefix(BirdSeedCollectable __instance)
+        {
+            BirdSeeds seed = session.CompleteSeedCheck(__instance);
+            SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.BirdSeedToId(seed));
+            UnityUtils.SetSeedText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+            GameManager.control.extraBirdSeedUses--;
+        }
+
+        static void Postfix(ref IEnumerator __result, RopeCollectable __instance)
+        {
+            __result = MyWrapper(__result, __instance);
+        }
+
+        static IEnumerator MyWrapper(IEnumerator original, RopeCollectable __instance)
+        {
+            while (original.MoveNext())
+            {
+                yield return original.Current;
+            }
+            yield return null;
+        }
+    }
+
+
     [HarmonyPatch(typeof(FallingEvent), "FellToDeath")]
     public class FellToDeathPatch
     {
@@ -176,7 +203,7 @@ public class PeaksOfArchipelagoMod : ModClass
         public static void Postfix(NPCEvents __instance)
         {
             session.fundamentalsBook = GameObject.Find("PEAKJOURNAL");
-            session.SetFundamentalsBookActive(session.playerData.items.books.IsChecked(Books.Fundamentals));
+            // session.SetFundamentalsBookActive(session.playerData.items.books.IsChecked(Books.Fundamentals));
             GameManager.control.monocular = session.playerData.items.monocular;
 
             Debug.Log($"Checking Progress");
@@ -341,13 +368,22 @@ public class PeaksOfArchipelagoMod : ModClass
     [HarmonyPatch(typeof(StatsAndAchievements), "SetStatFloat")]
     [HarmonyPatch(typeof(StatsAndAchievements), "SetStatInt")]
     [HarmonyPatch(typeof(StatsAndAchievements), "ResetStatsAndAchievements")]
-    [HarmonyPatch(typeof(SteamUserStats), "SetAchievement")]
-    [HarmonyPatch(typeof(SteamUserStats), "StoreStats")]
     public class SetAchievementPatch
     {
         static bool Prefix()
         {
             Debug.Log("Game wants to do something with achievements, but we blocking that shit");
+            return false;
+        }
+    }
+    [HarmonyPatch(typeof(SteamUserStats), "SetAchievement")]
+    [HarmonyPatch(typeof(SteamUserStats), "StoreStats")]
+    public class SetSteamAchievementPatch
+    {
+        static bool Prefix(ref bool __result)
+        {
+            Debug.Log("Game wants to do something with achievements, but we blocking that shit");
+            __result = true;
             return false;
         }
     }
