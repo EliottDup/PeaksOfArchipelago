@@ -22,6 +22,7 @@ class POASession(PlayerData playerData)
     private int itemcount = 0;
     public List<SimpleItemInfo> uncollectedItems = [];
     public string currentScene;
+    public GameObject fundamentalsBook;
 
     public async Task<bool> Connect(string uri, string SlotName, string Password)
     {
@@ -286,6 +287,10 @@ class POASession(PlayerData playerData)
         NPCEvents npcEvents = GameObject.FindObjectOfType<NPCEvents>();
         switch (book)
         {
+            case Books.Fundamentals:
+                SetFundamentalsBookActive(true);
+
+                break;
             case Books.Intermediate:
                 GameManager.control.category_2_unlocked = true;
                 npcEvents.cabin_Category2.SetActive(true);
@@ -302,6 +307,11 @@ class POASession(PlayerData playerData)
                 break;
         }
         GameManager.control.Save();
+    }
+
+    public void SetFundamentalsBookActive(bool enabled)
+    {
+        fundamentalsBook.SetActive(enabled);
     }
 
     private void UnlockBirdSeed(BirdSeeds birdSeed)
