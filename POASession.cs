@@ -170,6 +170,18 @@ class POASession(PlayerData playerData)
         return artefact;
     }
 
+    public BirdSeeds CompleteSeedCheck(BirdSeedCollectable seedCollectable)
+    {
+        BirdSeeds seed = Utils.GetSeedFromCollectable(seedCollectable);
+        Debug.Log("Completing seed " + seed.ToString());
+        playerData.locations.seeds.SetCheck(seed, true);
+
+        if (session == null) return (BirdSeeds)(-1);
+        session.Locations.CompleteLocationChecks(Utils.BirdSeedToId(seed));
+
+        return seed;
+    }
+
     public Peaks CompletePeakCheck(StamperPeakSummit peakStamper)
     {
         if (session == null) return (Peaks)(-1);

@@ -457,4 +457,9 @@ public static class Utils
         string json = JsonConvert.SerializeObject(data);
         return json;
     }
+
+    public static BirdSeeds GetSeedFromCollectable(BirdSeedCollectable seedCollectable)
+    {
+        return (BirdSeeds)seedCollectable.extraBirdSeedNumber;
+    }
 }

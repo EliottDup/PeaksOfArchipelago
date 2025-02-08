@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Reflection;
 using PeaksOfArchipelago;
 using UnityEngine;
@@ -75,5 +76,12 @@ static class UnityUtils
             return (bool)field.GetValue(GameManager.control);
         }
         throw new Exception("No boolean field " + fieldname + "found in GameManager");
+    }
+
+    internal static void SetSeedText(string message)
+    {
+        Text BirdSeedCollected = GameObject.Find("BirdSeedCollectedTxt")?.GetComponentInChildren<Text>();
+        if (BirdSeedCollected != null) BirdSeedCollected.text = message;
+        else Debug.Log("didnt find BirdSeedCollectedTxt");
     }
 }
