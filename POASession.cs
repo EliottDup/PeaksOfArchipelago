@@ -257,7 +257,6 @@ class POASession(PlayerData playerData)
     private void UnlockArtefact(Artefacts artefact)
     {
         playerData.items.artefacts.SetCheck(artefact, true);
-        UnityUtils.SetGameManagerArtefactCollected(artefact, true);
         switch (artefact)
         {
             case Artefacts.Coffebox_1:
