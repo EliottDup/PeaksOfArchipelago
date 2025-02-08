@@ -41,11 +41,6 @@ static class UnityUtils
         }
     }
 
-    internal static void LoadArtefacts(ArtefactLoaderCabin instance)
-    {
-        // foreach (Artefacts artefact in )
-    }
-
     // GameManager Helpers
     public static void SetGameManagerArtefactCollected(Artefacts artefact, bool value)
     {

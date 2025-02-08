@@ -60,55 +60,7 @@ public class PeaksOfArchipelagoMod : ModClass
         }
         Debug.Log("Loaded Peaks of Archipelago!");
 
-        // foreach (Ropes rope in Enum.GetValues(typeof(Ropes)))
-        // {
-        //     Debug.Log($"\"{rope.ToString()}\" : {Utils.RopeToId(rope)},");
-        // }
-        // foreach (Peaks peak in Enum.GetValues(typeof(Peaks)))
-        // {
-        //     Debug.Log($"\"{peak.ToString()}\" : {Utils.PeakToId(peak)},");
-        // }
-        // foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
-        // {
-        //     Debug.Log($"\"{artefact.ToString()}\" : {Utils.ArtefactToId(artefact)},");
-        // }
-        // foreach (Books book in Enum.GetValues(typeof(Books)))
-        // {
-        //     Debug.Log($"\"{book.ToString()}\" : {Utils.BookToId(book)},");
-        // }
-        // foreach (BirdSeeds birdSeed in Enum.GetValues(typeof(BirdSeeds)))
-        // {
-        //     Debug.Log($"\"{birdSeed.ToString()}\" : {Utils.BirdSeedToId(birdSeed)},");
-        // }
-        // foreach (Tools tool in Enum.GetValues(typeof(Tools)))
-        // {
-        //     Debug.Log($"\"{tool.ToString()}\" : {Utils.ToolToId(tool)},");
-        // }
-        // foreach (ExtraItems extraItem in Enum.GetValues(typeof(ExtraItems)))
-        // {
-        //     Debug.Log($"\"{extraItem.ToString()}\" : {Utils.ExtraItemToId(extraItem)},");
-        // }
-
-        // foreach (Ropes rope in Enum.GetValues(typeof(Ropes)))
-        // {
-        //     Debug.Log($"\"{rope.ToString()}\": PeaksOfYoreItemData(\"Rope\", rope_offset + {(int)rope}, ItemClassification.skip_balancing, 1),");
-        // }
-        // foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
-        // {
-        //     Debug.Log($"\"{artefact.ToString()}\": PeaksOfYoreItemData(\"Artefact\", artefact_offset + {(int)(artefact)}, ItemClassification.skip_balancing, 1),");
-        // }
-        // foreach (Books books in Enum.GetValues(typeof(Books)))
-        // {
-        //     Debug.Log($"\"{books.ToString()}\": PeaksOfYoreItemData(\"Book\", book_offset + {(int)(books)}, ItemClassification.progression | ItemClassification.useful, 1),");
-        // }
-        // foreach (ExtraItems extraItem in Enum.GetValues(typeof(ExtraItems)))
-        // {
-        //     Debug.Log($"\"{extraItem.ToString()}\": PeaksOfYoreItemData(\"Extra\", extra_item_offset + {(int)(extraItem)}, ItemClassification.filler, -1),");
-        // }
-        // foreach (Tools tool in Enum.GetValues(typeof(Tools)))
-        // {
-        //     Debug.Log($"\"{tool.ToString()}\": PeaksOfYoreItemData(\"Extra\", extra_item_offset + {(int)(tool)}, ItemClassification.progression | ItemClassification.useful, -1),");
-        // }
+        // Debug.Log(Utils.GetDataAsJson());
     }
 
     public override void OnDisabled()
@@ -225,32 +177,37 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             GameManager.control.monocular = session.playerData.items.monocular;
 
-            if (ItemEventsPatch.isCustomEvent || !__instance.runningEvent) return;
-            switch (__instance.eventName)
+            Debug.Log($"Checking Progress");
+            if (!ItemEventsPatch.isCustomEvent && __instance.runningEvent)
             {
-                case "Rope":
-                case "RopesUpgrade":
-                case "ArtefactMap":
-                case "Pocketwatch":
-                case "Crampons":
-                case "CramponsUpgrade":
-                case "Chalkbag":
-                case "AllArtefacts":
-                case "TimeAttack_Event1":
-                case "Category_2":
-                case "Category_3":
-                case "Category_4":
-                case "Phonograph":
-                    {
-                        __instance.runningEvent = false;
-                        Debug.Log("Stopping: " + __instance.eventName);
-                        __instance.StopCoroutine("GlowDoorEvent");
-                        break;
-                    }
+                switch (__instance.eventName)
+                {
+                    case "Rope":
+                    case "RopesUpgrade":
+                    case "ArtefactMap":
+                    case "Pocketwatch":
+                    case "Crampons":
+                    case "CramponsUpgrade":
+                    case "Chalkbag":
+                    case "AllArtefacts":
+                    case "TimeAttack_Event1":
+                    case "Category_2":
+                    case "Category_3":
+                    case "Category_4":
+                    case "Phonograph":
+                        {
+                            __instance.runningEvent = false;
+                            Debug.Log("Stopping: " + __instance.eventName);
+                            __instance.StopCoroutine("GlowDoorEvent");
+                            break;
+                        }
+                }
             }
             ItemEventsPatch.isCustomEvent = false;
-            if (session.recievedItems.Length != 0 && !__instance.runningEvent && session.currentScene != "TitleScreen")
+            session.UpdateRecievedItems();
+            if (session.uncollectedItems.Count != 0 && !__instance.runningEvent && session.currentScene != "TitleScreen")
             {
+                Debug.Log("starting custom event");
                 ItemEventsPatch.isCustomEvent = true;
                 __instance.eventName = "AllArtefacts";
                 __instance.StartCoroutine("GlowDoorEvent");
@@ -306,8 +263,9 @@ public class PeaksOfArchipelagoMod : ModClass
 
             string msg = "You got: ";
 
-            SimpleItemInfo last = session.recievedItems.Last();
-            foreach (SimpleItemInfo info in session.recievedItems)
+            session.UpdateRecievedItems();
+            SimpleItemInfo last = session.uncollectedItems.Last();
+            foreach (SimpleItemInfo info in session.uncollectedItems)
             {
                 Debug.Log("id: " + info.id + " belongs to item: " + info.itemName);
                 msg += info.itemName;
@@ -340,9 +298,9 @@ public class PeaksOfArchipelagoMod : ModClass
                 GameManager.control.extraChalkUses -= 999999999;
                 textElement.text = tempText;
 
-
-                SimpleItemInfo[] items = session.recievedItems;
-                session.recievedItems = [];
+                session.UpdateRecievedItems();
+                List<SimpleItemInfo> items = session.uncollectedItems;
+                session.uncollectedItems = [];
                 foreach (SimpleItemInfo item in items)
                 {
                     session.UnlockById(item.id);

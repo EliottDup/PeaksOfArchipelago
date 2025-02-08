@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>nl.eliott.PeaksOfArchipelago</AssemblyName>
     <Product>Peaks Of Archipelago</Product>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
@@ -45,6 +45,9 @@
     </Reference>
     <Reference Include="com.rlabrecque.steamworks.net">
       <HintPath>lib/com.rlabrecque.steamworks.net</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+          <HintPath>lib/Newtonsoft.Json</HintPath>
     </Reference>
 </ItemGroup>
 </Project>

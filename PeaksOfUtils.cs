@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace PeaksOfArchipelago;
 
@@ -95,7 +96,6 @@ public enum Peaks
     GreatGaol,
     StHaelga,
     YmirsShadow,
-    IceWaterFallDemo,
     GreatBulwark,
     SolemnTempest
 }
@@ -113,7 +113,7 @@ public enum Tools
     Pipe,
     RopeLengthUpgrade,
     Barometer,
-    progressiveCrampons,
+    ProgressiveCrampons,
     Monocular,
     Phonograph,
     Pocketwatch,
@@ -195,7 +195,7 @@ class CheckList<T> where T : struct, Enum   // I would use enum flags, but they 
 public static class Utils
 {
     //id offsets (surely 100 is enough)
-    public const int peakOffset = 0;
+    public const int peakOffset = 1;
     public const int ropeOffset = 100;
     public const int artefactOffset = 200;
     public const int bookOffset = 300;
@@ -279,7 +279,7 @@ public static class Utils
 
     public static int ToolToId(Tools tool)
     {
-        return (int)tool + birdSeedOffset;
+        return (int)tool + toolOffset;
     }
 
     public static int ExtraItemToId(ExtraItems extraItem)
@@ -338,5 +338,123 @@ public static class Utils
             return IdToBook(id).ToString();
         }
         return IdToExtraItem(id).ToString();
+    }
+
+    struct Location
+    {
+        public string name;
+        public string type;
+        public int id;
+        public int region;
+    }
+
+    struct Item
+    {
+        public string name;
+        public string type;
+        public int id;
+    }
+
+    struct Data
+    {
+        public Location[] locations;
+        public Item[] items;
+
+    }
+
+    public static string GetDataAsJson()
+    {
+        Data data;
+        data.locations = [];
+        data.items = [];
+        List<Location> locations = new List<Location>();
+        List<Item> items = new List<Item>();
+        foreach (Peaks peak in Enum.GetValues(typeof(Peaks)))
+        {
+            int id = Utils.PeakToId(peak);
+            string name = peak.ToString();
+            string type = "Peak";
+
+            Location location = new() { name = name, type = type, id = id, region = 0 };
+
+            locations.Add(location);
+        }
+
+        foreach (Ropes rope in Enum.GetValues(typeof(Ropes)))
+        {
+            int id = Utils.RopeToId(rope);
+            string name = rope.ToString();
+            string type = "Rope";
+
+            Location location = new() { name = name, type = type, id = id, region = 0 };
+            Item item = new() { name = name, type = type, id = id };
+
+            locations.Add(location);
+            items.Add(item);
+        }
+
+        foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
+        {
+            int id = Utils.ArtefactToId(artefact);
+            string name = artefact.ToString();
+            string type = "Artefact";
+
+            Location location = new() { name = name, type = type, id = id, region = 0 };
+            Item item = new() { name = name, type = type, id = id };
+
+            locations.Add(location);
+            items.Add(item);
+        }
+
+        foreach (Books book in Enum.GetValues(typeof(Books)))
+        {
+            int id = Utils.BookToId(book);
+            string name = book.ToString();
+            string type = "Book";
+
+            Item item = new() { name = name, type = type, id = id };
+
+            items.Add(item);
+        }
+
+        foreach (BirdSeeds birdSeed in Enum.GetValues(typeof(BirdSeeds)))
+        {
+            int id = Utils.BirdSeedToId(birdSeed);
+            string name = birdSeed.ToString();
+            string type = "Bird Seed";
+
+            Location location = new() { name = name, type = type, id = id, region = 0 };
+            Item item = new() { name = name, type = type, id = id };
+
+            locations.Add(location);
+            items.Add(item);
+        }
+
+        foreach (Tools tool in Enum.GetValues(typeof(Tools)))
+        {
+            int id = Utils.ToolToId(tool);
+            string name = tool.ToString();
+            string type = "Tool";
+
+            Item item = new() { name = name, type = type, id = id };
+
+            items.Add(item);
+        }
+
+        foreach (ExtraItems extraItem in Enum.GetValues(typeof(ExtraItems)))
+        {
+            int id = Utils.ExtraItemToId(extraItem);
+            string name = extraItem.ToString();
+            string type = "Extra Item";
+
+            Item item = new() { name = name, type = type, id = id };
+
+            items.Add(item);
+        }
+        data.locations = [.. locations];
+        data.items = [.. items];
+
+        string json = JsonConvert.SerializeObject(data);
+        return json;
     }
 }
