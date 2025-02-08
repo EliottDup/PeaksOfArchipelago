@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
-using HarmonyLib;
 using UnityEngine;
 
 namespace PeaksOfArchipelago;
@@ -19,29 +19,42 @@ class POASession(PlayerData playerData)
     Dictionary<long, ScoutedItemInfo> scoutedItems;
     public readonly PlayerData playerData = playerData;
 
-    public SimpleItemInfo[] recievedItems = [];
+    private int itemcount = 0;
+    public List<SimpleItemInfo> uncollectedItems = [];
     public string currentScene;
 
-    public bool Connect(string uri, string SlotName, string Password)
+    public async Task<bool> Connect(string uri, string SlotName, string Password)
     {
+        Debug.Log("Connecting to " + uri);
         session = ArchipelagoSessionFactory.CreateSession(uri);
-        LoginResult result = session.TryConnectAndLogin("Peaks Of Yore", SlotName, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems, password: Password);
-        // if (session.DataStorage["version"] != ModInfo.MOD_VERSION && session.DataStorage["version"])
-        // {
-        //     Debug.Log("Version Incompatible");
-        //     return false;
-        // }
+        Debug.Log("Created session!");
+        LoginResult result = session.TryConnectAndLogin("Peaks of Yore", SlotName, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems, password: Password);
+        Debug.Log("Login result: " + result.Successful);
 
+        if (!result.Successful)
+        {
+            Debug.Log("unsuccessful connect, aborting");
+            return false;
+        }
         session.Items.ItemReceived += (helper) =>
         {
-            ItemInfo info = helper.DequeueItem();
-            recievedItems.AddItem(new SimpleItemInfo
-            {
-                playerName = info.Player.Name,
-                itemName = info.ItemName,
-                id = info.ItemId
-            });
+            Debug.Log("Recieved item");
         };
+
+        session.SetClientState(ArchipelagoClientState.ClientConnected);
+
+        // session.Items.ItemReceived += (helper) =>
+        // {
+        //     ItemInfo info = helper.PeekItem();
+        //     Debug.Log("Recieved item " + info.ItemName);
+        //     recievedItems.AddItem(new SimpleItemInfo
+        //     {
+        //         playerName = info.Player.Name,
+        //         itemName = info.ItemName,
+        //         id = info.ItemId
+        //     });
+        //     helper.DequeueItem();
+        // };
 
         deathLinkService = session.CreateDeathLinkService();
         deathLinkService.EnableDeathLink();
@@ -52,15 +65,32 @@ class POASession(PlayerData playerData)
             Debug.Log(deathLinkObject.Source + deathLinkObject.Cause);
             KillPlayer();
         };
+        await LoadLocationDetails();
 
+        UpdateRecievedItems();
         // TODO: implement loading of data: rope count etc
         //! WARNING: THIS SHOULD BE DONE WHEN ENTERING THE CABIN SCENE, DOING SO EARLIER THAN THAT *WILL* FUCK UP SAVES
         return result.Successful;
     }
 
+    public void UpdateRecievedItems()
+    {
+        if (session == null) return;
+        if (session.Items.AllItemsReceived.Count == itemcount) return;
+        List<SimpleItemInfo> newRecievedItems = [.. session.Items.AllItemsReceived.Select(item => new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })];
+        Debug.Log($"total item count {newRecievedItems.Count}");
+        Debug.Log($"old item count {itemcount}");
+        uncollectedItems = [.. uncollectedItems.Concat(newRecievedItems.Skip(itemcount))];
+        Debug.Log($"Recieved {uncollectedItems.Count} items " + uncollectedItems.ToString());
+        itemcount = newRecievedItems.Count;
+
+    }
+
     public async Task LoadLocationDetails()
     {
+        Debug.Log("scouting items");
         scoutedItems = await session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, [.. session.Locations.AllLocations]);
+        Debug.Log("scouted items!");
     }
 
     public void HandleDeath()
@@ -309,6 +339,7 @@ class POASession(PlayerData playerData)
 
     private void UnlockTool(Tools tool)
     {
+        Debug.Log("Unlocking Tool:" + tool.ToString());
         switch (tool)
         {
             case Tools.Pipe:
@@ -330,7 +361,7 @@ class POASession(PlayerData playerData)
                     playerData.items.barometer = true;
                     break;
                 }
-            case Tools.progressiveCrampons:
+            case Tools.ProgressiveCrampons:
                 {
                     if (playerData.items.progressiveCrampons == 0)
                     {
@@ -375,6 +406,7 @@ class POASession(PlayerData playerData)
                     break;
                 }
         }
+        GameManager.control.Save();
     }
 
     private void UnlockExtraItem(ExtraItems extraItem)
