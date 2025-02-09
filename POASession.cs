@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ class POASession(PlayerData playerData)
     public List<SimpleItemInfo> uncollectedItems = [];
     public string currentScene;
     public GameObject fundamentalsBook;
+    private LoginSuccessful loginSuccessful;
 
     public async Task<bool> Connect(string uri, string SlotName, string Password)
     {
@@ -31,41 +33,46 @@ class POASession(PlayerData playerData)
         Debug.Log("Created session!");
         LoginResult result = session.TryConnectAndLogin("Peaks of Yore", SlotName, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems, password: Password);
         Debug.Log("Login result: " + result.Successful);
-
         if (!result.Successful)
         {
-            Debug.Log("unsuccessful connect, aborting");
+            Debug.LogError("unsuccessful connect, aborting");
+            Debug.LogError("Something went wrong and you are not connected");
+            foreach (string error in ((LoginFailure)result).Errors)
+            {
+                Debug.LogError(error);
+            }
             return false;
         }
+
         session.Items.ItemReceived += (helper) =>
         {
             Debug.Log("Recieved item");
         };
 
         session.SetClientState(ArchipelagoClientState.ClientConnected);
+        loginSuccessful = (LoginSuccessful)result;
 
-        // session.Items.ItemReceived += (helper) =>
+        // Debug.Log("printing slotdata");
+        // foreach (string key in loginSuccessful.SlotData.Keys)
         // {
-        //     ItemInfo info = helper.PeekItem();
-        //     Debug.Log("Recieved item " + info.ItemName);
-        //     recievedItems.AddItem(new SimpleItemInfo
-        //     {
-        //         playerName = info.Player.Name,
-        //         itemName = info.ItemName,
-        //         id = info.ItemId
-        //     });
-        //     helper.DequeueItem();
-        // };
+        //     Debug.Log(key);
+        // }
 
-        deathLinkService = session.CreateDeathLinkService();
-        deathLinkService.EnableDeathLink();
-
-
-        deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
+        if (loginSuccessful.SlotData.TryGetValue("deathLink", out var enableDeathLink))
         {
-            Debug.Log(deathLinkObject.Source + deathLinkObject.Cause);
-            KillPlayer();
-        };
+            if (Convert.ToBoolean(enableDeathLink))
+            {
+                deathLinkService = session.CreateDeathLinkService();
+                deathLinkService.EnableDeathLink();
+
+                deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
+                {
+                    Debug.Log(deathLinkObject.Source + deathLinkObject.Cause);
+                    KillPlayer();
+                };
+            }
+        }
+
         await LoadLocationDetails();
 
         UpdateRecievedItems();
@@ -89,13 +96,12 @@ class POASession(PlayerData playerData)
 
     public async Task LoadLocationDetails()
     {
-        Debug.Log("scouting items");
         scoutedItems = await session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, [.. session.Locations.AllLocations]);
-        Debug.Log("scouted items!");
     }
 
     public void HandleDeath()
     {
+        if (deathLinkService == null) return;
         if (playerKilled)
         {
             playerKilled = false;   // This is done to prevent players killed by deathlink to send out deathlink ticks again
@@ -106,10 +112,44 @@ class POASession(PlayerData playerData)
         deathLinkService.SendDeathLink(new DeathLink(session.Players.GetPlayerAliasAndName(session.ConnectionInfo.Slot), "Fell off."));
     }
 
+    public void CheckWin()
+    {
+        if (loginSuccessful.SlotData.TryGetValue("goal", out var goal))
+        {
+            string winCondition = goal.ToString();
+            bool checkPeaks = winCondition == "0" || winCondition == "2";       // 0 or 2
+            bool checkArtefacts = winCondition == "1" || winCondition == "2";   // 1 or 2
+            bool checkAll = winCondition == "3";
+            ReadOnlyCollection<long> missing = session.Locations.AllMissingLocations;
+            if (checkAll)
+            {
+                if (missing.Count() == 0)
+                {
+                    Debug.Log("Win condition achieved, unlocking items!");
+                    session.SetClientState(ArchipelagoClientState.ClientGoal);
+                    session.SetGoalAchieved();
+                }
+            }
+            else
+            {
+                foreach (long id in missing)
+                {
+                    Type type = Utils.GetTypeById(id);
+                    if ((type == typeof(Peaks) && checkPeaks) || (type == typeof(Artefacts) && checkArtefacts))
+                    {
+                        return;
+                    }
+                }
+                Debug.Log("Win condition achieved, unlocking items!");
+                session.SetClientState(ArchipelagoClientState.ClientGoal);
+                session.SetGoalAchieved();
+            }
+        }
+    }
+
     public void KillPlayer()
     {
         FallingEvent[] events = GameObject.FindObjectsOfType<FallingEvent>();
-        Debug.Log("found " + events.Length + " fallingEvents");
         foreach (FallingEvent fallingEvent in events)
         {
             MethodInfo method = typeof(FallingEvent).GetMethod("FellToDeath", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -205,11 +245,8 @@ class POASession(PlayerData playerData)
             UnityUtils.SetGameManagerArtefactCollected(artefact, playerData.items.artefacts.IsChecked(artefact));
             UnityUtils.SetGameManagerArtefactDirty(artefact, false);
         }
-        Debug.Log("loading Artefacts");
 
         instance.LoadArtefacts();
-
-        Debug.Log("loaded Artefacts");
 
         foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
         {
@@ -360,7 +397,6 @@ class POASession(PlayerData playerData)
 
     private void UnlockTool(Tools tool)
     {
-        Debug.Log("Unlocking Tool:" + tool.ToString());
         switch (tool)
         {
             case Tools.Pipe:

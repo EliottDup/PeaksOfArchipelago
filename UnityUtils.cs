@@ -12,16 +12,16 @@ static class UnityUtils
         Text ropeCollected = GameObject.Find("RopeCollectedTxt")?.GetComponentInChildren<Text>();
         Text NPCRopeCollected = GameObject.Find("NPCRopeCollectedTxt")?.GetComponentInChildren<Text>();
         if (ropeCollected != null) ropeCollected.text = message;
-        else Debug.Log("didnt find RopeCollectedText");
+        else Debug.LogWarning("didnt find RopeCollectedText");
         if (NPCRopeCollected != null) NPCRopeCollected.text = message;
-        else Debug.Log("didnt find NPCRopeCollectedText");
+        else Debug.LogWarning("didnt find NPCRopeCollectedText");
     }
 
     internal static void SetArtefactText(string message)
     {
         Text artefactCollected = GameObject.Find("ArtefactCollected")?.GetComponentInChildren<Text>();
         if (artefactCollected != null) artefactCollected.text = message;
-        else Debug.Log("didnt find artefactcollectedtext");
+        else Debug.LogWarning("didnt find artefactcollectedtext");
     }
 
     // progress disablers (these basically undo whatever progress has been done in order to have the randomiser work properly)
@@ -82,6 +82,6 @@ static class UnityUtils
     {
         Text BirdSeedCollected = GameObject.Find("BirdSeedCollectedTxt")?.GetComponentInChildren<Text>();
         if (BirdSeedCollected != null) BirdSeedCollected.text = message;
-        else Debug.Log("didnt find BirdSeedCollectedTxt");
+        else Debug.LogWarning("didnt find BirdSeedCollectedTxt");
     }
 }
