@@ -114,6 +114,7 @@ class POASession(PlayerData playerData)
 
     public void CheckWin()
     {
+        if (session == null) return;
         if (loginSuccessful.SlotData.TryGetValue("goal", out var goal))
         {
             string winCondition = goal.ToString();
