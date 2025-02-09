@@ -56,10 +56,10 @@ public class PeaksOfArchipelagoMod : ModClass
         playerData = new PlayerData();
         session = new POASession(playerData);
         harmony.PatchAll();
-        Connect.AddListener(OnConnectAsync);
+        Connect.AddListener(OnConnect);
         if (AutoConnect)
         {
-            OnConnectAsync();
+            OnConnect();
         }
         Debug.Log("Loaded Peaks of Archipelago!");
 
@@ -91,11 +91,12 @@ public class PeaksOfArchipelagoMod : ModClass
         return Hostname + ":" + Port;
     }
 
-    private async Task OnConnectAsync()
+    private void OnConnect()
     {
-        bool result = await session.Connect(GetUri(), SlotName, Password);
-        if (result)
+        Task<bool> result = session.Connect(GetUri(), SlotName, Password);
+        if (result.Result)
         {
+            Debug.Log("Connected successfully");
             justConnected = true;
         }
     }
