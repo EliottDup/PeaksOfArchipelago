@@ -236,7 +236,7 @@ public static class Utils
     {
         if (!ropeCollectable.isSingleRope)
         {
-            return (Ropes)ropeCollectable.extraRopeNumber;
+            return (Ropes)(ropeCollectable.extraRopeNumber + 4);
         }
         if (ropeCollectable.isWaltersCrag) return Ropes.WaltersCrag;
         if (ropeCollectable.isWalkersPillar) return Ropes.WalkersPillar;
@@ -248,6 +248,7 @@ public static class Utils
     public static Artefacts GetArtefactFromCollectable(ArtefactOnPeak artefactOnPeak)
     {
         int v = (int)artefactOnPeak.peakArtefact - 1;
+        if (artefactOnPeak.peakArtefact >= ArtefactOnPeak.Artefacts.Belt) v -= 3;
         return (Artefacts)v;
     }
 
@@ -321,7 +322,6 @@ public static class Utils
     {
         return (ExtraItems)(id - extraItemOffset);
     }
-
 
     public static string GetNameById(long id)
     {

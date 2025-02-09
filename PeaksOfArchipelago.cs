@@ -84,6 +84,11 @@ public class PeaksOfArchipelagoMod : ModClass
             GameManager.control.extraBirdSeedUses = 0;
         }
         session.currentScene = SceneManager.GetActiveScene().name;
+        Debug.Log(session.currentScene);
+        if (session.currentScene == "Cabin")
+        {
+            session.fundamentalsBook = GameObject.Find("PEAKJOURNAL");
+        }
     }
 
     private string GetUri()
@@ -93,12 +98,8 @@ public class PeaksOfArchipelagoMod : ModClass
 
     private void OnConnect()
     {
-        Task<bool> result = session.Connect(GetUri(), SlotName, Password);
-        if (result.Result)
-        {
-            Debug.Log("Connected successfully");
-            justConnected = true;
-        }
+        justConnected = true;
+        _ = session.Connect(GetUri(), SlotName, Password);
     }
 
     //------------------------- Harmony Patches -------------------------
@@ -214,7 +215,6 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         public static void Postfix(NPCEvents __instance)
         {
-            session.fundamentalsBook = GameObject.Find("PEAKJOURNAL");
             session.SetFundamentalsBookActive(session.playerData.items.books.IsChecked(Books.Fundamentals));
             GameManager.control.monocular = session.playerData.items.monocular;
 
@@ -360,7 +360,8 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static void Postfix(EnterPeakScene __instance)
         {
-            Debug.Log("Entering: " + GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString());
+            string peak = GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString();
+            Debug.Log("Entering peak: " + peak);
 
             // Debug.Log("texts:");
             // foreach (Text text in GameObject.FindObjectsOfType<Text>())  //Leaving this in case some text is ever misbehaving
