@@ -4,6 +4,7 @@
     "website_url": "https://github.com/EliottDup/PeaksOfArchipelago",
     "description": "An achipelago implementation for Peaks of Yore",
     "dependencies": [
-        "DolfeMods-POYModManager-1.0.3"
+        "DolfeMods-POYModManager-1.0.3",
+        "BepInEx-BepInExPack-5.4.2100"
     ]
 }
