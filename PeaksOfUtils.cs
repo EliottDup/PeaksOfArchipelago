@@ -458,6 +458,18 @@ public static class Utils
         return json;
     }
 
+    public static Type GetTypeById(long id)
+    {
+        if (id >= extraItemOffset) return typeof(ExtraItems);
+        if (id >= toolOffset) return typeof(Tools);
+        if (id >= birdSeedOffset) return typeof(BirdSeeds);
+        if (id >= bookOffset) return typeof(Books);
+        if (id >= artefactOffset) return typeof(Artefacts);
+        if (id >= ropeOffset) return typeof(Ropes);
+        if (id >= peakOffset) return typeof(Peaks);
+        return null;
+    }
+
     public static BirdSeeds GetSeedFromCollectable(BirdSeedCollectable seedCollectable)
     {
         return (BirdSeeds)seedCollectable.extraBirdSeedNumber;

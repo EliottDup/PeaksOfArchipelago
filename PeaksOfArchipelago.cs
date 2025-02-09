@@ -71,7 +71,6 @@ public class PeaksOfArchipelagoMod : ModClass
     public override void Start()        // Runs every time a new scene is launched (whenever "Start" would be ran on a normal unity object)
     {
         // DO NOT PUT GAMEMANAGER.SAVE HERE IT FUCKED UP MY SAVES LOL
-        Debug.Log("Now in scene: " + SceneManager.GetActiveScene().name);
         session.currentScene = SceneManager.GetActiveScene().name;
     }
 
@@ -112,7 +111,6 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static void Prefix(RopeCollectable __instance)
         {
-            Debug.Log("prefixing");
             Ropes rope = session.CompleteRopeCheck(__instance);
             SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.RopeToId(rope));
             UnityUtils.SetRopeText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
@@ -183,13 +181,10 @@ public class PeaksOfArchipelagoMod : ModClass
                 UnityUtils.SetGameManagerArtefactCollected(artefact, session.playerData.items.artefacts.IsChecked(artefact));
                 UnityUtils.SetGameManagerArtefactDirty(artefact, false);
             }
-            Debug.Log("loading Artefacts");
         }
 
         public static void Postfix()
         {
-            Debug.Log("loaded Artefacts");
-
             foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
             {
                 UnityUtils.SetGameManagerArtefactCollected(artefact, savestate.IsChecked(artefact));    // reset gamemanager to default state
@@ -203,10 +198,9 @@ public class PeaksOfArchipelagoMod : ModClass
         public static void Postfix(NPCEvents __instance)
         {
             session.fundamentalsBook = GameObject.Find("PEAKJOURNAL");
-            // session.SetFundamentalsBookActive(session.playerData.items.books.IsChecked(Books.Fundamentals));
+            session.SetFundamentalsBookActive(session.playerData.items.books.IsChecked(Books.Fundamentals));
             GameManager.control.monocular = session.playerData.items.monocular;
 
-            Debug.Log($"Checking Progress");
             if (!ItemEventsPatch.isCustomEvent && __instance.runningEvent)
             {
                 switch (__instance.eventName)
@@ -226,13 +220,14 @@ public class PeaksOfArchipelagoMod : ModClass
                     case "Phonograph":
                         {
                             __instance.runningEvent = false;
-                            Debug.Log("Stopping: " + __instance.eventName);
+                            Debug.Log("Blocking event: " + __instance.eventName);
                             __instance.StopCoroutine("GlowDoorEvent");
                             break;
                         }
                 }
             }
             ItemEventsPatch.isCustomEvent = false;
+            session.CheckWin();
             session.UpdateRecievedItems();
             if (session.uncollectedItems.Count != 0 && !__instance.runningEvent && session.currentScene != "TitleScreen")
             {
@@ -297,7 +292,6 @@ public class PeaksOfArchipelagoMod : ModClass
             SimpleItemInfo last = session.uncollectedItems.Last();
             foreach (SimpleItemInfo info in session.uncollectedItems)
             {
-                Debug.Log("id: " + info.id + " belongs to item: " + info.itemName);
                 msg += info.itemName;
                 if (info.id != last.id || info.itemName != last.itemName || info.playerName != last.playerName)
                 {
@@ -396,13 +390,12 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            Debug.Log("Transpiling RopeAnchor.Start");
             var codes = new List<CodeInstruction>(instructions);
             for (int i = 0; i < codes.Count; i++)
             {
                 if (i == 76 || i == 77 || i == 78)
                 {
-                    Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
+                    // Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
                     continue;
                 }
                 yield return codes[i];
@@ -436,13 +429,12 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            Debug.Log("Transpiling DetachThenAttachToNew");
             var codes = new List<CodeInstruction>(instructions);
             for (int i = 0; i < codes.Count; i++)
             {
                 if (i == 120 || i == 121 || i == 122 || i == 123)
                 {
-                    Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
+                    // Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
                     continue;
                 }
                 yield return codes[i];
@@ -455,13 +447,12 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            Debug.Log("Transpiling PullOutAnchor");
             var codes = new List<CodeInstruction>(instructions);
             for (int i = 0; i < codes.Count; i++)
             {
                 if (i == 79 || i == 80 || i == 81 || i == 82)
                 {
-                    Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
+                    // Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
                     continue;
                 }
                 yield return codes[i];
@@ -474,13 +465,12 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            Debug.Log("Transpiling CheckRope");
             var codes = new List<CodeInstruction>(instructions);
             for (int i = 0; i < codes.Count; i++)
             {
                 if (i == 267 || i == 268 || i == 269 || i == 270)
                 {
-                    Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
+                    // Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
                     continue;
                 }
                 yield return codes[i];
