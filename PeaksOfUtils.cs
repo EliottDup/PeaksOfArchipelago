@@ -229,6 +229,11 @@ public static class Utils
 
     public static Peaks GetPeakFromCollectable(StamperPeakSummit peakStamper)
     {
+        int p = (int)peakStamper.peakNames - 1;
+        if (p >= (int)StamperPeakSummit.PeakNames.IceWaterFallDemo)
+        {
+            p -= 1;
+        }
         return (Peaks)(peakStamper.peakNames - 1);
     }
 
