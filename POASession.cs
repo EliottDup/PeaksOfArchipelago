@@ -52,12 +52,6 @@ class POASession(PlayerData playerData)
         session.SetClientState(ArchipelagoClientState.ClientConnected);
         loginSuccessful = (LoginSuccessful)result;
 
-        // Debug.Log("printing slotdata");
-        // foreach (string key in loginSuccessful.SlotData.Keys)
-        // {
-        //     Debug.Log(key);
-        // }
-
         if (loginSuccessful.SlotData.TryGetValue("deathLink", out var enableDeathLink))
         {
             if (Convert.ToBoolean(enableDeathLink))
