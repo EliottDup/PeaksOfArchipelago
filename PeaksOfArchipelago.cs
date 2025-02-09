@@ -14,6 +14,7 @@ using System.Collections;
 using System.Linq;
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace PeaksOfArchipelago;
 
@@ -43,6 +44,8 @@ public class PeaksOfArchipelagoMod : ModClass
     [Editable] public bool AutoConnect { get; set; } = false;
     [Editable] public UnityEvent Connect { get; set; } = new UnityEvent();
 
+    private bool justConnected = false;
+
     Harmony harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
     PlayerData playerData;
 
@@ -53,10 +56,10 @@ public class PeaksOfArchipelagoMod : ModClass
         playerData = new PlayerData();
         session = new POASession(playerData);
         harmony.PatchAll();
-        Connect.AddListener(OnConnect);
+        Connect.AddListener(OnConnectAsync);
         if (AutoConnect)
         {
-            OnConnect();
+            OnConnectAsync();
         }
         Debug.Log("Loaded Peaks of Archipelago!");
 
@@ -71,6 +74,15 @@ public class PeaksOfArchipelagoMod : ModClass
     public override void Start()        // Runs every time a new scene is launched (whenever "Start" would be ran on a normal unity object)
     {
         // DO NOT PUT GAMEMANAGER.SAVE HERE IT FUCKED UP MY SAVES LOL
+        if (session.currentScene == "TitleScreen" && justConnected)
+        {
+            justConnected = false;
+            Debug.Log("entering cabin from main menu, resetting ropes, coffee, chalk and bird uses to zero");
+            GameManager.control.ropesCollected = 0;
+            GameManager.control.extraCoffeeUses = 0;
+            GameManager.control.extraChalkUses = 0;
+            GameManager.control.extraBirdSeedUses = 0;
+        }
         session.currentScene = SceneManager.GetActiveScene().name;
     }
 
@@ -79,9 +91,13 @@ public class PeaksOfArchipelagoMod : ModClass
         return Hostname + ":" + Port;
     }
 
-    private void OnConnect()
+    private async Task OnConnectAsync()
     {
-        _ = session.Connect(GetUri(), SlotName, Password);
+        bool result = await session.Connect(GetUri(), SlotName, Password);
+        if (result)
+        {
+            justConnected = true;
+        }
     }
 
     //------------------------- Harmony Patches -------------------------
@@ -332,6 +348,7 @@ public class PeaksOfArchipelagoMod : ModClass
                 foreach (RopeCabinDescription ropeCabinDescription in GameObject.FindObjectsOfType<RopeCabinDescription>())
                     ropeCabinDescription.UpdateCoffeeChalk();
                 GameObject.FindObjectOfType<ArtefactLoaderCabin>()?.LoadArtefacts();
+                GameObject.FindObjectOfType<RopeCabinDescription>()?.CheckCabinItems();
             }
             yield return null;
         }
