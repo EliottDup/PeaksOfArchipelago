@@ -29,11 +29,30 @@ public class PeaksOfArchipelago : BaseUnityPlugin
         Logger = base.Logger;
 
         Logger.LogInfo($"Plugin {ModInfo.MOD_GUID} is loaded!");
+
+        Harmony h = new(ModInfo.MOD_GUID + "_Paths");
+
+        MethodInfo method = AccessTools.PropertyGetter(AccessTools.TypeByName("POKModManager.Paths"), "GameFolder");
+        Debug.Log(method);
+        MethodInfo prefix = typeof(Patch_Paths).GetMethod("Prefix", BindingFlags.Static | BindingFlags.Public);
+        Debug.Log(method);
+        h.Patch(method, prefix: new HarmonyMethod(prefix));
+
+        new POKManager(true);
     }
 
     private void Start()
     {
         POKManager.RegisterMod(new PeaksOfArchipelagoMod(), ModInfo.MOD_NAME, ModInfo.MOD_VERSION, ModInfo.MOD_DESC, UseEditableAttributeOnly: true);
+    }
+}
+
+public class Patch_Paths
+{
+    public static bool Prefix(ref string __result)
+    {
+        __result = System.IO.Directory.GetParent(BepInEx.Paths.BepInExRootPath).ToString();
+        return false;
     }
 }
 
@@ -48,7 +67,7 @@ public class PeaksOfArchipelagoMod : ModClass
 
     private bool justConnected = false;
 
-    readonly Harmony harmony = new(MyPluginInfo.PLUGIN_GUID);
+    readonly Harmony harmony = new(ModInfo.MOD_GUID);
     PlayerData playerData;
 
     private static POASession session;
