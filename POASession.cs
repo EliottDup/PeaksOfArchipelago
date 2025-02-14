@@ -16,6 +16,7 @@ class POASession(PlayerData playerData)
 {
     ArchipelagoSession session;
     DeathLinkService deathLinkService;
+    private bool instantRope;
     bool playerKilled = false;
     Dictionary<long, ScoutedItemInfo> scoutedItems;
     public readonly PlayerData playerData = playerData;
@@ -28,6 +29,11 @@ class POASession(PlayerData playerData)
 
     public async Task<bool> Connect(string uri, string SlotName, string Password)
     {
+        loginSuccessful = null;
+        uncollectedItems = [];
+        deathLinkService = null;
+        // Reset some values to allow reconnection without restarting
+
         Debug.Log("Connecting to " + uri);
         session = ArchipelagoSessionFactory.CreateSession(uri);
         Debug.Log("Created session!");
@@ -65,6 +71,11 @@ class POASession(PlayerData playerData)
                     KillPlayer();
                 };
             }
+        }
+        if (loginSuccessful.SlotData.TryGetValue("ropeUnlockMode", out var ropeUnlockMode))
+        {
+            instantRope = Convert.ToInt32(ropeUnlockMode) == 0;
+            Debug.Log("rope mode: " + Convert.ToInt32(ropeUnlockMode));
         }
 
         await LoadLocationDetails();
@@ -286,6 +297,12 @@ class POASession(PlayerData playerData)
 
     private void UnlockRope(Ropes rope)
     {
+        if (instantRope)
+        {
+            GameManager.control.rope = true;
+            playerData.items.rope = true;
+        }
+
         playerData.items.ropes.SetCheck(rope, true);
         if (rope < Ropes.ExtraFirst)
         {
@@ -466,6 +483,12 @@ class POASession(PlayerData playerData)
         switch (extraItem)
         {
             case ExtraItems.ExtraRope:
+                if (instantRope)
+                {
+                    GameManager.control.rope = true;
+                    playerData.items.rope = true;
+                }
+
                 playerData.items.extraropeItemCount++;
                 GameManager.control.ropesCollected++;
                 break;

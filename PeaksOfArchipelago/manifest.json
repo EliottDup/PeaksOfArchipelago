@@ -1,6 +1,6 @@
 {
     "name": "PeaksOfArchipelago",
-    "version_number": "1.0.8",
+    "version_number": "1.0.9",
     "website_url": "https://github.com/EliottDup/PeaksOfArchipelago",
     "description": "An achipelago implementation for Peaks of Yore",
     "dependencies": [
