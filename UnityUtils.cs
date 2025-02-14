@@ -1,9 +1,9 @@
 using System;
-using System.ComponentModel;
 using System.Reflection;
-using PeaksOfArchipelago;
 using UnityEngine;
 using UnityEngine.UI;
+
+namespace PeaksOfArchipelago;
 
 static class UnityUtils
 {
@@ -22,6 +22,13 @@ static class UnityUtils
         Text artefactCollected = GameObject.Find("ArtefactCollected")?.GetComponentInChildren<Text>();
         if (artefactCollected != null) artefactCollected.text = message;
         else Debug.LogWarning("didnt find artefactcollectedtext");
+    }
+
+    public static void SetSeedText(string message)
+    {
+        Text BirdSeedCollected = GameObject.Find("BirdSeedCollectedTxt")?.GetComponentInChildren<Text>();
+        if (BirdSeedCollected != null) BirdSeedCollected.text = message;
+        else Debug.LogWarning("didnt find BirdSeedCollectedTxt");
     }
 
     // progress disablers (these basically undo whatever progress has been done in order to have the randomiser work properly)
@@ -78,10 +85,26 @@ static class UnityUtils
         throw new Exception("No boolean field " + fieldname + "found in GameManager");
     }
 
-    internal static void SetSeedText(string message)
+    public static void PrintObjectData(GameObject gameObject)
     {
-        Text BirdSeedCollected = GameObject.Find("BirdSeedCollectedTxt")?.GetComponentInChildren<Text>();
-        if (BirdSeedCollected != null) BirdSeedCollected.text = message;
-        else Debug.LogWarning("didnt find BirdSeedCollectedTxt");
+        Debug.Log("---------");
+        Debug.Log($"name: {gameObject.name}");
+        Debug.Log($"parent: {gameObject.transform.parent.name}");
+        Debug.Log($"pos: {gameObject.transform.position}");
+        Debug.Log($"rot: {gameObject.transform.rotation}");
+        foreach (Component comp in gameObject.GetComponents<Component>())
+        {
+            Type type = comp.GetType();
+            Debug.Log($"---{type.Name}---");
+            // Copy fields and properties
+            foreach (FieldInfo field in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+            {
+                Debug.Log($"{field.Name}: {field.GetValue(comp)}");
+            }
+        }
+        foreach (Transform child in gameObject.transform)
+        {
+            PrintObjectData(child.gameObject);
+        }
     }
 }

@@ -29,8 +29,30 @@ public class PeaksOfArchipelago : BaseUnityPlugin
         Logger = base.Logger;
 
         Logger.LogInfo($"Plugin {ModInfo.MOD_GUID} is loaded!");
+
+        Harmony h = new(ModInfo.MOD_GUID + "_Paths");
+
+        MethodInfo method = AccessTools.PropertyGetter(AccessTools.TypeByName("POKModManager.Paths"), "GameFolder");
+        Debug.Log(method);
+        MethodInfo prefix = typeof(Patch_Paths).GetMethod("Prefix", BindingFlags.Static | BindingFlags.Public);
+        Debug.Log(method);
+        h.Patch(method, prefix: new HarmonyMethod(prefix));
+
+        new POKManager(true);
+    }
+
+    private void Start()
+    {
         POKManager.RegisterMod(new PeaksOfArchipelagoMod(), ModInfo.MOD_NAME, ModInfo.MOD_VERSION, ModInfo.MOD_DESC, UseEditableAttributeOnly: true);
-        Logger.LogInfo($"Plugin {ModInfo.MOD_GUID} is loaded2!");
+    }
+}
+
+public class Patch_Paths
+{
+    public static bool Prefix(ref string __result)
+    {
+        __result = System.IO.Directory.GetParent(BepInEx.Paths.BepInExRootPath).ToString();
+        return false;
     }
 }
 
@@ -45,13 +67,14 @@ public class PeaksOfArchipelagoMod : ModClass
 
     private bool justConnected = false;
 
-    Harmony harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
+    readonly Harmony harmony = new(ModInfo.MOD_GUID);
     PlayerData playerData;
 
     private static POASession session;
 
     public override void OnEnabled()    // Runs when the mod is enabled, and completely at the start
     {
+        Debug.Log(BepInEx.Paths.BepInExConfigPath);
         playerData = new PlayerData();
         session = new POASession(playerData);
         harmony.PatchAll();
@@ -88,6 +111,18 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             session.fundamentalsBook = GameObject.Find("PEAKJOURNAL");
         }
+
+        // Debug.Log("texts:");
+        // foreach (Text text in GameObject.FindObjectsOfType<Text>())  //Leaving this in case some text is ever misbehaving
+        // {
+        //     if (text.gameObject.name != "txt") continue;
+        //     Debug.Log("TextMesh: " + text.gameObject.name + " : " + text.text);
+        //     Debug.Log(text.transform.parent.name);
+        //     foreach (Transform child in text.transform.parent)
+        //     {
+        //         Debug.Log("    " + child.name);
+        //     }
+        // }
     }
 
     private string GetUri()
@@ -434,18 +469,6 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             string peak = GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString();
             Debug.Log("Entering peak: " + peak);
-
-            // Debug.Log("texts:");
-            // foreach (Text text in GameObject.FindObjectsOfType<Text>())  //Leaving this in case some text is ever misbehaving
-            // {
-            //     if (text.gameObject.name != "txt") continue;
-            //     Debug.Log("TextMesh: " + text.gameObject.name + " : " + text.text);
-            //     Debug.Log(text.transform.parent.name);
-            //     foreach (Transform child in text.transform.parent)
-            //     {
-            //         Debug.Log("    " + child.name);
-            //     }
-            // }
         }
     }
 
