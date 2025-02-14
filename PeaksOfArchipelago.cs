@@ -14,7 +14,6 @@ using System.Collections;
 using System.Linq;
 using System;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace PeaksOfArchipelago;
 
@@ -213,10 +212,21 @@ public class PeaksOfArchipelagoMod : ModClass
     [HarmonyPatch(typeof(NPCEvents), "CheckProgress")]
     public class CheckProgressPatch
     {
+        static bool usingPipe;
+
+        public static void Prefix()
+        {
+            usingPipe = GameManager.control.isUsingPipe;
+        }
+
         public static void Postfix(NPCEvents __instance)
         {
             session.SetFundamentalsBookActive(session.playerData.items.books.IsChecked(Books.Fundamentals));
             GameManager.control.monocular = session.playerData.items.monocular;
+            if (!GameManager.control.monocular)
+            {
+                __instance.StopCoroutine("MissedMonocularTooltip");
+            }
 
             if (!ItemEventsPatch.isCustomEvent && __instance.runningEvent)
             {
@@ -253,6 +263,14 @@ public class PeaksOfArchipelagoMod : ModClass
                 __instance.eventName = "AllArtefacts";
                 // __instance.StartCoroutine("GlowDoorEvent");
                 __instance.npcParcelDeliverySystem.StartCoroutine("FadeScreenAndStartUnpackEvent");
+            }
+
+            if (session.playerData.items.pipe)
+            {
+                Debug.Log("Resetting Pipe ItemEvents");
+                GameManager.control.smokingpipe = true;
+                GameManager.control.isUsingPipe = usingPipe;
+                __instance.cabinPipe.SetActive(true);
             }
         }
     }
@@ -295,9 +313,11 @@ public class PeaksOfArchipelagoMod : ModClass
         public static bool isCustomEvent;
         static bool hasAllArtefacts = false;
         static string tempText = "";
+        static bool usingPipe;
         static Text textElement;
         static void Prefix(NPCEvents __instance)
         {
+            usingPipe = GameManager.control.isUsingPipe;
             hasAllArtefacts = GameManager.control.allArtefactsUnlocked;
             Text text = __instance.allArtefactsInfo.GetComponentInChildren<Text>();
             tempText = text.text;
@@ -351,7 +371,59 @@ public class PeaksOfArchipelagoMod : ModClass
                 GameObject.FindObjectOfType<ArtefactLoaderCabin>()?.LoadArtefacts();
                 GameObject.FindObjectOfType<RopeCabinDescription>()?.CheckCabinItems();
             }
+            if (session.playerData.items.pipe)
+            {
+                Debug.Log("Resetting Pipe ItemEvents");
+                GameManager.control.smokingpipe = true;
+                GameManager.control.isUsingPipe = usingPipe;
+                __instance.cabinPipe.SetActive(true);
+            }
             yield return null;
+        }
+    }
+
+    [HarmonyPatch(typeof(Pipe), "CheckLoad")]
+    public class PipeCheckPatch
+    {
+        static bool isUsingPipe;
+        static void Prefix()
+        {
+            isUsingPipe = GameManager.control.isUsingPipe;
+        }
+
+        static void Postfix(Pipe __instance)
+        {
+            if (session.playerData.items.pipe)
+            {
+                Debug.Log("Resetting Pipe Pipe.CheckLoad");
+                GameManager.control.isUsingPipe = isUsingPipe;
+                GameManager.control.smokingpipe = true;
+                __instance.gameObject.SetActive(isUsingPipe);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(PipeCabin), "CheckLoad")]
+    public class PipeCheck2Patch
+    {
+        static bool isUsingPipe;
+        static void Prefix()
+        {
+            isUsingPipe = GameManager.control.isUsingPipe;
+        }
+
+        static void Postfix(PipeCabin __instance)
+        {
+            Debug.Log("checking pipe Pipe PipeCabin.CheckLoad");
+
+            if (session.playerData.items.pipe)
+            {
+                Debug.Log("Resetting Pipe PipeCabin.CheckLoad");
+                GameManager.control.isUsingPipe = isUsingPipe;
+                GameManager.control.smokingpipe = true;
+                __instance.gameObject.SetActive(true);
+                __instance.playerPipe.SetActive(isUsingPipe);
+            }
         }
     }
 
@@ -421,27 +493,6 @@ public class PeaksOfArchipelagoMod : ModClass
             }
         }
     }
-
-
-    // [HarmonyPatch(typeof(NPCEvents), "ItemEvents", MethodType.Enumerator)]
-    // public class ItemEventsTranspiler
-    // {
-    //     static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-    //     {
-    //         CodeMatcher codeMatcher = new CodeMatcher(instructions);
-    //         codeMatcher.Start().MatchForward(false,
-    //             new CodeMatch(OpCodes.Br_S, 445)
-    //         ).Repeat(
-    //             matcher =>
-    //                 matcher.;
-    //         );
-    //         // .MatchForward(false,
-
-    //         //     new CodeMatch(OpCodes.Ldloc_1),
-    //         //     new CodeMatch(i => i.opcode == OpCodes.Ldloc_1)
-    //         // );
-    //     }
-    // }
 
     [HarmonyPatch(typeof(RopeAnchor), "DetachThenAttachToNew", MethodType.Enumerator)]
     public class DetachThenAttachToNewTranspiler
