@@ -504,7 +504,7 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static bool Prefix()
         {
-            Debug.Log("Game wants to do something with achievements, but we blocking that shit");
+            Debug.Log("Game wants to do something with achievements, but I say no");
             return false;
         }
     }
@@ -514,7 +514,7 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static bool Prefix(ref bool __result)
         {
-            Debug.Log("Game wants to do something with achievements, but we blocking that shit");
+            Debug.Log("Game wants to do something with achievements, but I say no");
             __result = true;
             return false;
         }
