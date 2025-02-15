@@ -21,9 +21,7 @@ public enum Ropes
     Extra9,
     Extra10,
     Extra11,
-    Extra12,
-    GreatGaolGiven,
-    StHaelgaGiven
+    Extra12
 }
 
 public enum Artefacts
@@ -190,7 +188,6 @@ class CheckList<T> where T : struct, Enum   // I would use enum flags, but they 
         return checks;
     }
 }
-
 
 public static class Utils
 {
