@@ -456,7 +456,7 @@ class POASession(PlayerData playerData)
                 }
             case Tools.Chalkbag:
                 {
-                    GameManager.control.extraChalkUses++;
+                    GameManager.control.chalkBag = true;
                     playerData.items.chalkbag = true;
                     break;
                 }

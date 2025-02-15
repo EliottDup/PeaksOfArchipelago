@@ -300,7 +300,7 @@ public class PeaksOfArchipelagoMod : ModClass
                 __instance.npcParcelDeliverySystem.StartCoroutine("FadeScreenAndStartUnpackEvent");
             }
 
-            if (session.playerData.items.pipe)
+            if (session.playerData.items.pipe) //reset pipe if necessary
             {
                 GameManager.control.smokingpipe = true;
                 GameManager.control.isUsingPipe = usingPipe;
@@ -322,22 +322,47 @@ public class PeaksOfArchipelagoMod : ModClass
     [HarmonyPatch(typeof(NPCSystem), "GivePlayerRope")]
     public class GivePlayerRopePatch
     {
-        public static void Postfix(NPCEvents __instance)
+        public static void Postfix(NPCSystem __instance)
         {
-            bool isStHaelga = (bool)typeof(NPCEvents).GetField("isStHaelga", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(__instance);
-            bool isGreatGaol = (bool)typeof(NPCEvents).GetField("isGreatGaol", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(__instance);
-            if (isStHaelga)
+            Ropes rope = (Ropes)(-1);
+            if (__instance.isStHaelga)
             {
-                session.CompleteRopeCheck(Ropes.StHaelgaGiven);
-                GameManager.control.ropesCollected--;
-                GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().anchorsInBackpack--;
+                rope = Ropes.StHaelga;
             }
-            if (isGreatGaol)
+            if (__instance.isGreatGaol)
             {
-                session.CompleteRopeCheck(Ropes.StHaelgaGiven);
-                GameManager.control.ropesCollected--;
-                GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().anchorsInBackpack--;
+                rope = Ropes.GreatGaol;
             }
+            GameManager.control.ropesCollected--;
+            GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().anchorsInBackpack--;
+
+            session.CompleteRopeCheck(rope);
+            SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.RopeToId(rope));
+            UnityUtils.SetRopeText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+        }
+    }
+
+    [HarmonyPatch(typeof(NPC_Climber), "GivePlayerRope")]
+    public class ClimberGivePlayerRopePatch
+    {
+        public static void Postfix(NPC_Climber __instance)
+        {
+            Ropes rope = (Ropes)(-1);
+            if (__instance.isWaltersCrag)
+            {
+                rope = Ropes.WaltersCrag;
+            }
+            if (__instance.isWalkersPillar)
+            {
+                rope = Ropes.WalkersPillar;
+            }
+
+            GameManager.control.ropesCollected--;
+            GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().anchorsInBackpack--;
+
+            session.CompleteRopeCheck(rope);
+            SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.RopeToId(rope));
+            UnityUtils.SetRopeText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
         }
     }
 
@@ -405,7 +430,7 @@ public class PeaksOfArchipelagoMod : ModClass
                 GameObject.FindObjectOfType<ArtefactLoaderCabin>()?.LoadArtefacts();
                 GameObject.FindObjectOfType<RopeCabinDescription>()?.CheckCabinItems();
             }
-            if (session.playerData.items.pipe)
+            if (session.playerData.items.pipe) //reset pipe if necessary
             {
                 GameManager.control.smokingpipe = true;
                 GameManager.control.isUsingPipe = usingPipe;
@@ -426,7 +451,7 @@ public class PeaksOfArchipelagoMod : ModClass
 
         static void Postfix(Pipe __instance)
         {
-            if (session.playerData.items.pipe)
+            if (session.playerData.items.pipe) //reset pipe if necessary
             {
                 GameManager.control.isUsingPipe = isUsingPipe;
                 GameManager.control.smokingpipe = true;
@@ -446,7 +471,7 @@ public class PeaksOfArchipelagoMod : ModClass
 
         static void Postfix(PipeCabin __instance)
         {
-            if (session.playerData.items.pipe)
+            if (session.playerData.items.pipe) //reset pipe if necessary
             {
                 GameManager.control.isUsingPipe = isUsingPipe;
                 GameManager.control.smokingpipe = true;
@@ -463,6 +488,11 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             string peak = GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString();
             Debug.Log("Entering peak: " + peak);
+
+            foreach (RopeCollectable ropecol in GameObject.FindObjectsOfType<RopeCollectable>())
+            {
+                Debug.Log("Found rope: " + Utils.GetRopeFromCollectable(ropecol));
+            }
         }
     }
 
