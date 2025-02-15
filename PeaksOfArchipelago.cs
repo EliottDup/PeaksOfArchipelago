@@ -302,7 +302,6 @@ public class PeaksOfArchipelagoMod : ModClass
 
             if (session.playerData.items.pipe)
             {
-                Debug.Log("Resetting Pipe ItemEvents");
                 GameManager.control.smokingpipe = true;
                 GameManager.control.isUsingPipe = usingPipe;
                 __instance.cabinPipe.SetActive(true);
@@ -408,7 +407,6 @@ public class PeaksOfArchipelagoMod : ModClass
             }
             if (session.playerData.items.pipe)
             {
-                Debug.Log("Resetting Pipe ItemEvents");
                 GameManager.control.smokingpipe = true;
                 GameManager.control.isUsingPipe = usingPipe;
                 __instance.cabinPipe.SetActive(true);
@@ -430,7 +428,6 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             if (session.playerData.items.pipe)
             {
-                Debug.Log("Resetting Pipe Pipe.CheckLoad");
                 GameManager.control.isUsingPipe = isUsingPipe;
                 GameManager.control.smokingpipe = true;
                 __instance.gameObject.SetActive(isUsingPipe);
@@ -449,11 +446,8 @@ public class PeaksOfArchipelagoMod : ModClass
 
         static void Postfix(PipeCabin __instance)
         {
-            Debug.Log("checking pipe Pipe PipeCabin.CheckLoad");
-
             if (session.playerData.items.pipe)
             {
-                Debug.Log("Resetting Pipe PipeCabin.CheckLoad");
                 GameManager.control.isUsingPipe = isUsingPipe;
                 GameManager.control.smokingpipe = true;
                 __instance.gameObject.SetActive(true);

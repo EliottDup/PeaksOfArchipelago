@@ -36,9 +36,7 @@ class POASession(PlayerData playerData)
 
         Debug.Log("Connecting to " + uri);
         session = ArchipelagoSessionFactory.CreateSession(uri);
-        Debug.Log("Created session!");
         LoginResult result = session.TryConnectAndLogin("Peaks of Yore", SlotName, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems, password: Password);
-        Debug.Log("Login result: " + result.Successful);
         if (!result.Successful)
         {
             Debug.LogError("unsuccessful connect, aborting");
@@ -50,20 +48,16 @@ class POASession(PlayerData playerData)
             return false;
         }
 
-        session.Items.ItemReceived += (helper) =>
-        {
-            Debug.Log("Recieved item");
-        };
-
         session.SetClientState(ArchipelagoClientState.ClientConnected);
         loginSuccessful = (LoginSuccessful)result;
 
         if (loginSuccessful.SlotData.TryGetValue("deathLink", out var enableDeathLink))
         {
-            if (Convert.ToBoolean(enableDeathLink))
+            if (Convert.ToInt32(enableDeathLink) == 1)
             {
                 deathLinkService = session.CreateDeathLinkService();
                 deathLinkService.EnableDeathLink();
+                Debug.Log("Enabling Death Link");
 
                 deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
                 {
@@ -81,8 +75,7 @@ class POASession(PlayerData playerData)
         await LoadLocationDetails();
 
         UpdateRecievedItems();
-        // TODO: implement loading of data: rope count etc
-        //! WARNING: THIS SHOULD BE DONE WHEN ENTERING THE CABIN SCENE, DOING SO EARLIER THAN THAT *WILL* FUCK UP SAVES
+        Debug.Log("Login result: " + result.Successful);
         return result.Successful;
     }
 
@@ -91,10 +84,9 @@ class POASession(PlayerData playerData)
         if (session == null) return;
         if (session.Items.AllItemsReceived.Count == itemcount) return;
         List<SimpleItemInfo> newRecievedItems = [.. session.Items.AllItemsReceived.Select(item => new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })];
-        Debug.Log($"total item count {newRecievedItems.Count}");
-        Debug.Log($"old item count {itemcount}");
+
         uncollectedItems = [.. uncollectedItems.Concat(newRecievedItems.Skip(itemcount))];
-        Debug.Log($"Recieved {uncollectedItems.Count} items " + uncollectedItems.ToString());
+        Debug.Log($"Recieved {uncollectedItems.Count} items");
         itemcount = newRecievedItems.Count;
 
     }
