@@ -234,24 +234,6 @@ class POASession(PlayerData playerData)
         return peak;
     }
 
-    internal void LoadArtefacts(ArtefactLoaderCabin instance)
-    {
-        CheckList<Artefacts> savestate = new();
-        foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
-        {
-            savestate.SetCheck(artefact, UnityUtils.GetGameManagerArtefactCollected(artefact));
-            UnityUtils.SetGameManagerArtefactCollected(artefact, playerData.items.artefacts.IsChecked(artefact));
-            UnityUtils.SetGameManagerArtefactDirty(artefact, false);
-        }
-
-        instance.LoadArtefacts();
-
-        foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
-        {
-            UnityUtils.SetGameManagerArtefactCollected(artefact, savestate.IsChecked(artefact));    // reset gamemanager to default state
-        }
-    }
-
     internal string UnlockById(long id)
     {
         if (id < Utils.artefactOffset)
@@ -327,10 +309,6 @@ class POASession(PlayerData playerData)
                 }
 
         }
-
-
-        // GameObject.FindObjectOfType<ArtefactLoaderCabin>()?.LoadArtefacts();
-        // GameManager.control.Save();
     }
 
     private void UnlockBook(Books book)
@@ -368,34 +346,7 @@ class POASession(PlayerData playerData)
 
     private void UnlockBirdSeed(BirdSeeds birdSeed)
     {
-        switch (birdSeed)
-        {
-            case BirdSeeds.ExtraSeed1:
-                {
-                    GameManager.control.hasExtraSeed1 = true;
-                    break;
-                }
-            case BirdSeeds.ExtraSeed2:
-                {
-                    GameManager.control.hasExtraSeed2 = true;
-                    break;
-                }
-            case BirdSeeds.ExtraSeed3:
-                {
-                    GameManager.control.hasExtraSeed3 = true;
-                    break;
-                }
-            case BirdSeeds.ExtraSeed4:
-                {
-                    GameManager.control.hasExtraSeed4 = true;
-                    break;
-                }
-            case BirdSeeds.ExtraSeed5:
-                {
-                    GameManager.control.hasExtraSeed5 = true;
-                    break;
-                }
-        }
+        GameManager.control.extraBirdSeedUses++;
         playerData.items.seeds.SetCheck(birdSeed, true);
     }
 

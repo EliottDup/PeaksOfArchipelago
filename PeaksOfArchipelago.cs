@@ -111,6 +111,8 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             session.fundamentalsBook = GameObject.Find("PEAKJOURNAL");
         }
+        Debug.Log($"You have {GameManager.control.extraBirdSeedUses} birdseeds");
+
 
         // Debug.Log("texts:");
         // foreach (Text text in GameObject.FindObjectsOfType<Text>())  //Leaving this in case some text is ever misbehaving
@@ -240,6 +242,10 @@ public class PeaksOfArchipelagoMod : ModClass
             foreach (Artefacts artefact in Enum.GetValues(typeof(Artefacts)))
             {
                 UnityUtils.SetGameManagerArtefactCollected(artefact, savestate.IsChecked(artefact));    // reset gamemanager to default state
+                if (UnityUtils.GetGameManagerArtefactCollected(artefact) != savestate.IsChecked(artefact))
+                {
+                    Debug.LogWarning($"Error: {artefact} should be {savestate.IsChecked(artefact)} but is {!savestate.IsChecked(artefact)}!");
+                }
             }
         }
     }
@@ -488,11 +494,6 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             string peak = GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString();
             Debug.Log("Entering peak: " + peak);
-
-            foreach (RopeCollectable ropecol in GameObject.FindObjectsOfType<RopeCollectable>())
-            {
-                Debug.Log("Found rope: " + Utils.GetRopeFromCollectable(ropecol));
-            }
         }
     }
 
@@ -588,10 +589,30 @@ public class PeaksOfArchipelagoMod : ModClass
                 if (i == 267 || i == 268 || i == 269 || i == 270)
                 {
                     // Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
-                    continue;
+                    continue;   // this stops ropes on peaks from disappearing if you have 42+ ropes
                 }
                 yield return codes[i];
             }
         }
     }
+
+    [HarmonyPatch(typeof(BirdSeedCollectable), "CheckBirdSeed")]
+    public class CheckBirdSeedTranspler
+    {
+        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = new List<CodeInstruction>(instructions);
+            for (int i = 0; i < codes.Count; i++)
+            {
+                if (i == 83 || i == 84 || i == 85 || i == 86)
+                {
+                    // Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
+                    continue;   // this stops bird seeds on peaks from disappearing if you have 5+ seeds
+                }
+                yield return codes[i];
+            }
+        }
+    }
+
+
 }
