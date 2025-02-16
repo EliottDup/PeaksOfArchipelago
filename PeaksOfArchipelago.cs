@@ -233,7 +233,10 @@ public class PeaksOfArchipelagoMod : ModClass
             {
                 savestate.SetCheck(artefact, UnityUtils.GetGameManagerArtefactCollected(artefact));
                 UnityUtils.SetGameManagerArtefactCollected(artefact, session.playerData.items.artefacts.IsChecked(artefact));
-                UnityUtils.SetGameManagerArtefactDirty(artefact, false);
+                if (session.playerData.items.artefacts.IsChecked(artefact))
+                {
+                    UnityUtils.SetGameManagerArtefactDirty(artefact, false);
+                }
             }
         }
 
