@@ -250,6 +250,7 @@ public class PeaksOfArchipelagoMod : ModClass
                     Debug.LogWarning($"Error: {artefact} should be {savestate.IsChecked(artefact)} but is {!savestate.IsChecked(artefact)}!");
                 }
             }
+            GameManager.control.Save();
         }
     }
 
