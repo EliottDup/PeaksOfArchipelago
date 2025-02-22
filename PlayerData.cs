@@ -40,6 +40,8 @@ class PlayerData
         public bool pocketwatch;
         public bool chalkbag;
         public bool rope;
+        public bool coffee;
+        internal bool lamp;
     }
 
     public Locations locations = new();

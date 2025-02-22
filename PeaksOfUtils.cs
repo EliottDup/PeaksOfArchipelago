@@ -116,7 +116,9 @@ public enum Tools
     Phonograph,
     Pocketwatch,
     Chalkbag,
-    Rope
+    Rope,
+    Coffee,
+    Lamp
 }
 
 public enum ExtraItems
