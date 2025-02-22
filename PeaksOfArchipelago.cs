@@ -213,7 +213,6 @@ public class PeaksOfArchipelagoMod : ModClass
         }
     }
 
-
     [HarmonyPatch(typeof(FallingEvent), "FellToDeath")]
     public class FellToDeathPatch
     {
@@ -325,6 +324,16 @@ public class PeaksOfArchipelagoMod : ModClass
         public static void Postfix()
         {
             GameManager.control.monocular = session.playerData.items.monocular;
+            GameManager.control.Save();
+        }
+    }
+
+    [HarmonyPatch(typeof(NPCSystem), "GivePlayerCoffee")]
+    public class GivePlayerCoffeePatch
+    {
+        public static void Postfix()
+        {
+            GameManager.control.coffee = session.playerData.items.coffee;
             GameManager.control.Save();
         }
     }
@@ -498,6 +507,25 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             string peak = GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString();
             Debug.Log("Entering peak: " + peak);
+        }
+    }
+
+    [HarmonyPatch(typeof(OilLamp), "OilLampLightUp")]
+    public class OilLampLightUpPatch
+    {
+        static void Postfix(OilLamp __instance, ref IEnumerator __result)
+        {
+            if (session.playerData.items.lamp)
+            {
+                return;
+            }
+            __result = Wrapper(__instance);
+        }
+
+        static IEnumerator Wrapper(OilLamp __instance)
+        {
+            __instance.oilLampLight.intensity = 0;
+            yield return null;
         }
     }
 

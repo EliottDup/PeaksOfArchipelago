@@ -297,7 +297,6 @@ class POASession(PlayerData playerData)
             case Artefacts.Coffebox_1:
             case Artefacts.Coffebox_2:
                 {
-                    GameManager.control.coffee = true;
                     GameManager.control.extraCoffeeUses += 2;
                     break;
                 }
@@ -417,6 +416,17 @@ class POASession(PlayerData playerData)
                     playerData.items.rope = true;
                     break;
                 }
+            case Tools.Coffee:
+                {
+                    GameManager.control.coffee = true;
+                    playerData.items.coffee = true;
+                    break;
+                }
+            case Tools.Lamp:
+                {
+                    playerData.items.lamp = true;
+                    break;
+                }
         }
         GameManager.control.Save();
     }
@@ -436,7 +446,6 @@ class POASession(PlayerData playerData)
                 GameManager.control.ropesCollected++;
                 break;
             case ExtraItems.ExtraCoffee:
-                GameManager.control.coffee = true;
                 playerData.items.extraCoffeeItemCount++;
                 GameManager.control.extraCoffeeUses++;
                 break;
