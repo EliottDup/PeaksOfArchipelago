@@ -258,9 +258,21 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static bool usingPipe;
 
-        public static void Prefix()
+        public static void Prefix(NPCEvents __instance)
         {
             usingPipe = GameManager.control.isUsingPipe;
+            ItemEventsPatch.isCustomEvent = false;
+            session.CheckWin();
+            session.UpdateRecievedItems();
+            if (session.uncollectedItems.Count != 0 && !__instance.runningEvent && session.currentScene != "TitleScreen")
+            {
+                Debug.Log("starting custom event");
+                ItemEventsPatch.isCustomEvent = true;
+                __instance.eventName = "AllArtefacts";
+                __instance.runningEvent = true;
+                // __instance.StartCoroutine("GlowDoorEvent");
+                __instance.npcParcelDeliverySystem.StartCoroutine("FadeScreenAndStartUnpackEvent");
+            }
         }
 
         public static void Postfix(NPCEvents __instance)
@@ -297,17 +309,7 @@ public class PeaksOfArchipelagoMod : ModClass
                         }
                 }
             }
-            ItemEventsPatch.isCustomEvent = false;
-            session.CheckWin();
-            session.UpdateRecievedItems();
-            if (session.uncollectedItems.Count != 0 && !__instance.runningEvent && session.currentScene != "TitleScreen")
-            {
-                Debug.Log("starting custom event");
-                ItemEventsPatch.isCustomEvent = true;
-                __instance.eventName = "AllArtefacts";
-                // __instance.StartCoroutine("GlowDoorEvent");
-                __instance.npcParcelDeliverySystem.StartCoroutine("FadeScreenAndStartUnpackEvent");
-            }
+
 
             if (session.playerData.items.pipe) //reset pipe if necessary
             {
