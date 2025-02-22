@@ -8,6 +8,7 @@ using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
+
 using UnityEngine;
 
 namespace PeaksOfArchipelago;
@@ -74,6 +75,11 @@ class POASession(PlayerData playerData)
 
         await LoadLocationDetails();
 
+        session.Items.ItemReceived += (receivedItemsHelper) =>
+        {
+            Debug.Log($"Received Item: {receivedItemsHelper.PeekItem().ItemName}");
+        };
+
         UpdateRecievedItems();
         Debug.Log("Login result: " + result.Successful);
         return result.Successful;
@@ -82,13 +88,14 @@ class POASession(PlayerData playerData)
     public void UpdateRecievedItems()
     {
         if (session == null) return;
+
         if (session.Items.AllItemsReceived.Count == itemcount) return;
-        List<SimpleItemInfo> newRecievedItems = [.. session.Items.AllItemsReceived.Select(item => new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })];
+        List<SimpleItemInfo> newRecievedItems = [.. session.Items.AllItemsReceived.Select(item =>
+            new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })]; // slight affront to god to convert to custom item class
 
         uncollectedItems = [.. uncollectedItems.Concat(newRecievedItems.Skip(itemcount))];
         Debug.Log($"Recieved {uncollectedItems.Count} items");
         itemcount = newRecievedItems.Count;
-
     }
 
     public async Task LoadLocationDetails()
