@@ -222,6 +222,23 @@ public class PeaksOfArchipelagoMod : ModClass
         }
     }
 
+    [HarmonyPatch(typeof(ResetPosition), "FadeToBlack")]
+    public class ResetPositionPatch
+    {
+        static void Prefix(ResetPosition __instance)
+        {
+            if (__instance.isSea)
+            {
+                Debug.Log("Not killing, in the sea");
+            }
+            else
+            {
+                Debug.Log("Killing, fell on rocks i guess");
+                session.HandleDeath();
+            }
+        }
+    }
+
     [HarmonyPatch(typeof(ArtefactLoaderCabin), "LoadArtefacts")]
     public class ArtefactLoaderPatch
     {
