@@ -26,6 +26,8 @@ class POASession(PlayerData playerData)
     public GameObject fundamentalsBook;
     private LoginSuccessful loginSuccessful;
     private bool firstLogin = false;
+    public bool finished = false;
+    public bool seenFinishedCutScene = false;
 
     public async Task<bool> Connect(string uri, string SlotName, string Password)
     {
@@ -81,12 +83,11 @@ class POASession(PlayerData playerData)
 
         firstLogin = true;
         session.DataStorage["ItemCount"].Initialize(0);
-        // UpdateRecievedItems();
         Debug.Log("Login result: " + result.Successful);
         return result.Successful;
     }
 
-    public void UpdateRecievedItems()
+    public void UpdateReceivedItems()
     {
         if (session == null) return;
         if (firstLogin)
@@ -95,12 +96,12 @@ class POASession(PlayerData playerData)
             Debug.Log("Getting previously unlocked items");
             itemcount = session.DataStorage["ItemCount"];
             Debug.Log($"found {itemcount} already unlocked items");
-            List<SimpleItemInfo> oldRecievedItems = [.. session.Items.AllItemsReceived.Take(itemcount).Select(item =>
+            List<SimpleItemInfo> oldReceivedItems = [.. session.Items.AllItemsReceived.Take(itemcount).Select(item =>
             new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })];
-            foreach (SimpleItemInfo oldRecievedItem in oldRecievedItems)
+            foreach (SimpleItemInfo oldReceivedItem in oldReceivedItems)
             {
-                Debug.Log($"{oldRecievedItem.itemName} already received, unlocking");
-                UnlockById(oldRecievedItem.id);
+                Debug.Log($"{oldReceivedItem.itemName} already received, unlocking");
+                UnlockById(oldReceivedItem.id);
             }
         }
         else
@@ -108,12 +109,12 @@ class POASession(PlayerData playerData)
             Debug.Log("not first login");
         }
         if (session.Items.AllItemsReceived.Count == itemcount) return;
-        List<SimpleItemInfo> newRecievedItems = [.. session.Items.AllItemsReceived.Select(item =>
+        List<SimpleItemInfo> newReceivedItems = [.. session.Items.AllItemsReceived.Select(item =>
             new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })]; // slight affront to god to convert to custom item class
 
-        uncollectedItems = [.. uncollectedItems.Concat(newRecievedItems.Skip(itemcount))];
-        Debug.Log($"Recieved {uncollectedItems.Count} items");
-        itemcount = newRecievedItems.Count;
+        uncollectedItems = [.. uncollectedItems.Concat(newReceivedItems.Skip(itemcount))];
+        Debug.Log($"Received {uncollectedItems.Count} items");
+        itemcount = newReceivedItems.Count;
         session.DataStorage["ItemCount"] = itemcount;
     }
 
@@ -152,6 +153,7 @@ class POASession(PlayerData playerData)
                     Debug.Log("Win condition achieved, unlocking items!");
                     session.SetClientState(ArchipelagoClientState.ClientGoal);
                     session.SetGoalAchieved();
+                    finished = true;
                 }
             }
             else
@@ -167,6 +169,7 @@ class POASession(PlayerData playerData)
                 Debug.Log("Win condition achieved, unlocking items!");
                 session.SetClientState(ArchipelagoClientState.ClientGoal);
                 session.SetGoalAchieved();
+                finished = true;
             }
         }
     }

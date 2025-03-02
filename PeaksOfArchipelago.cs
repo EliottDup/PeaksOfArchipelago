@@ -280,7 +280,7 @@ public class PeaksOfArchipelagoMod : ModClass
             usingPipe = GameManager.control.isUsingPipe;
             ItemEventsPatch.isCustomEvent = false;
             session.CheckWin();
-            session.UpdateRecievedItems();
+            session.UpdateReceivedItems();
             if (session.uncollectedItems.Count != 0 && !__instance.runningEvent && session.currentScene != "TitleScreen")
             {
                 Debug.Log("starting custom event");
@@ -289,6 +289,13 @@ public class PeaksOfArchipelagoMod : ModClass
                 __instance.runningEvent = true;
                 // __instance.StartCoroutine("GlowDoorEvent");
                 __instance.npcParcelDeliverySystem.StartCoroutine("FadeScreenAndStartUnpackEvent");
+            }
+            else if (session.finished && !session.seenFinishedCutScene)
+            {
+                ItemEventsPatch.isFinishEvent = true;
+                session.seenFinishedCutScene = true;
+                __instance.eventName = "CompleteGame_Base";
+                __instance.StartCoroutine("GlowDoorEvent");
             }
         }
 
@@ -301,7 +308,7 @@ public class PeaksOfArchipelagoMod : ModClass
                 __instance.StopCoroutine("MissedMonocularTooltip");
             }
 
-            if (!ItemEventsPatch.isCustomEvent && __instance.runningEvent)
+            if (!(ItemEventsPatch.isCustomEvent || ItemEventsPatch.isFinishEvent) && __instance.runningEvent)
             {
                 switch (__instance.eventName)
                 {
@@ -407,7 +414,8 @@ public class PeaksOfArchipelagoMod : ModClass
     [HarmonyPatch(typeof(NPCEvents), "ItemEvents")]
     public class ItemEventsPatch
     {
-        public static bool isCustomEvent;
+        public static bool isCustomEvent = false;
+        public static bool isFinishEvent = false;
         static bool hasAllArtefacts = false;
         static string tempText = "";
         static bool usingPipe;
@@ -422,7 +430,7 @@ public class PeaksOfArchipelagoMod : ModClass
 
             string msg = "You got: ";
 
-            session.UpdateRecievedItems();
+            session.UpdateReceivedItems();
             SimpleItemInfo last = session.uncollectedItems.Last();
             foreach (SimpleItemInfo info in session.uncollectedItems)
             {
@@ -456,7 +464,7 @@ public class PeaksOfArchipelagoMod : ModClass
                 GameManager.control.extraChalkUses -= 999999999;
                 textElement.text = tempText;
 
-                session.UpdateRecievedItems();
+                session.UpdateReceivedItems();
                 List<SimpleItemInfo> items = session.uncollectedItems;
                 session.uncollectedItems = [];
                 foreach (SimpleItemInfo item in items)
