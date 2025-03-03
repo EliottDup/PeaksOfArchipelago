@@ -233,7 +233,7 @@ public static class Utils
         {
             p -= 1;
         }
-        return (Peaks)(peakStamper.peakNames - 1);
+        return (Peaks)(p);
     }
 
     public static Ropes GetRopeFromCollectable(RopeCollectable ropeCollectable)
