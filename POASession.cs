@@ -8,7 +8,6 @@ using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
-
 using UnityEngine;
 
 namespace PeaksOfArchipelago;
@@ -21,12 +20,14 @@ class POASession(PlayerData playerData)
     bool playerKilled = false;
     Dictionary<long, ScoutedItemInfo> scoutedItems;
     public readonly PlayerData playerData = playerData;
-
     private int itemcount = 0;
     public List<SimpleItemInfo> uncollectedItems = [];
     public string currentScene;
     public GameObject fundamentalsBook;
     private LoginSuccessful loginSuccessful;
+    private bool firstLogin = false;
+    public bool finished = false;
+    public bool seenFinishedCutScene = false;
 
     public async Task<bool> Connect(string uri, string SlotName, string Password)
     {
@@ -80,22 +81,41 @@ class POASession(PlayerData playerData)
             Debug.Log($"Received Item: {receivedItemsHelper.PeekItem().ItemName}");
         };
 
-        UpdateRecievedItems();
+        firstLogin = true;
+        session.DataStorage["ItemCount"].Initialize(0);
         Debug.Log("Login result: " + result.Successful);
         return result.Successful;
     }
 
-    public void UpdateRecievedItems()
+    public void UpdateReceivedItems()
     {
         if (session == null) return;
-
+        if (firstLogin)
+        {
+            firstLogin = false;
+            Debug.Log("Getting previously unlocked items");
+            itemcount = session.DataStorage["ItemCount"];
+            Debug.Log($"found {itemcount} already unlocked items");
+            List<SimpleItemInfo> oldReceivedItems = [.. session.Items.AllItemsReceived.Take(itemcount).Select(item =>
+            new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })];
+            foreach (SimpleItemInfo oldReceivedItem in oldReceivedItems)
+            {
+                Debug.Log($"{oldReceivedItem.itemName} already received, unlocking");
+                UnlockById(oldReceivedItem.id);
+            }
+        }
+        else
+        {
+            Debug.Log("not first login");
+        }
         if (session.Items.AllItemsReceived.Count == itemcount) return;
-        List<SimpleItemInfo> newRecievedItems = [.. session.Items.AllItemsReceived.Select(item =>
+        List<SimpleItemInfo> newReceivedItems = [.. session.Items.AllItemsReceived.Select(item =>
             new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })]; // slight affront to god to convert to custom item class
 
-        uncollectedItems = [.. uncollectedItems.Concat(newRecievedItems.Skip(itemcount))];
-        Debug.Log($"Recieved {uncollectedItems.Count} items");
-        itemcount = newRecievedItems.Count;
+        uncollectedItems = [.. uncollectedItems.Concat(newReceivedItems.Skip(itemcount))];
+        Debug.Log($"Received {uncollectedItems.Count} items");
+        itemcount = newReceivedItems.Count;
+        session.DataStorage["ItemCount"] = itemcount;
     }
 
     public async Task LoadLocationDetails()
@@ -133,6 +153,7 @@ class POASession(PlayerData playerData)
                     Debug.Log("Win condition achieved, unlocking items!");
                     session.SetClientState(ArchipelagoClientState.ClientGoal);
                     session.SetGoalAchieved();
+                    finished = true;
                 }
             }
             else
@@ -148,6 +169,7 @@ class POASession(PlayerData playerData)
                 Debug.Log("Win condition achieved, unlocking items!");
                 session.SetClientState(ArchipelagoClientState.ClientGoal);
                 session.SetGoalAchieved();
+                finished = true;
             }
         }
     }
