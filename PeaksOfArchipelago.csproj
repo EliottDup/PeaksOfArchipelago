@@ -44,10 +44,16 @@
       <HintPath>lib/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="com.rlabrecque.steamworks.net">
-      <HintPath>lib/com.rlabrecque.steamworks.net</HintPath>
+      <HintPath>lib/com.rlabrecque.steamworks.net.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-          <HintPath>lib/Newtonsoft.Json</HintPath>
+          <HintPath>lib/Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Rewired_Core">
+      <HintPath>lib/Rewired_Core.dll</HintPath>
+    </Reference>
+        <!-- <Reference Include="Rewired_Core.net">
+      <HintPath>lib/Rewired_Core.net.dll</HintPath>
+    </Reference> -->
 </ItemGroup>
 </Project>

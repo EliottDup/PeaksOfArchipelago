@@ -118,7 +118,9 @@ public enum Tools
     Chalkbag,
     Rope,
     Coffee,
-    Lamp
+    Lamp,
+    leftHand,
+    RightHand
 }
 
 public enum ExtraItems
@@ -195,12 +197,12 @@ public static class Utils
 {
     //id offsets (surely 100 is enough)
     public const int peakOffset = 1;
-    public const int ropeOffset = 100;
-    public const int artefactOffset = 200;
-    public const int bookOffset = 300;
-    public const int birdSeedOffset = 400;
-    public const int toolOffset = 500;
-    public const int extraItemOffset = 600;
+    public const int ropeOffset = 1000;
+    public const int artefactOffset = 2000;
+    public const int bookOffset = 3000;
+    public const int birdSeedOffset = 4000;
+    public const int toolOffset = 5000;
+    public const int extraItemOffset = 6000;
 
     public readonly static Dictionary<Artefacts, string> artefactToVariableName = new()
     {

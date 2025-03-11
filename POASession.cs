@@ -450,6 +450,16 @@ class POASession(PlayerData playerData)
                     playerData.items.lamp = true;
                     break;
                 }
+            case Tools.RightHand:
+                {
+                    playerData.items.rightHand = true;
+                    break;
+                }
+            case Tools.leftHand:
+                {
+                    playerData.items.leftHand = true;
+                    break;
+                }
         }
         GameManager.control.Save();
     }
