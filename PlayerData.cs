@@ -8,15 +8,6 @@ class PlayerData
         public CheckList<Artefacts> artefacts = new();
         public CheckList<Peaks> peaks = new();
         public CheckList<BirdSeeds> seeds = new();
-        public int progressiveCrampons;
-        public bool pipe;
-        public bool ropeLengthUpgrade;
-        public bool barometer;
-        public bool monocular;
-        public bool phonograph;
-        public bool pocketwatch;
-        public bool chalkbag;
-        public bool rope;
     }
 
     public class Items

@@ -33,12 +33,11 @@ public class PeaksOfArchipelago : BaseUnityPlugin
         Harmony h = new(ModInfo.MOD_GUID + "_Paths");
 
         MethodInfo method = AccessTools.PropertyGetter(AccessTools.TypeByName("POKModManager.Paths"), "GameFolder");
-        Debug.Log(method);
         MethodInfo prefix = typeof(Patch_Paths).GetMethod("Prefix", BindingFlags.Static | BindingFlags.Public);
-        Debug.Log(method);
         h.Patch(method, prefix: new HarmonyMethod(prefix));
 
-        new POKManager(true);
+        new POKManager(true);   //Re-initialise the ModManager with correct paths
+        // A "funny" side effect is that if the mod is installed manually instead of using r2modman or thunderstore, the main menu gains a second "Mods" button
     }
 
     private void Start()
@@ -51,7 +50,7 @@ public class Patch_Paths
 {
     public static bool Prefix(ref string __result)
     {
-        __result = System.IO.Directory.GetParent(BepInEx.Paths.BepInExRootPath).ToString();
+        __result = System.IO.Directory.GetParent(BepInEx.Paths.BepInExRootPath).ToString(); // this fixes a bug with the mod manager, where some paths would not always be correct and crash the mod
         return false;
     }
 }
@@ -74,18 +73,17 @@ public class PeaksOfArchipelagoMod : ModClass
 
     public override void OnEnabled()    // Runs when the mod is enabled, and completely at the start
     {
-        Debug.Log(BepInEx.Paths.BepInExConfigPath);
+
         playerData = new PlayerData();
         session = new POASession(playerData);
         harmony.PatchAll();
+
         Connect.AddListener(OnConnect);
         if (AutoConnect)
         {
             OnConnect();
         }
-        Debug.Log("Loaded Peaks of Archipelago!");
-
-        // Debug.Log(Utils.GetDataAsJson());
+        Debug.Log("Enabled Peaks of Archipelago!");
     }
 
     public override void OnDisabled()
@@ -106,7 +104,7 @@ public class PeaksOfArchipelagoMod : ModClass
             GameManager.control.extraBirdSeedUses = 0;
         }
         session.currentScene = SceneManager.GetActiveScene().name;
-        Debug.Log(session.currentScene);
+        Debug.Log("Entering Scene" + session.currentScene);
         if (session.currentScene == "Cabin")
         {
             session.fundamentalsBook = GameObject.Find("PEAKJOURNAL");
@@ -227,15 +225,12 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static void Prefix(ResetPosition __instance)
         {
-            if (__instance.isSea)
+            if (!__instance.isSea)
             {
-                Debug.Log("Not killing, in the sea");
-            }
-            else
-            {
-                Debug.Log("Killing, fell on rocks i guess");
                 session.HandleDeath();
+                //player fell on rocks and therefore must die
             }
+            // else they fell in the water which is fine :)
         }
     }
 
@@ -281,7 +276,7 @@ public class PeaksOfArchipelagoMod : ModClass
             ItemEventsPatch.isCustomEvent = false;
             session.CheckWin();
             session.UpdateReceivedItems();
-            if (session.uncollectedItems.Count != 0 && !__instance.runningEvent && session.currentScene != "TitleScreen")
+            if (session.uncollectedItems.Count != 0 && !__instance.runningEvent && session.currentScene != "TitleScreen")   //player has received new items
             {
                 Debug.Log("starting custom event");
                 ItemEventsPatch.isCustomEvent = true;
@@ -290,7 +285,7 @@ public class PeaksOfArchipelagoMod : ModClass
                 // __instance.StartCoroutine("GlowDoorEvent");
                 __instance.npcParcelDeliverySystem.StartCoroutine("FadeScreenAndStartUnpackEvent");
             }
-            else if (session.finished && !session.seenFinishedCutScene)
+            else if (session.finished && !session.seenFinishedCutScene) // player finished the game and won!
             {
                 ItemEventsPatch.isFinishEvent = true;
                 session.seenFinishedCutScene = true;
@@ -672,6 +667,4 @@ public class PeaksOfArchipelagoMod : ModClass
             }
         }
     }
-
-
 }
