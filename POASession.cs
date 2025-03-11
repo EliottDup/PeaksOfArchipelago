@@ -71,14 +71,13 @@ class POASession(PlayerData playerData)
         if (loginSuccessful.SlotData.TryGetValue("ropeUnlockMode", out var ropeUnlockMode))
         {
             instantRope = Convert.ToInt32(ropeUnlockMode) == 0;
-            Debug.Log("rope mode: " + Convert.ToInt32(ropeUnlockMode));
         }
 
         await LoadLocationDetails();
 
         session.Items.ItemReceived += (receivedItemsHelper) =>
         {
-            Debug.Log($"Received Item: {receivedItemsHelper.PeekItem().ItemName}");
+            Debug.Log($"Received Item: {receivedItemsHelper.PeekItem().ItemName}"); // This doesn't seem to work for some reason, so I just check for new items when entering the cabin
         };
 
         firstLogin = true;
@@ -100,13 +99,8 @@ class POASession(PlayerData playerData)
             new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })];
             foreach (SimpleItemInfo oldReceivedItem in oldReceivedItems)
             {
-                Debug.Log($"{oldReceivedItem.itemName} already received, unlocking");
                 UnlockById(oldReceivedItem.id);
             }
-        }
-        else
-        {
-            Debug.Log("not first login");
         }
         if (session.Items.AllItemsReceived.Count == itemcount) return;
         List<SimpleItemInfo> newReceivedItems = [.. session.Items.AllItemsReceived.Select(item =>
@@ -259,7 +253,7 @@ class POASession(PlayerData playerData)
         playerData.locations.peaks.SetCheck(peak, true);
 
         Debug.Log("Completing peak " + peak.ToString());
-        // DONE!
+        // DONE!    // I don't know why I placed this comment here lol
         return peak;
     }
 
