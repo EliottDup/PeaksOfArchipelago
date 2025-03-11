@@ -32,7 +32,9 @@ class PlayerData
         public bool chalkbag;
         public bool rope;
         public bool coffee;
-        internal bool lamp;
+        public bool lamp;
+        public bool rightHand;
+        public bool leftHand;
     }
 
     public Locations locations = new();

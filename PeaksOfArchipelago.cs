@@ -551,6 +551,17 @@ public class PeaksOfArchipelagoMod : ModClass
         }
     }
 
+    [HarmonyPatch(typeof(Rewired.Player), "GetButton", [typeof(string)])]
+    public class HandPatch
+    {
+        static bool Prefix(ref bool __result, string actionName)
+        {
+            if (actionName == "Arm Right" && !session.playerData.items.rightHand) return false;
+            if (actionName == "Arm Left" && !session.playerData.items.leftHand) return false;
+            return true;
+        }
+    }
+
     [HarmonyPatch(typeof(StatsAndAchievements), "SetAchievement")]
     [HarmonyPatch(typeof(StatsAndAchievements), "SetStatFloat")]
     [HarmonyPatch(typeof(StatsAndAchievements), "SetStatInt")]
