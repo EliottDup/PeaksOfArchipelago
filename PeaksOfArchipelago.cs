@@ -529,6 +529,10 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             string peak = GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString();
             Debug.Log("Entering peak: " + peak);
+            GameObject go = new GameObject();
+            Traps t = go.AddComponent<Traps>();
+            session.trapsHandler = t;
+            go.transform.parent = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()[0].transform;
         }
     }
 

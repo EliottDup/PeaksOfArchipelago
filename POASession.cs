@@ -28,6 +28,7 @@ class POASession(PlayerData playerData)
     private bool firstLogin = false;
     public bool finished = false;
     public bool seenFinishedCutScene = false;
+    public Traps trapsHandler;
 
     public async Task<bool> Connect(string uri, string SlotName, string Password)
     {
@@ -64,6 +65,7 @@ class POASession(PlayerData playerData)
                 deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
                 {
                     Debug.Log(deathLinkObject.Source + deathLinkObject.Cause);
+                    // trapsHandler.StartBirdTrap();
                     KillPlayer();
                 };
             }
@@ -119,7 +121,6 @@ class POASession(PlayerData playerData)
 
     public void HandleDeath()
     {
-        if (deathLinkService == null) return;
         if (playerKilled)
         {
             playerKilled = false;   // This is done to prevent players killed by deathlink to send out deathlink ticks again
