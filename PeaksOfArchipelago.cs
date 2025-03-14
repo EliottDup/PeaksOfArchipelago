@@ -42,7 +42,7 @@ public class PeaksOfArchipelago : BaseUnityPlugin
 
     private void Start()
     {
-        POKManager.RegisterMod(new PeaksOfArchipelagoMod(), ModInfo.MOD_NAME, ModInfo.MOD_VERSION, ModInfo.MOD_DESC, UseEditableAttributeOnly: true);
+        POKManager.RegisterMod(new PeaksOfArchipelagoMod(Logger), ModInfo.MOD_NAME, ModInfo.MOD_VERSION, ModInfo.MOD_DESC, UseEditableAttributeOnly: true);
     }
 }
 
@@ -70,12 +70,19 @@ public class PeaksOfArchipelagoMod : ModClass
     PlayerData playerData;
 
     private static POASession session;
+    private ManualLogSource logger;
+
+    public PeaksOfArchipelagoMod(ManualLogSource logger)
+    {
+        this.logger = logger;
+    }
 
     public override void OnEnabled()    // Runs when the mod is enabled, and completely at the start
     {
 
         playerData = new PlayerData();
         session = new POASession(playerData);
+        session.logger = logger;
         harmony.PatchAll();
 
         Connect.AddListener(OnConnect);
@@ -531,7 +538,8 @@ public class PeaksOfArchipelagoMod : ModClass
             Debug.Log("Entering peak: " + peak);
             GameObject go = new GameObject();
             Traps t = go.AddComponent<Traps>();
-            session.trapsHandler = t;
+            session.trapHandler = t;
+            t.logger = session.logger;
             go.transform.parent = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()[0].transform;
         }
     }

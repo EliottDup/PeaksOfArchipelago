@@ -8,6 +8,7 @@ using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
+using BepInEx.Logging;
 using UnityEngine;
 
 namespace PeaksOfArchipelago;
@@ -28,7 +29,8 @@ class POASession(PlayerData playerData)
     private bool firstLogin = false;
     public bool finished = false;
     public bool seenFinishedCutScene = false;
-    public Traps trapsHandler;
+    public Traps trapHandler;
+    public ManualLogSource logger;
 
     public async Task<bool> Connect(string uri, string SlotName, string Password)
     {
@@ -64,8 +66,9 @@ class POASession(PlayerData playerData)
 
                 deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
                 {
-                    Debug.Log(deathLinkObject.Source + deathLinkObject.Cause);
-                    // trapsHandler.StartBirdTrap();
+                    logger.LogInfo(deathLinkObject.Source + deathLinkObject.Cause);
+                    logger.Log(LogLevel.Info, trapHandler);
+                    RandomTrap();
                     KillPlayer();
                 };
             }
@@ -167,6 +170,12 @@ class POASession(PlayerData playerData)
                 finished = true;
             }
         }
+    }
+
+    public void RandomTrap()
+    {
+        Debug.Log("AAA");
+        trapHandler.StartBirdTrap();
     }
 
     public void KillPlayer()

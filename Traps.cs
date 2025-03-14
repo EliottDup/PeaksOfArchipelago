@@ -1,11 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
+using BepInEx.Logging;
 using UnityEngine;
 
 class Traps : MonoBehaviour
 {
     Bird hunter = null;
     Bird crow = null;
+    public ManualLogSource logger;
     public void Start()
     {
         Bird[] birds = GameObject.FindObjectsOfType<Bird>();
@@ -30,15 +31,30 @@ class Traps : MonoBehaviour
 
     public void StartBirdTrap()
     {
+
+        logger.LogInfo("HEEELP");
         StartCoroutine("BirdsTrap");
     }
 
     private IEnumerator BirdsTrap()
     {
-        hunter.gameObject.SetActive(true);
-        crow.gameObject.SetActive(true);
-        yield return new WaitForSeconds(15f);
-        hunter.gameObject.SetActive(false);
-        crow.gameObject.SetActive(false);
+        if (hunter != null && crow != null)
+        {
+            yield return new WaitForEndOfFrame();
+            logger.LogInfo("activating birds");
+            hunter.enabled = false;
+            hunter.gameObject.SetActive(true);
+            crow.enabled = false;
+            crow.gameObject.SetActive(true);
+            logger.LogInfo("activated birds");
+            yield return new WaitForSeconds(15f);
+            logger.LogInfo("deactivating birds");
+            hunter.gameObject.SetActive(false);
+            crow.gameObject.SetActive(false);
+        }
+        else
+        {
+            logger.LogInfo("birds are null?");
+        }
     }
 }
