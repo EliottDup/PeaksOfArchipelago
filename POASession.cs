@@ -39,16 +39,16 @@ class POASession(PlayerData playerData)
         deathLinkService = null;
         // Reset some values to allow reconnection without restarting
 
-        Debug.Log("Connecting to " + uri);
+        logger.LogInfo("Connecting to " + uri);
         session = ArchipelagoSessionFactory.CreateSession(uri);
         LoginResult result = session.TryConnectAndLogin("Peaks of Yore", SlotName, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems, password: Password);
         if (!result.Successful)
         {
-            Debug.LogError("unsuccessful connect, aborting");
-            Debug.LogError("Something went wrong and you are not connected");
+            logger.LogError("unsuccessful connect, aborting");
+            logger.LogError("Something went wrong and you are not connected");
             foreach (string error in ((LoginFailure)result).Errors)
             {
-                Debug.LogError(error);
+                logger.LogError(error);
             }
             return false;
         }
@@ -62,7 +62,7 @@ class POASession(PlayerData playerData)
             {
                 deathLinkService = session.CreateDeathLinkService();
                 deathLinkService.EnableDeathLink();
-                Debug.Log("Enabling Death Link");
+                logger.LogInfo("Enabling Death Link");
 
                 deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
                 {
@@ -82,12 +82,12 @@ class POASession(PlayerData playerData)
 
         session.Items.ItemReceived += (receivedItemsHelper) =>
         {
-            Debug.Log($"Received Item: {receivedItemsHelper.PeekItem().ItemName}"); // This doesn't seem to work for some reason, so I just check for new items when entering the cabin
+            logger.LogInfo($"Received Item: {receivedItemsHelper.PeekItem().ItemName}"); // This doesn't seem to work for some reason, so I just check for new items when entering the cabin
         };
 
         firstLogin = true;
         session.DataStorage["ItemCount"].Initialize(0);
-        Debug.Log("Login result: " + result.Successful);
+        logger.LogInfo("Login result: " + result.Successful);
         return result.Successful;
     }
 
@@ -97,9 +97,9 @@ class POASession(PlayerData playerData)
         if (firstLogin)
         {
             firstLogin = false;
-            Debug.Log("Getting previously unlocked items");
+            logger.LogInfo("Getting previously unlocked items");
             itemcount = session.DataStorage["ItemCount"];
-            Debug.Log($"found {itemcount} already unlocked items");
+            logger.LogInfo($"found {itemcount} already unlocked items");
             List<SimpleItemInfo> oldReceivedItems = [.. session.Items.AllItemsReceived.Take(itemcount).Select(item =>
             new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })];
             foreach (SimpleItemInfo oldReceivedItem in oldReceivedItems)
@@ -112,7 +112,7 @@ class POASession(PlayerData playerData)
             new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })]; // slight affront to god to convert to custom item class
 
         uncollectedItems = [.. uncollectedItems.Concat(newReceivedItems.Skip(itemcount))];
-        Debug.Log($"Received {uncollectedItems.Count} items");
+        logger.LogInfo($"Received {uncollectedItems.Count} items");
         itemcount = newReceivedItems.Count;
         session.DataStorage["ItemCount"] = itemcount;
     }
@@ -129,7 +129,7 @@ class POASession(PlayerData playerData)
             playerKilled = false;   // This is done to prevent players killed by deathlink to send out deathlink ticks again
             return;
         }
-        Debug.Log("Sending Deathlink");
+        logger.LogInfo("Sending Deathlink");
         if (session == null) return;
         deathLinkService.SendDeathLink(new DeathLink(session.Players.GetPlayerAliasAndName(session.ConnectionInfo.Slot), "Fell off."));
     }
@@ -148,7 +148,7 @@ class POASession(PlayerData playerData)
             {
                 if (missing.Count() == 0)
                 {
-                    Debug.Log("Win condition achieved, unlocking items!");
+                    logger.LogInfo("Win condition achieved, unlocking items!");
                     session.SetClientState(ArchipelagoClientState.ClientGoal);
                     session.SetGoalAchieved();
                     finished = true;
@@ -164,7 +164,7 @@ class POASession(PlayerData playerData)
                         return;
                     }
                 }
-                Debug.Log("Win condition achieved, unlocking items!");
+                logger.LogInfo("Win condition achieved, unlocking items!");
                 session.SetClientState(ArchipelagoClientState.ClientGoal);
                 session.SetGoalAchieved();
                 finished = true;
@@ -174,7 +174,7 @@ class POASession(PlayerData playerData)
 
     public void RandomTrap()
     {
-        Debug.Log("AAA");
+        logger.LogInfo("AAA");
         trapHandler.StartBirdTrap();
     }
 
@@ -188,7 +188,7 @@ class POASession(PlayerData playerData)
             {
                 return;
             }
-            Debug.Log("killing player");
+            logger.LogInfo("killing player");
             playerKilled = true;
             method.Invoke(fallingEvent, null);
         }
@@ -214,7 +214,7 @@ class POASession(PlayerData playerData)
     public Ropes CompleteRopeCheck(Ropes rope)
     {
         playerData.locations.ropes.SetCheck(rope, true);                            // save rope check
-        Debug.Log("Completing rope " + rope.ToString());
+        logger.LogInfo("Completing rope " + rope.ToString());
 
         if (session == null) return (Ropes)(-1);
         session.Locations.CompleteLocationChecks(Utils.RopeToId(rope));  // send check complete to multiworld
@@ -232,7 +232,7 @@ class POASession(PlayerData playerData)
     public Artefacts CompleteArtefactCheck(ArtefactOnPeak artefactOnPeak)
     {
         Artefacts artefact = Utils.GetArtefactFromCollectable(artefactOnPeak);
-        Debug.Log("Completing artefact " + artefact.ToString());
+        logger.LogInfo("Completing artefact " + artefact.ToString());
         playerData.locations.artefacts.SetCheck(artefact, true);
 
         if (session == null) return (Artefacts)(-1);
@@ -244,7 +244,7 @@ class POASession(PlayerData playerData)
     public BirdSeeds CompleteSeedCheck(BirdSeedCollectable seedCollectable)
     {
         BirdSeeds seed = Utils.GetSeedFromCollectable(seedCollectable);
-        Debug.Log("Completing seed " + seed.ToString());
+        logger.LogInfo("Completing seed " + seed.ToString());
         playerData.locations.seeds.SetCheck(seed, true);
 
         if (session == null) return (BirdSeeds)(-1);
@@ -262,7 +262,7 @@ class POASession(PlayerData playerData)
 
         playerData.locations.peaks.SetCheck(peak, true);
 
-        Debug.Log("Completing peak " + peak.ToString());
+        logger.LogInfo("Completing peak " + peak.ToString());
         // DONE!    // I don't know why I placed this comment here lol
         return peak;
     }

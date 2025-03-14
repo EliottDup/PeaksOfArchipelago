@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using BepInEx.Logging;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,28 +8,29 @@ namespace PeaksOfArchipelago;
 
 static class UnityUtils
 {
+    public static ManualLogSource logger;
     public static void SetRopeText(string message)
     {
         Text ropeCollected = GameObject.Find("RopeCollectedTxt")?.GetComponentInChildren<Text>();
         Text NPCRopeCollected = GameObject.Find("NPCRopeCollectedTxt")?.GetComponentInChildren<Text>();
         if (ropeCollected != null) ropeCollected.text = message;
-        else Debug.LogWarning("didnt find RopeCollectedText");
+        else logger.LogWarning("didnt find RopeCollectedText");
         if (NPCRopeCollected != null) NPCRopeCollected.text = message;
-        else Debug.LogWarning("didnt find NPCRopeCollectedText");
+        else logger.LogWarning("didnt find NPCRopeCollectedText");
     }
 
     internal static void SetArtefactText(string message)
     {
         Text artefactCollected = GameObject.Find("ArtefactCollected")?.GetComponentInChildren<Text>();
         if (artefactCollected != null) artefactCollected.text = message;
-        else Debug.LogWarning("didnt find artefactcollectedtext");
+        else logger.LogWarning("didnt find artefactcollectedtext");
     }
 
     public static void SetSeedText(string message)
     {
         Text BirdSeedCollected = GameObject.Find("BirdSeedCollectedTxt")?.GetComponentInChildren<Text>();
         if (BirdSeedCollected != null) BirdSeedCollected.text = message;
-        else Debug.LogWarning("didnt find BirdSeedCollectedTxt");
+        else logger.LogWarning("didnt find BirdSeedCollectedTxt");
     }
 
     // progress disablers (these basically undo whatever progress has been done in order to have the randomiser work properly)
@@ -87,19 +89,19 @@ static class UnityUtils
 
     public static void PrintObjectData(GameObject gameObject)
     {
-        Debug.Log("---------");
-        Debug.Log($"name: {gameObject.name}");
-        Debug.Log($"parent: {gameObject.transform.parent.name}");
-        Debug.Log($"pos: {gameObject.transform.position}");
-        Debug.Log($"rot: {gameObject.transform.rotation}");
+        logger.LogInfo("---------");
+        logger.LogInfo($"name: {gameObject.name}");
+        logger.LogInfo($"parent: {gameObject.transform.parent.name}");
+        logger.LogInfo($"pos: {gameObject.transform.position}");
+        logger.LogInfo($"rot: {gameObject.transform.rotation}");
         foreach (Component comp in gameObject.GetComponents<Component>())
         {
             Type type = comp.GetType();
-            Debug.Log($"---{type.Name}---");
+            logger.LogInfo($"---{type.Name}---");
             // Copy fields and properties
             foreach (FieldInfo field in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
-                Debug.Log($"{field.Name}: {field.GetValue(comp)}");
+                logger.LogInfo($"{field.Name}: {field.GetValue(comp)}");
             }
         }
         foreach (Transform child in gameObject.transform)
