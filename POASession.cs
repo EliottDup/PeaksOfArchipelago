@@ -68,7 +68,7 @@ class POASession(PlayerData playerData)
                 {
                     logger.LogInfo(deathLinkObject.Source + deathLinkObject.Cause);
                     logger.Log(LogLevel.Info, trapHandler);
-                    RandomTrap();
+                    // RandomTrap();
                     KillPlayer();
                 };
             }
