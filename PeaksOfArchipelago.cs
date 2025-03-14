@@ -70,11 +70,11 @@ public class PeaksOfArchipelagoMod : ModClass
     PlayerData playerData;
 
     private static POASession session;
-    private ManualLogSource logger;
+    private static ManualLogSource logger;
 
     public PeaksOfArchipelagoMod(ManualLogSource logger)
     {
-        this.logger = logger;
+        PeaksOfArchipelagoMod.logger = logger;
     }
 
     public override void OnEnabled()    // Runs when the mod is enabled, and completely at the start
@@ -83,6 +83,7 @@ public class PeaksOfArchipelagoMod : ModClass
         playerData = new PlayerData();
         session = new POASession(playerData);
         session.logger = logger;
+        UnityUtils.logger = logger;
         harmony.PatchAll();
 
         Connect.AddListener(OnConnect);
@@ -90,7 +91,7 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             OnConnect();
         }
-        Debug.Log("Enabled Peaks of Archipelago!");
+        logger.LogInfo("Enabled Peaks of Archipelago!");
     }
 
     public override void OnDisabled()
@@ -104,30 +105,30 @@ public class PeaksOfArchipelagoMod : ModClass
         if (session.currentScene == "TitleScreen" && justConnected)
         {
             justConnected = false;
-            Debug.Log("entering cabin from main menu, resetting ropes, coffee, chalk and bird uses to zero");
+            logger.LogInfo("entering cabin from main menu, resetting ropes, coffee, chalk and bird uses to zero");
             GameManager.control.ropesCollected = 0;
             GameManager.control.extraCoffeeUses = 0;
             GameManager.control.extraChalkUses = 0;
             GameManager.control.extraBirdSeedUses = 0;
         }
         session.currentScene = SceneManager.GetActiveScene().name;
-        Debug.Log("Entering Scene" + session.currentScene);
+        logger.LogInfo("Entering Scene" + session.currentScene);
         if (session.currentScene == "Cabin")
         {
             session.fundamentalsBook = GameObject.Find("PEAKJOURNAL");
         }
-        Debug.Log($"You have {GameManager.control.extraBirdSeedUses} birdseeds");
+        logger.LogInfo($"You have {GameManager.control.extraBirdSeedUses} birdseeds");
 
 
-        // Debug.Log("texts:");
+        // logger.LogInfo("texts:");
         // foreach (Text text in GameObject.FindObjectsOfType<Text>())  //Leaving this in case some text is ever misbehaving
         // {
         //     if (text.gameObject.name != "txt") continue;
-        //     Debug.Log("TextMesh: " + text.gameObject.name + " : " + text.text);
-        //     Debug.Log(text.transform.parent.name);
+        //     logger.LogInfo("TextMesh: " + text.gameObject.name + " : " + text.text);
+        //     logger.LogInfo(text.transform.parent.name);
         //     foreach (Transform child in text.transform.parent)
         //     {
-        //         Debug.Log("    " + child.name);
+        //         logger.LogInfo("    " + child.name);
         //     }
         // }
     }
@@ -265,7 +266,7 @@ public class PeaksOfArchipelagoMod : ModClass
                 UnityUtils.SetGameManagerArtefactCollected(artefact, savestate.IsChecked(artefact));    // reset gamemanager to default state
                 if (UnityUtils.GetGameManagerArtefactCollected(artefact) != savestate.IsChecked(artefact))
                 {
-                    Debug.LogWarning($"Error: {artefact} should be {savestate.IsChecked(artefact)} but is {!savestate.IsChecked(artefact)}!");
+                    logger.LogWarning($"Error: {artefact} should be {savestate.IsChecked(artefact)} but is {!savestate.IsChecked(artefact)}!");
                 }
             }
             GameManager.control.Save();
@@ -285,7 +286,7 @@ public class PeaksOfArchipelagoMod : ModClass
             session.UpdateReceivedItems();
             if (session.uncollectedItems.Count != 0 && !__instance.runningEvent && session.currentScene != "TitleScreen")   //player has received new items
             {
-                Debug.Log("starting custom event");
+                logger.LogInfo("starting custom event");
                 ItemEventsPatch.isCustomEvent = true;
                 __instance.eventName = "AllArtefacts";
                 __instance.runningEvent = true;
@@ -329,7 +330,7 @@ public class PeaksOfArchipelagoMod : ModClass
                     case "Phonograph":
                         {
                             __instance.runningEvent = false;
-                            Debug.Log("Blocking event: " + __instance.eventName);
+                            logger.LogInfo("Blocking event: " + __instance.eventName);
                             __instance.StopCoroutine("GlowDoorEvent");
                             break;
                         }
@@ -535,7 +536,7 @@ public class PeaksOfArchipelagoMod : ModClass
         static void Postfix(EnterPeakScene __instance)
         {
             string peak = GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString();
-            Debug.Log("Entering peak: " + peak);
+            logger.LogInfo("Entering peak: " + peak);
             GameObject go = new GameObject();
             Traps t = go.AddComponent<Traps>();
             session.trapHandler = t;
@@ -582,7 +583,7 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static bool Prefix()
         {
-            Debug.Log("Game wants to do something with achievements, but I say no");
+            logger.LogInfo("Game wants to do something with achievements, but I say no");
             return false;
         }
     }
@@ -592,7 +593,7 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static bool Prefix(ref bool __result)
         {
-            Debug.Log("Game wants to do something with achievements, but I say no");
+            logger.LogInfo("Game wants to do something with achievements, but I say no");
             __result = true;
             return false;
         }
@@ -611,7 +612,7 @@ public class PeaksOfArchipelagoMod : ModClass
             {
                 if (i == 76 || i == 77 || i == 78)
                 {
-                    // Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
+                    // logger.LogInfo("Disabled line " + i + " : " + codes[i].ToString());
                     continue;
                 }
                 yield return codes[i];
@@ -629,7 +630,7 @@ public class PeaksOfArchipelagoMod : ModClass
             {
                 if (i == 120 || i == 121 || i == 122 || i == 123)
                 {
-                    // Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
+                    // logger.LogInfo("Disabled line " + i + " : " + codes[i].ToString());
                     continue;
                 }
                 yield return codes[i];
@@ -647,7 +648,7 @@ public class PeaksOfArchipelagoMod : ModClass
             {
                 if (i == 79 || i == 80 || i == 81 || i == 82)
                 {
-                    // Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
+                    // logger.LogInfo("Disabled line " + i + " : " + codes[i].ToString());
                     continue;
                 }
                 yield return codes[i];
@@ -665,7 +666,7 @@ public class PeaksOfArchipelagoMod : ModClass
             {
                 if (i == 267 || i == 268 || i == 269 || i == 270)
                 {
-                    // Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
+                    // logger.LogInfo("Disabled line " + i + " : " + codes[i].ToString());
                     continue;   // this stops ropes on peaks from disappearing if you have 42+ ropes
                 }
                 yield return codes[i];
@@ -683,7 +684,7 @@ public class PeaksOfArchipelagoMod : ModClass
             {
                 if (i == 83 || i == 84 || i == 85 || i == 86)
                 {
-                    // Debug.Log("Disabled line " + i + " : " + codes[i].ToString());
+                    // logger.LogInfo("Disabled line " + i + " : " + codes[i].ToString());
                     continue;   // this stops bird seeds on peaks from disappearing if you have 5+ seeds
                 }
                 yield return codes[i];
