@@ -31,8 +31,6 @@ class Traps : MonoBehaviour
 
     public void StartBirdTrap()
     {
-
-        logger.LogInfo("HEEELP");
         StartCoroutine("BirdsTrap");
     }
 
@@ -42,11 +40,8 @@ class Traps : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
             logger.LogInfo("activating birds");
-            hunter.enabled = false;
             hunter.gameObject.SetActive(true);
-            crow.enabled = false;
             crow.gameObject.SetActive(true);
-            logger.LogInfo("activated birds");
             yield return new WaitForSeconds(15f);
             logger.LogInfo("deactivating birds");
             hunter.gameObject.SetActive(false);
