@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using BepInEx.Logging;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,9 +9,10 @@ class UIHandler : MonoBehaviour
     public static UIHandler instance;
     public static ManualLogSource logger;
     public static Font poyFont;
-    Text chat;
+    Transform chatBoxTransform;
     GameObject canvas;
 
+    Queue<string> messages = new Queue<string>();
 
     void Awake()
     {
@@ -30,97 +32,99 @@ class UIHandler : MonoBehaviour
         CreateUI();
     }
 
+    void Update()
+    {
+        if (messages.Count != 0)
+        {
+            CreateChatMessage(messages.Dequeue());
+        }
+    }
+
     void CreateUI()
     {
-        GameObject lg = CreateVerticalPanel("panel", canvas.transform, new Vector2(-25, 0), 1f, 0.5f, false, 400, 400);
-        lg.GetComponent<VerticalLayoutGroup>().childControlWidth = true;
-        lg.GetComponent<VerticalLayoutGroup>().childControlHeight = true;
-        lg.GetComponent<VerticalLayoutGroup>().childForceExpandHeight = true;
-        lg.GetComponent<VerticalLayoutGroup>().childForceExpandWidth = true;
-        lg.GetComponent<VerticalLayoutGroup>().childAlignment = TextAnchor.LowerCenter;
-        // chatBox = lg;
-        chat = CreateTextElem("testText", 32, lg.transform, TextAnchor.LowerLeft);
-        chat.GetComponent<ContentSizeFitter>().enabled = false;
-        chat.horizontalOverflow = HorizontalWrapMode.Wrap;
-        chat.verticalOverflow = VerticalWrapMode.Overflow;
-        RectMask2D rm2d = lg.gameObject.AddComponent<RectMask2D>();
-        rm2d.AddClippable(chat);
-        chat.text = "";
+        chatBoxTransform = CreateVerticalPanel("panel", new Color(0, 0, 0, 0), canvas.transform, new Vector2(-12.5f, 0), 1f, 0.75f, 1f, 0f, TextAnchor.LowerRight).transform;
+        chatBoxTransform.GetComponent<VerticalLayoutGroup>().childForceExpandWidth = false;
+        chatBoxTransform.GetComponent<VerticalLayoutGroup>().childForceExpandHeight = false;
     }
 
     public void AddChatMessage(string text)
     {
-        chat.text += "\n" + text;
+        messages.Enqueue(text);
     }
 
-    public void ShowText(string text)
+    private void CreateChatMessage(string text)
     {
-        StartCoroutine(FadeAndShowText(text));
+        GameObject p = CreateVerticalPanel("chatmessagepanel", new Color(0, 0, 0, 0.8f), chatBoxTransform, new Vector2(0, 0), 0, 1, 1, 0, TextAnchor.LowerRight);
+        CanvasGroup cg = p.AddComponent<CanvasGroup>();
+        Text t = CreateTextElem("chatmessageText", 20, p.transform, alignment: TextAnchor.LowerRight);
+        t.text = text;
+        StartCoroutine(FadeAndShowText(cg, .5f, 4f, .5f));
     }
 
-    IEnumerator FadeAndShowText(string text)
+    public void ShowText(string text, float fadeInTime = 0.5f, float stayTime = 2f, float fadeOutTime = 0.5f)
     {
-        yield return new WaitForEndOfFrame();
-        GameObject p = CreateVerticalPanel("textmoment", canvas.transform, new Vector2(0, 0), .5f, 0.75f);
-        CanvasGroup cv = p.AddComponent<CanvasGroup>();
+        GameObject p = CreateVerticalPanel("textmoment", new Color(0, 0, 0, 0.8f), canvas.transform, new Vector2(0, 0), .5f, 0.75f);
+        CanvasGroup cg = p.AddComponent<CanvasGroup>();
         Text t = CreateTextElem("Textmomento", 32, p.transform);
         t.text = text;
+        StartCoroutine(FadeAndShowText(cg, fadeInTime, stayTime, fadeOutTime));
+    }
+
+    IEnumerator FadeAndShowText(CanvasGroup cg, float fadeInTime, float stayTime, float fadeOutTime)
+    {
+        yield return new WaitForEndOfFrame();
+        cg.alpha = 0;
 
         float timer = 0;
         while (timer < 1f)
         {
-            timer += Time.deltaTime * 2f;
-            cv.alpha = timer;
+            timer += Time.deltaTime / fadeInTime;
+            cg.alpha = timer;
             yield return null;
         }
-        cv.alpha = 1;
-        yield return new WaitForSeconds(2);
+        cg.alpha = 1;
+        yield return new WaitForSeconds(stayTime);
         timer = 0;
         while (timer < 1f)
         {
-            timer += Time.deltaTime * 2f;
-            cv.alpha = 1 - timer;
+            timer += Time.deltaTime * fadeOutTime;
+            cg.alpha = 1 - timer;
             yield return null;
         }
-        cv.alpha = 0;
+        cg.alpha = 0;
         yield return null;
-        Destroy(p);
+        Destroy(cg.gameObject);
     }
 
-
-    static GameObject CreateVerticalPanel(string name, Transform parent, Vector2 position, float pivotx = 0.5f, float pivoty = 0.5f, bool addCSF = true, float sizex = 0, float sizey = 0)
+    static GameObject CreateVerticalPanel(string name, Color color, Transform parent, Vector2 position, float anchorx = 0.5f, float anchory = 0.5f, float pivotx = -1, float pivoty = -1, TextAnchor alignment = TextAnchor.MiddleCenter)
     {
         GameObject p = new GameObject(name);
         p.transform.SetParent(parent, false);
         Image pImage = p.AddComponent<Image>();
-        pImage.color = new Color(0, 0, 0, 0.8f);
+        pImage.color = color;
 
         RectTransform pRect = p.GetComponent<RectTransform>() ?? p.AddComponent<RectTransform>();
 
-        Vector2 pivotPosition = new Vector2(pivotx, pivoty);
-        pRect.anchorMax = pivotPosition;
-        pRect.anchorMin = pivotPosition;
-        pRect.pivot = pivotPosition;
+
+        Vector2 anchorPosition = new Vector2(anchorx, anchory);
+        Vector2 pivotPosition = (pivotx == -1) ? anchorPosition : new Vector2(pivotx, pivoty);
+        pRect.anchorMax = anchorPosition;
+        pRect.anchorMin = anchorPosition;
         pRect.anchoredPosition = position;
 
+        pRect.pivot = pivotPosition;
+
         VerticalLayoutGroup vlg = p.AddComponent<VerticalLayoutGroup>();
-        vlg.childAlignment = TextAnchor.MiddleCenter;
+        vlg.childAlignment = alignment;
         vlg.spacing = 25;
         vlg.padding.bottom = 30;
         vlg.padding.right = 10;
         vlg.padding.left = 10;
         vlg.padding.top = 10;
 
-        if (addCSF)
-        {
-            ContentSizeFitter csf = p.AddComponent<ContentSizeFitter>();
-            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        }
-        else
-        {
-            pRect.sizeDelta = new Vector2(sizex, sizey);
-        }
+        ContentSizeFitter csf = p.AddComponent<ContentSizeFitter>();
+        csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+        csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
         return p;
     }

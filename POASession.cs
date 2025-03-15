@@ -11,7 +11,6 @@ using Archipelago.MultiClient.Net.MessageLog.Parts;
 using Archipelago.MultiClient.Net.Models;
 using BepInEx.Logging;
 using UnityEngine;
-using UnityEngine.TextCore;
 using Color = UnityEngine.Color;
 
 namespace PeaksOfArchipelago;
@@ -49,6 +48,7 @@ class POASession(PlayerData playerData)
         {
             logger.LogError("unsuccessful connect, aborting");
             logger.LogError("Something went wrong and you are not connected");
+            UIHandler.instance.ShowText("<color=#FF0000>Connection failed, see the console for more details</color>");
             foreach (string error in ((LoginFailure)result).Errors)
             {
                 logger.LogError(error);
@@ -56,7 +56,7 @@ class POASession(PlayerData playerData)
             return false;
         }
 
-        UIHandler.instance.ShowText("Connection Successful!");
+        UIHandler.instance.ShowText("Connection Successful!", 0.5f, 4, 0.5f);
 
         session.SetClientState(ArchipelagoClientState.ClientConnected);
         loginSuccessful = (LoginSuccessful)result;
