@@ -85,6 +85,7 @@ public class PeaksOfArchipelagoMod : ModClass
         session.logger = logger;
         UnityUtils.logger = logger;
         UIHandler.logger = logger;
+        Traps.logger = logger;
         harmony.PatchAll();
 
         Connect.AddListener(OnConnect);
@@ -127,12 +128,10 @@ public class PeaksOfArchipelagoMod : ModClass
 
         if (session.currentScene != "TitleScreen")
         {
-
-            if (GameObject.FindObjectsOfType<Bird>().Length != 0)
+            if (Traps.instance == null)
             {
                 Traps t = go.AddComponent<Traps>();
-                session.trapHandler = t;
-                t.logger = session.logger;
+                Traps.instance = t;
             }
         }
 
