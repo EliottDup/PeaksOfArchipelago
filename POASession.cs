@@ -31,7 +31,6 @@ class POASession(PlayerData playerData)
     private bool firstLogin = false;
     public bool finished = false;
     public bool seenFinishedCutScene = false;
-    public Traps trapHandler;
     public ManualLogSource logger;
 
     public async Task<bool> Connect(string uri, string SlotName, string Password)
@@ -72,8 +71,7 @@ class POASession(PlayerData playerData)
                 deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
                 {
                     logger.LogInfo(deathLinkObject.Source + deathLinkObject.Cause);
-                    logger.Log(LogLevel.Info, trapHandler);
-                    // RandomTrap()
+                    // Traps.instance.StartTrap();
                     KillPlayer();
                 };
             }
@@ -187,12 +185,6 @@ class POASession(PlayerData playerData)
                 finished = true;
             }
         }
-    }
-
-    public void RandomTrap()
-    {
-        logger.LogInfo("AAA");
-        trapHandler.StartBirdTrap();
     }
 
     public void KillPlayer()
