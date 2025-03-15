@@ -7,9 +7,12 @@ using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.MessageLog.Parts;
 using Archipelago.MultiClient.Net.Models;
 using BepInEx.Logging;
 using UnityEngine;
+using UnityEngine.TextCore;
+using Color = UnityEngine.Color;
 
 namespace PeaksOfArchipelago;
 
@@ -53,6 +56,8 @@ class POASession(PlayerData playerData)
             return false;
         }
 
+        UIHandler.instance.ShowText("Connection Successful!");
+
         session.SetClientState(ArchipelagoClientState.ClientConnected);
         loginSuccessful = (LoginSuccessful)result;
 
@@ -68,7 +73,7 @@ class POASession(PlayerData playerData)
                 {
                     logger.LogInfo(deathLinkObject.Source + deathLinkObject.Cause);
                     logger.Log(LogLevel.Info, trapHandler);
-                    // RandomTrap();
+                    // RandomTrap()
                     KillPlayer();
                 };
             }
@@ -79,6 +84,18 @@ class POASession(PlayerData playerData)
         }
 
         await LoadLocationDetails();
+
+        session.MessageLog.OnMessageReceived += (logMessage) =>
+        {
+            string message = "";
+            foreach (MessagePart part in logMessage.Parts)
+            {
+                Color col = new Color(part.Color.R, part.Color.G, part.Color.B);
+                logger.LogInfo(col);
+                message += $"<color=#{ColorUtility.ToHtmlStringRGB(col)}>" + part.Text + "</color>";
+            }
+            UIHandler.instance.AddChatMessage(message);
+        };
 
         session.Items.ItemReceived += (receivedItemsHelper) =>
         {
