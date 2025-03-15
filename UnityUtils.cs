@@ -9,29 +9,6 @@ namespace PeaksOfArchipelago;
 static class UnityUtils
 {
     public static ManualLogSource logger;
-    public static void SetRopeText(string message)
-    {
-        Text ropeCollected = GameObject.Find("RopeCollectedTxt")?.GetComponentInChildren<Text>();
-        Text NPCRopeCollected = GameObject.Find("NPCRopeCollectedTxt")?.GetComponentInChildren<Text>();
-        if (ropeCollected != null) ropeCollected.text = message;
-        else logger.LogWarning("didnt find RopeCollectedText");
-        if (NPCRopeCollected != null) NPCRopeCollected.text = message;
-        else logger.LogWarning("didnt find NPCRopeCollectedText");
-    }
-
-    internal static void SetArtefactText(string message)
-    {
-        Text artefactCollected = GameObject.Find("ArtefactCollected")?.GetComponentInChildren<Text>();
-        if (artefactCollected != null) artefactCollected.text = message;
-        else logger.LogWarning("didnt find artefactcollectedtext");
-    }
-
-    public static void SetSeedText(string message)
-    {
-        Text BirdSeedCollected = GameObject.Find("BirdSeedCollectedTxt")?.GetComponentInChildren<Text>();
-        if (BirdSeedCollected != null) BirdSeedCollected.text = message;
-        else logger.LogWarning("didnt find BirdSeedCollectedTxt");
-    }
 
     // progress disablers (these basically undo whatever progress has been done in order to have the randomiser work properly)
     public static void UndoRopeProgress(RopeCollectable ropeCollectable)
