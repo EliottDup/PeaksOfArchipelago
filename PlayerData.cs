@@ -7,6 +7,7 @@ class PlayerData
         public CheckList<Ropes> ropes = new();
         public CheckList<Artefacts> artefacts = new();
         public CheckList<Peaks> peaks = new();
+        public CheckList<Peaks> fsPeaks = new();
         public CheckList<BirdSeeds> seeds = new();
     }
 

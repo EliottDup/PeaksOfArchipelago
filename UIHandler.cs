@@ -64,7 +64,12 @@ class UIHandler : MonoBehaviour
 
     public void ShowText(string text, float fadeInTime = 0.5f, float stayTime = 2f, float fadeOutTime = 0.5f)
     {
-        GameObject p = CreatePanel("textmoment", new Color(0, 0, 0, 0.8f), canvas.transform, new Vector2(0, 0), .5f, 0.75f);
+        ShowText(text, Vector2.zero, fadeInTime, stayTime, fadeOutTime);
+    }
+
+    public void ShowText(string text, Vector2 offset, float fadeInTime = 0.5f, float stayTime = 2f, float fadeOutTime = 0.5f)
+    {
+        GameObject p = CreatePanel("textmoment", new Color(0, 0, 0, 0.8f), canvas.transform, offset, 0.5f, 0.75f);
         CanvasGroup cg = p.AddComponent<CanvasGroup>();
         Text t = CreateTextElem("Textmomento", 32, p.transform);
         t.text = text;
@@ -99,6 +104,7 @@ class UIHandler : MonoBehaviour
 
     public static GameObject CreatePanel(string name, Color color, Transform parent, Vector2 position, float anchorx = 0.5f, float anchory = 0.5f, float pivotx = -1, float pivoty = -1, TextAnchor alignment = TextAnchor.MiddleCenter, bool vertical = true)
     {
+        if (parent == null) parent = FindObjectOfType<Canvas>()?.transform;
         GameObject p = new GameObject(name);
         p.transform.SetParent(parent, false);
         Image pImage = p.AddComponent<Image>();

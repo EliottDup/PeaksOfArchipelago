@@ -31,7 +31,7 @@ class POASession(PlayerData playerData)
     private bool firstLogin = false;
     public bool finished = false;
     public bool seenFinishedCutScene = false;
-    public ManualLogSource logger;
+    public static ManualLogSource logger;
 
     public async Task<bool> Connect(string uri, string SlotName, string Password)
     {
@@ -71,8 +71,9 @@ class POASession(PlayerData playerData)
                 deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
                 {
                     logger.LogInfo(deathLinkObject.Source + deathLinkObject.Cause);
-                    // Traps.instance.StartTrap();
-                    KillPlayer();
+                    // Traps.instance?.StartTrap();
+                    Traps.instance?.StartNightTrap();
+                    // KillPlayer();
                 };
             }
         }
@@ -146,7 +147,7 @@ class POASession(PlayerData playerData)
         }
         logger.LogInfo("Sending Deathlink");
         if (session == null) return;
-        deathLinkService.SendDeathLink(new DeathLink(session.Players.GetPlayerAliasAndName(session.ConnectionInfo.Slot), "Fell off."));
+        deathLinkService?.SendDeathLink(new DeathLink(session.Players.GetPlayerAliasAndName(session.ConnectionInfo.Slot), "Fell off."));
     }
 
     public void CheckWin()
@@ -274,6 +275,19 @@ class POASession(PlayerData playerData)
         logger.LogInfo("Completing peak " + peak.ToString());
         // DONE!    // I don't know why I placed this comment here lol
         return peak;
+    }
+
+    public void CompleteFSPeakCheck(Peaks peak)
+    {
+        if (session == null) return;
+
+        session.Locations.CompleteLocationChecks(Utils.FSPeakToId(peak));
+
+        playerData.locations.fsPeaks.SetCheck(peak, true);
+
+        logger.LogInfo("Completing free solo peak " + peak.ToString());
+        // DONE!    // I don't know why I placed this comment here lol
+        return;
     }
 
     internal string UnlockById(long id)

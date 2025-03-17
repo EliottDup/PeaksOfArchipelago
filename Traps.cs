@@ -1,51 +1,42 @@
 using System;
 using System.Collections;
 using BepInEx.Logging;
+using PeaksOfArchipelago;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 class Traps : MonoBehaviour
 {
     enum Trap
     {
         Birds,
-        Rope,
+        Night,
     }
     Bird hunter = null;
     Bird crow = null;
     public static ManualLogSource logger;
     private GameObject trapList;
     public static Traps instance;
+    public static PlayerData playerData;
     bool birdTrapRunning = false;
+    private bool nightTrapRunning;
+    OilLamp oilLamp;
+
+    public void Awake()
+    {
+        oilLamp = FindObjectOfType<OilLamp>();
+        if (!oilLamp) logger.LogError("Didn't find Oil Lamp!");
+        hunter = GameObject.Find("SeaBird_Hunter").GetComponent<Bird>();
+        if (!hunter) logger.LogError("Didn't find Hunter!");
+        crow = GameObject.Find("CrowBird_Hunter").GetComponent<Bird>();
+        if (!crow) logger.LogError("Didn't find Crow!");
+    }
 
     public void Start()
     {
         // trapList = UIHandler.CreateClock("panel", new Color(1, 1, 1, 1), UIHandler.instance.canvas.transform, new Vector2(0, 0), new Vector2(100, 100), 0.5f, 0.5f);
-        trapList = UIHandler.CreatePanel("trap list", new Color(0, 0, 0, 0.8f), UIHandler.instance.canvas.transform, new Vector2(10, 10), 0, 0);
-
-        StartCoroutine(StartTimer("Test1", 60f));
-        StartCoroutine(StartTimer("Test2", 10f));
-        StartCoroutine(StartTimer("Test3", 20f));
-        StartCoroutine(StartTimer("Test4", 30f));
-
-        Bird[] birds = GameObject.FindObjectsOfType<Bird>();
-        foreach (Bird bird in birds)
-        {
-            print(bird.name + " " + bird.isHunter + " " + bird.isCrow);
-            if (bird.isHunter)
-            {
-                if (bird.isCrow)
-                {
-                    print("Found Crow");
-                    crow = bird;
-                }
-                else
-                {
-                    print("found Hunter");
-                    hunter = bird;
-                }
-            }
-        }
+        trapList = UIHandler.CreatePanel("trap list", new Color(0, 0, 0, 0.8f), FindObjectOfType<Canvas>()?.transform, new Vector2(10, 10), 0, 0);
     }
 
     public void StartTrap()
@@ -61,8 +52,12 @@ class Traps : MonoBehaviour
                     }
                     break;
                 }
-            case Trap.Rope:
+            case Trap.Night:
                 {
+                    if (!StartNightTrap())
+                    {
+                        StartOneTimeTrap();
+                    }
                     break;
                 }
         }
@@ -79,9 +74,43 @@ class Traps : MonoBehaviour
         if (!birdTrapRunning)
         {
             StartCoroutine(BirdsTrap());
-            return false;
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    public bool StartNightTrap()
+    {
+        if (!nightTrapRunning)
+        {
+            StartCoroutine(NightTrap());
+            return true;
+        }
+        return false;
+    }
+
+    private IEnumerator NightTrap()
+    {
+        yield return new WaitForEndOfFrame();
+        GameManager.control.alps_statue_sundown_InUse = true;
+        FindObjectOfType<EnterPeakScene>().PublicSetSundown();
+        if (playerData.items.lamp)
+        {
+            oilLamp.lampObj.SetActive(true);
+            oilLamp.StartCoroutine("StartOilLamp", false);
+        }
+        nightTrapRunning = true;
+
+        yield return StartTimer("Sundown", 30f);
+
+        nightTrapRunning = false;
+        if (playerData.items.lamp)
+        {
+            oilLamp.lampObj.SetActive(false);
+        }
+        GameManager.control.alps_statue_sundown_InUse = false;
+        FindObjectOfType<EnterPeakScene>().PublicSetSundown();
+
     }
 
     private IEnumerator BirdsTrap()
@@ -93,6 +122,8 @@ class Traps : MonoBehaviour
             hunter.gameObject.SetActive(true);
             crow.gameObject.SetActive(true);
             birdTrapRunning = true;
+            hunter.InitiateBird();
+            crow.InitiateBird();
 
             yield return StartTimer("Birds!", 60f);
 
@@ -106,6 +137,7 @@ class Traps : MonoBehaviour
             logger.LogInfo("birds are null?");
         }
     }
+
 
 
     private IEnumerator StartTimer(string name, float duration)

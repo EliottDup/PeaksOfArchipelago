@@ -203,6 +203,7 @@ public static class Utils
     public const int birdSeedOffset = 4000;
     public const int toolOffset = 5000;
     public const int extraItemOffset = 6000;
+    public const int freeSoloPeakOffset = 7000;
 
     public readonly static Dictionary<Artefacts, string> artefactToVariableName = new()
     {
@@ -294,6 +295,16 @@ public static class Utils
         return (int)extraItem + extraItemOffset;
     }
 
+
+    public static long FSPeakToId(Peaks peak)
+    {
+        if ((int)peak < 30)
+        {
+            throw new ArgumentOutOfRangeException($"ERROR: Peak {peak} should not be free soloed");
+        }
+        return ((int)peak) + freeSoloPeakOffset;
+    }
+
     public static Peaks IdtoPeak(long id)
     {
         return (Peaks)(id - peakOffset);
@@ -327,6 +338,11 @@ public static class Utils
     public static ExtraItems IdToExtraItem(long id)
     {
         return (ExtraItems)(id - extraItemOffset);
+    }
+
+    public static Peaks IdToFSPeak(long id)
+    {
+        return (Peaks)(id - freeSoloPeakOffset);
     }
 
     public static string GetNameById(long id)
@@ -466,6 +482,7 @@ public static class Utils
 
     public static Type GetTypeById(long id)
     {
+        if (id >= freeSoloPeakOffset) return typeof(Peaks);
         if (id >= extraItemOffset) return typeof(ExtraItems);
         if (id >= toolOffset) return typeof(Tools);
         if (id >= birdSeedOffset) return typeof(BirdSeeds);
