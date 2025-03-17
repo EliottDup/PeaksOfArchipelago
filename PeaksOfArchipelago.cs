@@ -82,7 +82,7 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         playerData = new PlayerData();
         session = new POASession(playerData);
-        session.logger = logger;
+        POASession.logger = logger;
         UnityUtils.logger = logger;
         UIHandler.logger = logger;
         Traps.logger = logger;
@@ -122,31 +122,9 @@ public class PeaksOfArchipelagoMod : ModClass
         logger.LogInfo($"You have {GameManager.control.extraBirdSeedUses} birdseeds");
 
 
-        GameObject go = new GameObject("PeaksOfArchipelagoScriptHolder");
+        GameObject go = GameObject.Find("PeaksOfArchipelagoScriptHolder") ?? new GameObject("PeaksOfArchipelagoScriptHolder");
         go.transform.SetParent(UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()[0].transform);
         go.AddComponent<UIHandler>();
-
-        if (session.currentScene != "TitleScreen")
-        {
-            if (Traps.instance == null)
-            {
-                Traps t = go.AddComponent<Traps>();
-                Traps.instance = t;
-            }
-        }
-
-
-        // logger.LogInfo("texts:");
-        // foreach (Text text in GameObject.FindObjectsOfType<Text>())  //Leaving this in case some text is ever misbehaving
-        // {
-        //     if (text.gameObject.name != "txt") continue;
-        //     logger.LogInfo("TextMesh: " + text.gameObject.name + " : " + text.text);
-        //     logger.LogInfo(text.transform.parent.name);
-        //     foreach (Transform child in text.transform.parent)
-        //     {
-        //         logger.LogInfo("    " + child.name);
-        //     }
-        // }
     }
 
     private string GetUri()
@@ -170,6 +148,13 @@ public class PeaksOfArchipelagoMod : ModClass
             Peaks peak = session.CompletePeakCheck(__instance);
             SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.PeakToId(peak));
             UIHandler.instance.ShowText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+            if (GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().ropesPlacedDuringMap == 0 && (int)peak >= 30)
+            {
+                session.CompleteFSPeakCheck(peak);
+                SimpleItemInfo FSitemInfo = session.GetLocationDetails(Utils.FSPeakToId(peak));
+                UIHandler.instance.ShowText("Found " + FSitemInfo.playerName + "'s " + FSitemInfo.itemName, new Vector2(0, 50));
+
+            }
         }
     }
 
@@ -551,10 +536,16 @@ public class PeaksOfArchipelagoMod : ModClass
     [HarmonyPatch(typeof(EnterPeakScene), "Awake")]
     public class EnterPeakScenePatch
     {
-        static void Postfix(EnterPeakScene __instance)
+        static void Prefix(EnterPeakScene __instance)
         {
             string peak = GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString();
             logger.LogInfo("Entering peak: " + peak);
+
+            GameObject go = GameObject.Find("PeaksOfArchipelagoScriptHolder") ?? new GameObject("PeaksOfArchipelagoScriptHolder");
+            Traps t = go.AddComponent<Traps>();
+            logger.LogInfo("Adding traps instance");
+            Traps.instance = t;
+            Traps.playerData = session.playerData;
         }
     }
 
