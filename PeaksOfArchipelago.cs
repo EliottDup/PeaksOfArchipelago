@@ -85,7 +85,7 @@ public class PeaksOfArchipelagoMod : ModClass
         POASession.logger = logger;
         UnityUtils.logger = logger;
         UIHandler.logger = logger;
-        Traps.logger = logger;
+        // Traps.logger = logger;
         harmony.PatchAll();
 
         Connect.AddListener(OnConnect);
@@ -542,10 +542,10 @@ public class PeaksOfArchipelagoMod : ModClass
             logger.LogInfo("Entering peak: " + peak);
 
             GameObject go = GameObject.Find("PeaksOfArchipelagoScriptHolder") ?? new GameObject("PeaksOfArchipelagoScriptHolder");
-            Traps t = go.AddComponent<Traps>();
-            logger.LogInfo("Adding traps instance");
-            Traps.instance = t;
-            Traps.playerData = session.playerData;
+            // Traps t = go.AddComponent<Traps>();
+            // logger.LogInfo("Adding traps instance");
+            // Traps.instance = t;
+            // Traps.playerData = session.playerData;
         }
     }
 
