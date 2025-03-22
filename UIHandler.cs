@@ -46,6 +46,7 @@ class UIHandler : MonoBehaviour
         chatBoxTransform = CreatePanel("panel", new Color(0, 0, 0, 0), canvas.transform, new Vector2(-12.5f, 0), 1f, 0.75f, 1f, 0f, TextAnchor.LowerRight).transform;
         chatBoxTransform.GetComponent<VerticalLayoutGroup>().childForceExpandWidth = false;
         chatBoxTransform.GetComponent<VerticalLayoutGroup>().childForceExpandHeight = false;
+        logger.LogInfo("created UI");
     }
 
     public void AddChatMessage(string text)

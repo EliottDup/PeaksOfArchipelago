@@ -72,8 +72,8 @@ class POASession(PlayerData playerData)
                 {
                     logger.LogInfo(deathLinkObject.Source + deathLinkObject.Cause);
                     // Traps.instance?.StartTrap();
-                    Traps.instance?.StartNightTrap();
-                    // KillPlayer();
+                    // Traps.instance?.StartNightTrap();
+                    KillPlayer();
                 };
             }
         }
@@ -201,6 +201,12 @@ class POASession(PlayerData playerData)
             logger.LogInfo("killing player");
             playerKilled = true;
             method.Invoke(fallingEvent, null);
+        }
+        Climbing[] climbingScripts = GameObject.FindObjectsOfType<Climbing>();
+        foreach (Climbing climbing in climbingScripts)
+        {
+            climbing.ReleaseLHand(true);
+            climbing.ReleaseRHand(true);
         }
     }
 
