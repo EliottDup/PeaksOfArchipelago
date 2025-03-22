@@ -8,6 +8,9 @@ class PlayerData
         public CheckList<Artefacts> artefacts = new();
         public CheckList<Peaks> peaks = new();
         public CheckList<Peaks> fsPeaks = new();
+        public CheckList<Peaks> timePBs = new();
+        public CheckList<Peaks> holdsPBs = new();
+        public CheckList<Peaks> ropesPBs = new();
         public CheckList<BirdSeeds> seeds = new();
     }
 
