@@ -47,7 +47,7 @@ class POASession(PlayerData playerData)
         {
             logger.LogError("unsuccessful connect, aborting");
             logger.LogError("Something went wrong and you are not connected");
-            UIHandler.instance.ShowText("<color=#FF0000>Connection failed, see the console for more details</color>");
+            UIHandler.instance.Notify("<color=#FF0000>Connection failed, see the console for more details</color>");
             foreach (string error in ((LoginFailure)result).Errors)
             {
                 logger.LogError(error);
@@ -55,7 +55,7 @@ class POASession(PlayerData playerData)
             return false;
         }
 
-        UIHandler.instance.ShowText("Connection Successful!", 0.5f, 4, 0.5f);
+        UIHandler.instance.Notify("Connection Successful!", 0.5f, 4, 0.5f);
 
         session.SetClientState(ArchipelagoClientState.ClientConnected);
         loginSuccessful = (LoginSuccessful)result;
@@ -294,6 +294,36 @@ class POASession(PlayerData playerData)
         logger.LogInfo("Completing free solo peak " + peak.ToString());
         // DONE!    // I don't know why I placed this comment here lol
         return;
+    }
+
+    internal void CompleteTimePBCheck(Peaks peak)
+    {
+        if (session == null) return;
+
+        session.Locations.CompleteLocationChecks((long)peak + Utils.timePBPeakOffset);
+        playerData.locations.timePBs.SetCheck(peak, true);
+
+        UIHandler.instance.Notify($"{peak} time PB Reached!");
+    }
+
+    internal void CompleteHoldsPBCheck(Peaks peak)
+    {
+        if (session == null) return;
+
+        session.Locations.CompleteLocationChecks((long)peak + Utils.holdPBPeakOffset);
+        playerData.locations.holdsPBs.SetCheck(peak, true);
+
+        UIHandler.instance.Notify($"{peak} hold PB Reached!");
+    }
+
+    internal void CompleteRopesPBCheck(Peaks peak)
+    {
+        if (session == null) return;
+
+        session.Locations.CompleteLocationChecks((long)peak + Utils.ropePBPeakOffset);
+        playerData.locations.ropesPBs.SetCheck(peak, true);
+
+        UIHandler.instance.Notify($"{peak} rope PB Reached!");
     }
 
     internal string UnlockById(long id)

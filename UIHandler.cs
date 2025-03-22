@@ -10,6 +10,7 @@ class UIHandler : MonoBehaviour
     public static ManualLogSource logger;
     public static Font poyFont;
     Transform chatBoxTransform;
+    Transform unlockNotifsTransform;
     public GameObject canvas;
 
     Queue<string> messages = new Queue<string>();
@@ -43,9 +44,14 @@ class UIHandler : MonoBehaviour
     void CreateUI()
     {
         // Chat messages
-        chatBoxTransform = CreatePanel("panel", new Color(0, 0, 0, 0), canvas.transform, new Vector2(-12.5f, 0), 1f, 0.75f, 1f, 0f, TextAnchor.LowerRight).transform;
-        chatBoxTransform.GetComponent<VerticalLayoutGroup>().childForceExpandWidth = false;
-        chatBoxTransform.GetComponent<VerticalLayoutGroup>().childForceExpandHeight = false;
+        chatBoxTransform = CreatePanel("chatbox", new Color(0, 0, 0, 0), canvas.transform, new Vector2(-12.5f, 0), 1f, 0.75f, 1f, 0f, TextAnchor.LowerRight).transform;
+        chatBoxTransform.GetComponent<HorizontalOrVerticalLayoutGroup>().childForceExpandWidth = false;
+        chatBoxTransform.GetComponent<HorizontalOrVerticalLayoutGroup>().childForceExpandHeight = false;
+
+        unlockNotifsTransform = CreatePanel("unlock notifications", new Color(0, 0, 0, 0), canvas.transform, Vector2.zero, 0.5f, 0.75f, 0.5f, 0.5f, TextAnchor.MiddleCenter).transform;
+        unlockNotifsTransform.GetComponent<HorizontalOrVerticalLayoutGroup>().childForceExpandWidth = false;
+        unlockNotifsTransform.GetComponent<HorizontalOrVerticalLayoutGroup>().childForceExpandHeight = false;
+
         logger.LogInfo("created UI");
     }
 
@@ -63,12 +69,16 @@ class UIHandler : MonoBehaviour
         StartCoroutine(FadeAndShowText(cg, .5f, 4f, .5f));
     }
 
-    public void ShowText(string text, float fadeInTime = 0.5f, float stayTime = 2f, float fadeOutTime = 0.5f)
+    public void Notify(string text, float fadeInTime = 0.5f, float stayTime = 2f, float fadeOutTime = 0.5f)
     {
-        ShowText(text, Vector2.zero, fadeInTime, stayTime, fadeOutTime);
+        GameObject p = CreatePanel("textmoment", new Color(0, 0, 0, 0.8f), unlockNotifsTransform, Vector2.zero);
+        CanvasGroup cg = p.AddComponent<CanvasGroup>();
+        Text t = CreateTextElem("Textmomento", 32, p.transform);
+        t.text = text;
+        StartCoroutine(FadeAndShowText(cg, fadeInTime, stayTime, fadeOutTime));
     }
 
-    public void ShowText(string text, Vector2 offset, float fadeInTime = 0.5f, float stayTime = 2f, float fadeOutTime = 0.5f)
+    public void ShowTextAtPosition(string text, Vector2 offset, float fadeInTime = 0.5f, float stayTime = 2f, float fadeOutTime = 0.5f)
     {
         GameObject p = CreatePanel("textmoment", new Color(0, 0, 0, 0.8f), canvas.transform, offset, 0.5f, 0.75f);
         CanvasGroup cg = p.AddComponent<CanvasGroup>();

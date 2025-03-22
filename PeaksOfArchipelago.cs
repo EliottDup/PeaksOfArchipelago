@@ -72,6 +72,7 @@ public class PeaksOfArchipelagoMod : ModClass
 
     private static POASession session;
     public static ManualLogSource logger;
+    public static TimeAttackDefaultData timeAttackDefaultData;
 
     public PeaksOfArchipelagoMod(ManualLogSource logger)
     {
@@ -147,12 +148,12 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             Peaks peak = session.CompletePeakCheck(__instance);
             SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.PeakToId(peak));
-            UIHandler.instance.ShowText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+            UIHandler.instance.Notify("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
             if (GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().ropesPlacedDuringMap == 0 && (int)peak >= 30)
             {
                 session.CompleteFSPeakCheck(peak);
                 SimpleItemInfo FSitemInfo = session.GetLocationDetails(Utils.FSPeakToId(peak));
-                UIHandler.instance.ShowText("Found " + FSitemInfo.playerName + "'s " + FSitemInfo.itemName, new Vector2(0, 50));
+                UIHandler.instance.Notify("Found " + FSitemInfo.playerName + "'s " + FSitemInfo.itemName);
 
             }
         }
@@ -165,7 +166,7 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             Artefacts artefact = session.CompleteArtefactCheck(__instance);
             SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.ArtefactToId(artefact));
-            UIHandler.instance.ShowText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+            UIHandler.instance.Notify("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
         }
     }
 
@@ -176,7 +177,7 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             Ropes rope = session.CompleteRopeCheck(__instance);
             SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.RopeToId(rope));
-            UIHandler.instance.ShowText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+            UIHandler.instance.Notify("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
         }
 
         static void Postfix(ref IEnumerator __result, RopeCollectable __instance)
@@ -203,7 +204,7 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             BirdSeeds seed = session.CompleteSeedCheck(__instance);
             SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.BirdSeedToId(seed));
-            UIHandler.instance.ShowText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+            UIHandler.instance.Notify("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
             GameManager.control.extraBirdSeedUses--;
         }
 
@@ -219,6 +220,44 @@ public class PeaksOfArchipelagoMod : ModClass
                 yield return original.Current;
             }
             yield return null;
+        }
+    }
+
+    [HarmonyPatch(typeof(TimeAttack), "SetBestTime")]
+    public class SetBestTimePatch
+    {
+        public static void Prefix(TimeAttack __instance)
+        {
+            if (!__instance.summitStamper.isCategory4)
+            {
+                Peaks peak = Utils.GetPeakFromCollectable(__instance.summitStamper);
+                if (__instance.timer < timeAttackDefaultData.times[(int)peak])
+                {
+                    session.CompleteTimePBCheck(peak);
+                }
+                if (__instance.holdsMade < timeAttackDefaultData.holds[(int)peak])
+                {
+                    session.CompleteHoldsPBCheck(peak);
+                }
+                if (__instance.ropesUsed <= timeAttackDefaultData.ropes[(int)peak])
+                {
+                    session.CompleteRopesPBCheck(peak);
+                }
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(TimeAttackSetter), "SetDefaults")]
+    public class SetDefaultTimes
+    {
+        public static void Postfix(TimeAttackSetter __instance)
+        {
+            if (timeAttackDefaultData.holds == null)
+            {
+                timeAttackDefaultData.times = [.. __instance.category1_defaultTimes, .. __instance.category2_defaultTimes, .. __instance.category3_defaultTimes];
+                timeAttackDefaultData.holds = [.. __instance.category1_defaultHolds, .. __instance.category2_defaultHolds, .. __instance.category3_defaultHolds];
+                timeAttackDefaultData.ropes = [.. __instance.category1_defaultRopes, .. __instance.category2_defaultRopes, .. __instance.category3_defaultRopes];
+            }
         }
     }
 
@@ -389,7 +428,7 @@ public class PeaksOfArchipelagoMod : ModClass
 
             session.CompleteRopeCheck(rope);
             SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.RopeToId(rope));
-            UIHandler.instance.ShowText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+            UIHandler.instance.Notify("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
         }
     }
 
@@ -413,7 +452,7 @@ public class PeaksOfArchipelagoMod : ModClass
 
             session.CompleteRopeCheck(rope);
             SimpleItemInfo itemInfo = session.GetLocationDetails(Utils.RopeToId(rope));
-            UIHandler.instance.ShowText("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+            UIHandler.instance.Notify("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
         }
     }
 

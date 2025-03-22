@@ -131,6 +131,13 @@ public enum ExtraItems
     ExtraSeed
 }
 
+public struct TimeAttackDefaultData
+{
+    public float[] times;
+    public int[] ropes;
+    public int[] holds;
+}
+
 struct SimpleItemInfo
 {
     public string playerName;
@@ -195,7 +202,7 @@ class CheckList<T> where T : struct, Enum   // I would use enum flags, but they 
 
 public static class Utils
 {
-    //id offsets (surely 100 is enough)
+    //id offsets (surely 1000 is enough)
     public const int peakOffset = 1;
     public const int ropeOffset = 1000;
     public const int artefactOffset = 2000;
@@ -204,6 +211,9 @@ public static class Utils
     public const int toolOffset = 5000;
     public const int extraItemOffset = 6000;
     public const int freeSoloPeakOffset = 7000;
+    public const int timePBPeakOffset = 8000;
+    public const int ropePBPeakOffset = 9000;
+    public const int holdPBPeakOffset = 10000;
 
     public readonly static Dictionary<Artefacts, string> artefactToVariableName = new()
     {
