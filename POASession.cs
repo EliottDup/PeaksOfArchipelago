@@ -302,8 +302,6 @@ class POASession(PlayerData playerData)
 
         session.Locations.CompleteLocationChecks((long)peak + Utils.timePBPeakOffset);
         playerData.locations.timePBs.SetCheck(peak, true);
-
-        UIHandler.instance.Notify($"{peak} time PB Reached!");
     }
 
     internal void CompleteHoldsPBCheck(Peaks peak)
@@ -312,8 +310,6 @@ class POASession(PlayerData playerData)
 
         session.Locations.CompleteLocationChecks((long)peak + Utils.holdPBPeakOffset);
         playerData.locations.holdsPBs.SetCheck(peak, true);
-
-        UIHandler.instance.Notify($"{peak} hold PB Reached!");
     }
 
     internal void CompleteRopesPBCheck(Peaks peak)
@@ -322,8 +318,6 @@ class POASession(PlayerData playerData)
 
         session.Locations.CompleteLocationChecks((long)peak + Utils.ropePBPeakOffset);
         playerData.locations.ropesPBs.SetCheck(peak, true);
-
-        UIHandler.instance.Notify($"{peak} rope PB Reached!");
     }
 
     internal string UnlockById(long id)

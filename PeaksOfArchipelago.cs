@@ -234,14 +234,23 @@ public class PeaksOfArchipelagoMod : ModClass
                 if (__instance.timer < timeAttackDefaultData.times[(int)peak])
                 {
                     session.CompleteTimePBCheck(peak);
+                    SimpleItemInfo itemInfo = session.GetLocationDetails((long)peak + Utils.timePBPeakOffset);
+                    UIHandler.instance.Notify("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+
                 }
                 if (__instance.holdsMade < timeAttackDefaultData.holds[(int)peak])
                 {
                     session.CompleteHoldsPBCheck(peak);
+                    SimpleItemInfo itemInfo = session.GetLocationDetails((long)peak + Utils.holdPBPeakOffset);
+                    UIHandler.instance.Notify("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+
                 }
                 if (__instance.ropesUsed <= timeAttackDefaultData.ropes[(int)peak])
                 {
                     session.CompleteRopesPBCheck(peak);
+                    SimpleItemInfo itemInfo = session.GetLocationDetails((long)peak + Utils.ropePBPeakOffset);
+                    UIHandler.instance.Notify("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+
                 }
             }
         }
