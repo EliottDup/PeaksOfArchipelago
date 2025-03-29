@@ -138,6 +138,21 @@ public struct TimeAttackDefaultData
     public int[] holds;
 }
 
+public enum CollectibleType
+{
+    Peak,
+    Rope,
+    Artefact,
+    Book,
+    BirdSeed,
+    Tool,
+    ExtraItem,
+    FreeSoloPeak,
+    TimeParPeak,
+    RopeParPeak,
+    HoldParPeak
+}
+
 struct SimpleItemInfo
 {
     public string playerName;
@@ -490,17 +505,20 @@ public static class Utils
         return json;
     }
 
-    public static Type GetTypeById(long id)
+    public static CollectibleType GetTypeById(long id)
     {
-        if (id >= freeSoloPeakOffset) return typeof(Peaks);
-        if (id >= extraItemOffset) return typeof(ExtraItems);
-        if (id >= toolOffset) return typeof(Tools);
-        if (id >= birdSeedOffset) return typeof(BirdSeeds);
-        if (id >= bookOffset) return typeof(Books);
-        if (id >= artefactOffset) return typeof(Artefacts);
-        if (id >= ropeOffset) return typeof(Ropes);
-        if (id >= peakOffset) return typeof(Peaks);
-        return null;
+        if (id >= holdPBPeakOffset) return CollectibleType.HoldParPeak;
+        if (id >= ropePBPeakOffset) return CollectibleType.RopeParPeak;
+        if (id >= timePBPeakOffset) return CollectibleType.TimeParPeak;
+        if (id >= freeSoloPeakOffset) return CollectibleType.ExtraItem;
+        if (id >= extraItemOffset) return CollectibleType.ExtraItem;
+        if (id >= toolOffset) return CollectibleType.Tool;
+        if (id >= birdSeedOffset) return CollectibleType.BirdSeed;
+        if (id >= bookOffset) return CollectibleType.Book;
+        if (id >= artefactOffset) return CollectibleType.Artefact;
+        if (id >= ropeOffset) return CollectibleType.Rope;
+        if (id >= peakOffset) return CollectibleType.Peak;
+        return (CollectibleType)(-1);
     }
 
     public static BirdSeeds GetSeedFromCollectable(BirdSeedCollectable seedCollectable)

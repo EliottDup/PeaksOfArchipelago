@@ -90,7 +90,6 @@ class POASession(PlayerData playerData)
             foreach (MessagePart part in logMessage.Parts)
             {
                 Color col = new Color(part.Color.R, part.Color.G, part.Color.B);
-                logger.LogInfo(col);
                 message += $"<color=#{ColorUtility.ToHtmlStringRGB(col)}>" + part.Text + "</color>";
             }
             UIHandler.instance.AddChatMessage(message);
@@ -165,6 +164,7 @@ class POASession(PlayerData playerData)
                 if (missing.Count() == 0)
                 {
                     logger.LogInfo("Win condition achieved, unlocking items!");
+                    UIHandler.instance.Notify("Win condition achieved!");
                     session.SetClientState(ArchipelagoClientState.ClientGoal);
                     session.SetGoalAchieved();
                     finished = true;
@@ -174,12 +174,13 @@ class POASession(PlayerData playerData)
             {
                 foreach (long id in missing)
                 {
-                    Type type = Utils.GetTypeById(id);
-                    if ((type == typeof(Peaks) && checkPeaks) || (type == typeof(Artefacts) && checkArtefacts))
+                    CollectibleType type = Utils.GetTypeById(id);
+                    if ((type == CollectibleType.Peak && checkPeaks) || (type == CollectibleType.Artefact && checkArtefacts))
                     {
                         return;
                     }
                 }
+                UIHandler.instance.Notify("Win condition achieved!");
                 logger.LogInfo("Win condition achieved, unlocking items!");
                 session.SetClientState(ArchipelagoClientState.ClientGoal);
                 session.SetGoalAchieved();
@@ -227,6 +228,15 @@ class POASession(PlayerData playerData)
         };
     }
 
+    public void NotifyCollection(long id, bool hideIfAlreadyUnlocked = true)
+    {
+        if (!session.Locations.AllLocationsChecked.Contains(id))
+        {
+            SimpleItemInfo itemInfo = GetLocationDetails(id);
+            UIHandler.instance.Notify("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
+        }
+    }
+
     public Ropes CompleteRopeCheck(Ropes rope)
     {
         playerData.locations.ropes.SetCheck(rope, true);                            // save rope check
@@ -245,42 +255,34 @@ class POASession(PlayerData playerData)
         return rope;
     }
 
-    public Artefacts CompleteArtefactCheck(ArtefactOnPeak artefactOnPeak)
+    public void CompleteArtefactCheck(Artefacts artefact)
     {
-        Artefacts artefact = Utils.GetArtefactFromCollectable(artefactOnPeak);
         logger.LogInfo("Completing artefact " + artefact.ToString());
         playerData.locations.artefacts.SetCheck(artefact, true);
 
-        if (session == null) return (Artefacts)(-1);
+        if (session == null) return;
         session.Locations.CompleteLocationChecks(Utils.ArtefactToId(artefact));
-
-        return artefact;
     }
 
-    public BirdSeeds CompleteSeedCheck(BirdSeedCollectable seedCollectable)
+    public void CompleteSeedCheck(BirdSeeds seed)
     {
-        BirdSeeds seed = Utils.GetSeedFromCollectable(seedCollectable);
         logger.LogInfo("Completing seed " + seed.ToString());
         playerData.locations.seeds.SetCheck(seed, true);
 
-        if (session == null) return (BirdSeeds)(-1);
+        if (session == null) return;
         session.Locations.CompleteLocationChecks(Utils.BirdSeedToId(seed));
-
-        return seed;
     }
 
-    public Peaks CompletePeakCheck(StamperPeakSummit peakStamper)
+    public void CompletePeakCheck(Peaks peak)
     {
-        if (session == null) return (Peaks)(-1);
+        if (session == null) return;
 
-        Peaks peak = Utils.GetPeakFromCollectable(peakStamper);
         session.Locations.CompleteLocationChecks(Utils.PeakToId(peak));
 
         playerData.locations.peaks.SetCheck(peak, true);
 
         logger.LogInfo("Completing peak " + peak.ToString());
         // DONE!    // I don't know why I placed this comment here lol
-        return peak;
     }
 
     public void CompleteFSPeakCheck(Peaks peak)
