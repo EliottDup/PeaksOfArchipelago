@@ -14,7 +14,6 @@ using System.Collections;
 using System.Linq;
 using System;
 using System.Reflection;
-using UnityEngine.Analytics;
 
 namespace PeaksOfArchipelago;
 
