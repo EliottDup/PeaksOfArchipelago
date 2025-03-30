@@ -2,3 +2,7 @@
 /obj/
 /PeaksOfArchipelago/*.dll
 /PeaksOfArchipelago/*.zip
+/lib/Assembly-CSharp.dll
+/lib/*steamworks.net.dll
+/lib/Rewired_Core.dll
+/lib/UnityEngine.UI.dll
