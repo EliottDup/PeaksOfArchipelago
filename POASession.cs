@@ -213,7 +213,7 @@ class POASession(PlayerData playerData)
 
     public SimpleItemInfo GetLocationDetails(long loc)
     {
-        if (scoutedItems == null)
+        if (scoutedItems == null || !session.Locations.AllLocations.Contains(loc))
         {
             return new SimpleItemInfo
             {
@@ -230,7 +230,7 @@ class POASession(PlayerData playerData)
 
     public void NotifyCollection(long id, bool hideIfAlreadyUnlocked = true)
     {
-        if (!session.Locations.AllLocationsChecked.Contains(id))
+        if (!session.Locations.AllLocationsChecked.Contains(id) && session.Locations.AllLocations.Contains(id))
         {
             SimpleItemInfo itemInfo = GetLocationDetails(id);
             UIHandler.instance.Notify("Found " + itemInfo.playerName + "'s " + itemInfo.itemName);
