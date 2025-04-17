@@ -157,7 +157,8 @@ class POASession(PlayerData playerData)
             string winCondition = goal.ToString();
             bool checkPeaks = winCondition == "0" || winCondition == "2";       // 0 or 2
             bool checkArtefacts = winCondition == "1" || winCondition == "2";   // 1 or 2
-            bool checkAll = winCondition == "3";
+            bool checkTimeAttack = winCondition == "3";
+            bool checkAll = winCondition == "4";
             ReadOnlyCollection<long> missing = session.Locations.AllMissingLocations;
             if (checkAll)
             {
@@ -175,7 +176,11 @@ class POASession(PlayerData playerData)
                 foreach (long id in missing)
                 {
                     CollectibleType type = Utils.GetTypeById(id);
-                    if ((type == CollectibleType.Peak && checkPeaks) || (type == CollectibleType.Artefact && checkArtefacts))
+                    if ((type == CollectibleType.Peak && checkPeaks) ||
+                        (type == CollectibleType.Artefact && checkArtefacts) ||
+                        ((type == CollectibleType.TimeParPeak ||
+                          type == CollectibleType.RopeParPeak ||
+                          type == CollectibleType.HoldParPeak) && checkTimeAttack))
                     {
                         return;
                     }
