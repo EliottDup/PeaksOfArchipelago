@@ -4,7 +4,6 @@ using BepInEx.Logging;
 using PeaksOfArchipelago;
 using UnityEngine;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
 
 class Traps : MonoBehaviour
 {
@@ -12,6 +11,9 @@ class Traps : MonoBehaviour
     {
         Birds,
         Night,
+        Holds,
+        Gravity,
+        OneTime
     }
     Bird hunter = null;
     Bird crow = null;
@@ -21,6 +23,9 @@ class Traps : MonoBehaviour
     public static PlayerData playerData;
     bool birdTrapRunning = false;
     private bool nightTrapRunning;
+    private bool holdsTrapRunning;
+    private bool gravityTrapRunning;
+
     OilLamp oilLamp;
 
     public void Awake()
@@ -37,6 +42,7 @@ class Traps : MonoBehaviour
     {
         // trapList = UIHandler.CreateClock("panel", new Color(1, 1, 1, 1), UIHandler.instance.canvas.transform, new Vector2(0, 0), new Vector2(100, 100), 0.5f, 0.5f);
         trapList = UIHandler.CreatePanel("trap list", new Color(0, 0, 0, 0.8f), FindObjectOfType<Canvas>()?.transform, new Vector2(10, 10), 0, 0);
+        trapList.SetActive(false);
     }
 
     public void StartTrap()
@@ -60,12 +66,38 @@ class Traps : MonoBehaviour
                     }
                     break;
                 }
+            case Trap.Holds:
+                {
+                    if (!StartHoldsTrap())
+                    {
+                        StartOneTimeTrap();
+                    }
+                    break;
+                }
+            case Trap.Gravity:
+                {
+                    if (!StartGravityTrap())
+                    {
+                        StartOneTimeTrap();
+                    }
+                    break;
+                }
+            case Trap.OneTime:
+                {
+                    StartOneTimeTrap();
+                    break;
+                }
         }
     }
 
-    void StartOneTimeTrap()
+    public bool StartGravityTrap()
     {
-
+        if (!gravityTrapRunning)
+        {
+            StartCoroutine(GravityTrap());
+            return true;
+        }
+        return false;
     }
 
 
@@ -89,9 +121,77 @@ class Traps : MonoBehaviour
         return false;
     }
 
+    public void StartOneTimeTrap()
+    {
+        switch (UnityEngine.Random.Range(0, 4))
+        {
+            case 0:
+                {
+                    RopeAnchor ra = GameObject.FindObjectOfType<RopeAnchor>();
+                    if (ra == null || ra.anchorsInBackpack <= 0)
+                    {
+                        break;
+                    }
+                    ra.anchorsInBackpack -= 1;
+                    ra.StartCoroutine("RopesLeftTooltip");
+                    UIHandler.instance.Notify("You dropped a rope");
+                    return;
+                }
+            case 1:
+                {
+                    CoffeeDrink cd = GameObject.FindObjectOfType<CoffeeDrink>();
+                    if (cd == null || cd.coffeeSipsLeft <= 0)
+                    {
+                        break;
+                    }
+                    cd.coffeeSipsLeft -= 1;
+                    cd.StartCoroutine("CoffeeLeftToolTip");
+                    UIHandler.instance.Notify("Your coffee spilled");
+                    return;
+                }
+            case 2:
+                {
+                    ChalkBag cb = GameObject.FindObjectOfType<ChalkBag>();
+                    if (cb == null || cb.chalkBagUsesLeft <= 0)
+                    {
+                        break;
+                    }
+                    cb.chalkBagUsesLeft -= 1;
+                    cb.StartCoroutine("ChalkLeftToolTip", false);
+                    UIHandler.instance.Notify("You found a hole in your chalk bag");
+                    return;
+                }
+            case 3:
+                {
+                    ChalkBag cb = GameObject.FindObjectOfType<ChalkBag>();
+                    if (cb == null || cb.birdseedsUsesLeft <= 0)
+                    {
+                        break;
+                    }
+                    cb.birdseedsUsesLeft -= 1;
+                    cb.StartCoroutine("ChalkLeftToolTip", true);
+                    UIHandler.instance.Notify("You realise you forgot a portion of bird seeds");
+                    return;
+                }
+        }
+        UIHandler.instance.Notify("Nothing Happened...");
+    }
+
+    public bool StartHoldsTrap()
+    {
+        if (!holdsTrapRunning)
+        {
+            string[] traps = ["CrimpsTrap", "SlopersTrap", "PitchesTrap"];
+            StartCoroutine(traps[UnityEngine.Random.Range(0, traps.Length)]);
+            return true;
+        }
+        return false;
+    }
+
     private IEnumerator NightTrap()
     {
         yield return new WaitForEndOfFrame();
+        logger.LogInfo("Starting Night Trap");
         GameManager.control.alps_statue_sundown_InUse = true;
         FindObjectOfType<EnterPeakScene>().PublicSetSundown();
         if (playerData.items.lamp)
@@ -101,7 +201,7 @@ class Traps : MonoBehaviour
         }
         nightTrapRunning = true;
 
-        yield return StartTimer("Sundown", 30f);
+        yield return StartTimer("Sundown", 60f);
 
         nightTrapRunning = false;
         if (playerData.items.lamp)
@@ -138,10 +238,97 @@ class Traps : MonoBehaviour
         }
     }
 
+    private IEnumerator CrimpsTrap()
+    {
+        yield return new WaitForEndOfFrame();
+        holdsTrapRunning = true;
+        GameObject[] array = GameObject.FindGameObjectsWithTag("Climbable");
+        for (int i = 0; i < array.Length; i++)
+        {
+            if (array[i].name != "ClimbableSloper_Normal" && array[i].name != "ClimbableSloper_Slippery" &&
+                array[i].name != "ClimbableSloper_Easy" && array[i].name != "ClimbableSloper_Rain" &&
+                array[i].name != "ClimbableSloper_Rain_Brick")
+            {
+                array[i].tag = "ClimbableMicroHold";
+            }
+        }
 
+        yield return StartTimer("Oops, all crimps!", 30f);
+
+        yield return new WaitForEndOfFrame();
+        for (int i = 0; i < array.Length; i++)
+        {
+            if (array[i].name != "ClimbableSloper_Normal" && array[i].name != "ClimbableSloper_Slippery" &&
+                array[i].name != "ClimbableSloper_Easy" && array[i].name != "ClimbableSloper_Rain" &&
+                array[i].name != "ClimbableSloper_Rain_Brick")
+            {
+                array[i].tag = "Climbable";
+            }
+        }
+        holdsTrapRunning = false;
+    }
+
+    private IEnumerator SlopersTrap()
+    {
+        yield return new WaitForEndOfFrame();
+        holdsTrapRunning = true;
+
+        GameObject[] array = GameObject.FindGameObjectsWithTag("Climbable");
+        string[] array2 = new string[array.Length];
+        for (int j = 0; j < array.Length; j++)
+        {
+            array2[j] = array[j].name;
+            array[j].name = "ClimbableSloper_Easy";
+        }
+        yield return StartTimer("Oops, all slopers!", 15f);
+
+        yield return new WaitForEndOfFrame();
+
+        for (int j = 0; j < array.Length; j++)
+        {
+            array[j].name = array2[j];
+        }
+
+        holdsTrapRunning = false;
+    }
+
+    private IEnumerator PitchesTrap()
+    {
+        yield return new WaitForEndOfFrame();
+        holdsTrapRunning = true;
+
+        GameObject[] array = GameObject.FindGameObjectsWithTag("Climbable");
+        for (int j = 0; j < array.Length; j++)
+        {
+            array[j].tag = "ClimbablePitch";
+        }
+        yield return StartTimer("Oops, all pitches!", 30f);
+
+        yield return new WaitForEndOfFrame();
+
+        for (int j = 0; j < array.Length; j++)
+        {
+            array[j].tag = "Climbable";
+        }
+
+        holdsTrapRunning = false;
+    }
+
+    private IEnumerator GravityTrap()
+    {
+        yield return new WaitForEndOfFrame();
+        gravityTrapRunning = true;
+        Physics.gravity = new Vector3(0f, -10.692901f, 0f);
+
+        yield return StartTimer("Feeling Heavy", 30f);
+        Physics.gravity = new Vector3(0f, -9.81f, 0f);
+        gravityTrapRunning = false;
+    }
 
     private IEnumerator StartTimer(string name, float duration)
     {
+        yield return new WaitForEndOfFrame();
+        trapList.SetActive(true);
         GameObject p = UIHandler.CreatePanel(name + " clock", new Color(0, 0, 0, 0.8f), trapList.transform, Vector2.zero, vertical: false);
         Text t = UIHandler.CreateTextElem("name", 32, p.transform);
         t.text = name;
@@ -163,5 +350,9 @@ class Traps : MonoBehaviour
         }
         logger.LogInfo(i.rectTransform.sizeDelta);
         Destroy(p);
+        if (trapList.transform.childCount == 0)
+        {
+            trapList.SetActive(false);
+        }
     }
 }

@@ -55,10 +55,17 @@ class POASession(PlayerData playerData)
             return false;
         }
 
-        UIHandler.instance.Notify("Connection Successful!", 0.5f, 4, 0.5f);
+        UIHandler.instance.Notify("<color=#00FF00>Connection Successful!</color>", 0.5f, 4, 0.5f);
 
         session.SetClientState(ArchipelagoClientState.ClientConnected);
         loginSuccessful = (LoginSuccessful)result;
+
+        bool deathLinkTraps = false;
+        if (loginSuccessful.SlotData.TryGetValue("deathLinkTraps", out var tmp))
+        {
+            deathLinkTraps = Convert.ToInt32(tmp) == 1;
+        }
+
 
         if (loginSuccessful.SlotData.TryGetValue("deathLink", out var enableDeathLink))
         {
@@ -67,14 +74,22 @@ class POASession(PlayerData playerData)
                 deathLinkService = session.CreateDeathLinkService();
                 deathLinkService.EnableDeathLink();
                 logger.LogInfo("Enabling Death Link");
-
-                deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
+                if (deathLinkTraps)
                 {
-                    logger.LogInfo(deathLinkObject.Source + deathLinkObject.Cause);
-                    // Traps.instance?.StartTrap();
-                    // Traps.instance?.StartNightTrap();
-                    KillPlayer();
-                };
+                    deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
+                    {
+                        logger.LogInfo(deathLinkObject.Source + deathLinkObject.Cause);
+                        Traps.instance?.StartTrap();
+                    };
+                }
+                else
+                {
+                    deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
+                    {
+                        logger.LogInfo(deathLinkObject.Source + deathLinkObject.Cause);
+                        KillPlayer();
+                    };
+                }
             }
         }
         if (loginSuccessful.SlotData.TryGetValue("ropeUnlockMode", out var ropeUnlockMode))
