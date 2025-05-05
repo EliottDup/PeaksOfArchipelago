@@ -15,6 +15,13 @@ class Traps : MonoBehaviour
         Gravity,
         OneTime
     }
+    enum SingleTimeTrap
+    {
+        Ropes,
+        Chalk,
+        Coffee,
+        Seeds
+    }
     Bird hunter = null;
     Bird crow = null;
     public static ManualLogSource logger;
@@ -123,9 +130,9 @@ class Traps : MonoBehaviour
 
     public void StartOneTimeTrap()
     {
-        switch (UnityEngine.Random.Range(0, 4))
+        switch ((SingleTimeTrap)UnityEngine.Random.Range(0, 4))
         {
-            case 0:
+            case SingleTimeTrap.Ropes:
                 {
                     RopeAnchor ra = GameObject.FindObjectOfType<RopeAnchor>();
                     if (ra == null || ra.anchorsInBackpack <= 0)
@@ -137,7 +144,7 @@ class Traps : MonoBehaviour
                     UIHandler.instance.Notify("You dropped a rope");
                     return;
                 }
-            case 1:
+            case SingleTimeTrap.Coffee:
                 {
                     CoffeeDrink cd = GameObject.FindObjectOfType<CoffeeDrink>();
                     if (cd == null || cd.coffeeSipsLeft <= 0)
@@ -149,7 +156,7 @@ class Traps : MonoBehaviour
                     UIHandler.instance.Notify("Your coffee spilled");
                     return;
                 }
-            case 2:
+            case SingleTimeTrap.Chalk:
                 {
                     ChalkBag cb = GameObject.FindObjectOfType<ChalkBag>();
                     if (cb == null || cb.chalkBagUsesLeft <= 0)
@@ -161,7 +168,7 @@ class Traps : MonoBehaviour
                     UIHandler.instance.Notify("You found a hole in your chalk bag");
                     return;
                 }
-            case 3:
+            case SingleTimeTrap.Seeds:
                 {
                     ChalkBag cb = GameObject.FindObjectOfType<ChalkBag>();
                     if (cb == null || cb.birdseedsUsesLeft <= 0)
@@ -191,9 +198,12 @@ class Traps : MonoBehaviour
     private IEnumerator NightTrap()
     {
         yield return new WaitForEndOfFrame();
+        UIHandler.instance.Notify("Sudden Eclipse");
         logger.LogInfo("Starting Night Trap");
         GameManager.control.alps_statue_sundown_InUse = true;
         FindObjectOfType<EnterPeakScene>().PublicSetSundown();
+        GameManager.control.alps_statue_sundown_InUse = false;
+
         if (playerData.items.lamp)
         {
             oilLamp.lampObj.SetActive(true);
@@ -201,14 +211,13 @@ class Traps : MonoBehaviour
         }
         nightTrapRunning = true;
 
-        yield return StartTimer("Sundown", 60f);
+        yield return StartTimer("Eclipse", 60f);
 
         nightTrapRunning = false;
         if (playerData.items.lamp)
         {
             oilLamp.lampObj.SetActive(false);
         }
-        GameManager.control.alps_statue_sundown_InUse = false;
         FindObjectOfType<EnterPeakScene>().PublicSetSundown();
 
     }
@@ -218,6 +227,7 @@ class Traps : MonoBehaviour
         if (hunter != null && crow != null)
         {
             yield return new WaitForEndOfFrame();
+            UIHandler.instance.Notify("You've awakened the birds's wrath");
             logger.LogInfo("activating birds");
             hunter.gameObject.SetActive(true);
             crow.gameObject.SetActive(true);
@@ -225,7 +235,7 @@ class Traps : MonoBehaviour
             hunter.InitiateBird();
             crow.InitiateBird();
 
-            yield return StartTimer("Birds!", 60f);
+            yield return StartTimer("Birds!", 30f);
 
             birdTrapRunning = false;
             logger.LogInfo("deactivating birds");
@@ -234,6 +244,7 @@ class Traps : MonoBehaviour
         }
         else
         {
+            UIHandler.instance.AddChatMessage("Something went wrong, please report this to the dev :) \n (you can keep playing)");
             logger.LogInfo("birds are null?");
         }
     }
@@ -243,6 +254,7 @@ class Traps : MonoBehaviour
         yield return new WaitForEndOfFrame();
         holdsTrapRunning = true;
         GameObject[] array = GameObject.FindGameObjectsWithTag("Climbable");
+        UIHandler.instance.Notify("All the holds seem so small today");
         for (int i = 0; i < array.Length; i++)
         {
             if (array[i].name != "ClimbableSloper_Normal" && array[i].name != "ClimbableSloper_Slippery" &&
@@ -271,6 +283,7 @@ class Traps : MonoBehaviour
     private IEnumerator SlopersTrap()
     {
         yield return new WaitForEndOfFrame();
+        UIHandler.instance.Notify("Your hands feel greasy");
         holdsTrapRunning = true;
 
         GameObject[] array = GameObject.FindGameObjectsWithTag("Climbable");
@@ -295,6 +308,7 @@ class Traps : MonoBehaviour
     private IEnumerator PitchesTrap()
     {
         yield return new WaitForEndOfFrame();
+        UIHandler.instance.Notify("You seem to tire quicker than usual");
         holdsTrapRunning = true;
 
         GameObject[] array = GameObject.FindGameObjectsWithTag("Climbable");
@@ -317,6 +331,7 @@ class Traps : MonoBehaviour
     private IEnumerator GravityTrap()
     {
         yield return new WaitForEndOfFrame();
+        UIHandler.instance.Notify("How much porridge did ye have for breakfast?");
         gravityTrapRunning = true;
         Physics.gravity = new Vector3(0f, -10.692901f, 0f);
 
