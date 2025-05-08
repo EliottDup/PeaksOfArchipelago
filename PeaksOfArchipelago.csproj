@@ -55,5 +55,12 @@
         <!-- <Reference Include="Rewired_Core.net">
       <HintPath>lib/Rewired_Core.net.dll</HintPath>
     </Reference> -->
-</ItemGroup>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="Build">
+    <Copy
+      SourceFiles="$(TargetDir)$(TargetFileName)"
+      DestinationFolder="$(LocalModFolder)" 
+      SkipUnchangedFiles="true"
+      Condition=" '$(LocalModFolder)' != '' " />
+  </Target>
 </Project>

@@ -112,7 +112,13 @@ class POASession(PlayerData playerData)
 
         session.Items.ItemReceived += (receivedItemsHelper) =>
         {
-            logger.LogInfo($"Received Item: {receivedItemsHelper.PeekItem().ItemName}"); // This doesn't seem to work for some reason, so I just check for new items when entering the cabin
+            ItemInfo item = receivedItemsHelper.AllItemsReceived.Last();
+            logger.LogInfo($"Receiving Item: {item.ItemName}"); // This doesn't seem to work for some reason, so I just check for new items when entering the cabin
+            if (item.ItemId == Utils.ExtraItemToId(ExtraItems.Trap))
+            {
+                logger.LogInfo("Activating Trap!");
+                Traps.instance?.StartTrap();
+            }
         };
 
         firstLogin = true;

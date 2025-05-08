@@ -128,7 +128,8 @@ public enum ExtraItems
     ExtraRope,
     ExtraChalk,
     ExtraCoffee,
-    ExtraSeed
+    ExtraSeed,
+    Trap
 }
 
 public struct TimeAttackDefaultData
