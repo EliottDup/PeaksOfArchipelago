@@ -145,7 +145,7 @@ class POASession(PlayerData playerData)
         }
         if (session.Items.AllItemsReceived.Count == itemcount) return;
         List<SimpleItemInfo> newReceivedItems = [.. session.Items.AllItemsReceived.Select(item =>
-            new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })]; // slight affront to god to convert to custom item class
+            new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName }).Where( item => item.itemName != "Trap")]; // slight affront to god to convert to custom item class & filter out traps
 
         uncollectedItems = [.. uncollectedItems.Concat(newReceivedItems.Skip(itemcount))];
         logger.LogInfo($"Received {uncollectedItems.Count} items");

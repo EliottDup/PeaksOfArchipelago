@@ -489,11 +489,13 @@ public class PeaksOfArchipelagoMod : ModClass
             string msg = "You got: ";
 
             session.UpdateReceivedItems();
-            SimpleItemInfo last = session.uncollectedItems.Last();
-            foreach (SimpleItemInfo info in session.uncollectedItems)
+
+            for (int i = 0; i < session.uncollectedItems.Count; i++)
             {
+                SimpleItemInfo info = session.uncollectedItems[i];
+                if (info.itemName == "Trap") continue;
                 msg += info.itemName;
-                if (info.id != last.id || info.itemName != last.itemName || info.playerName != last.playerName)
+                if (i != session.uncollectedItems.Count - 1)
                 {
                     msg += ", ";
                 }
@@ -651,6 +653,25 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             logger.LogInfo("Game wants to do something with achievements, but I say no");
             __result = true;
+            return false;
+        }
+    }
+
+    [HarmonyPatch]
+    public class CollectionTextPatch
+    {
+        static IEnumerable<MethodBase> TargetMethods()
+        {
+            yield return AccessTools.Method(typeof(BirdSeedCollectedText), "InitiateCollectedTextSingle");
+            yield return AccessTools.Method(typeof(RopeCollectedText), "InitiateCollectedTextSingle");
+            yield return AccessTools.Method(typeof(BirdSeedCollectedText), "InitiateCollectedText");
+            yield return AccessTools.Method(typeof(RopeCollectedText), "InitiateCollectedText");
+            yield return AccessTools.Method(typeof(ArtefactCollectedText), "InitiateCollectedText");
+        }
+
+        static bool Prefix()
+        {
+            logger.LogInfo("Blocking collection Text");
             return false;
         }
     }
