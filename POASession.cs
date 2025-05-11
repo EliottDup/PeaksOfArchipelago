@@ -52,6 +52,20 @@ class POASession(PlayerData playerData)
             {
                 logger.LogError(error);
             }
+            foreach (ConnectionRefusedError error in ((LoginFailure)result).ErrorCodes)
+            {
+                string errorMsg = error switch
+                {
+                    ConnectionRefusedError.InvalidSlot => "Slot name invalid",
+                    ConnectionRefusedError.InvalidGame => "Developer made a big oopsie lol",
+                    ConnectionRefusedError.SlotAlreadyTaken => "Player already connected",
+                    ConnectionRefusedError.IncompatibleVersion => "Version incompatible",
+                    ConnectionRefusedError.InvalidPassword => "Password is incorrect",
+                    ConnectionRefusedError.InvalidItemsHandling => "Developer made a big oopsie lol",
+                    _ => "Error so weird even the code doesn't know whats going on",
+                };
+                UIHandler.instance.AddChatMessage($"<color=#FF0000>Error: {errorMsg}</color>");
+            }
             return false;
         }
 
