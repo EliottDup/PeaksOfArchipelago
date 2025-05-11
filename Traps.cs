@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using BepInEx.Logging;
 using PeaksOfArchipelago;
 using UnityEngine;
@@ -54,39 +55,32 @@ class Traps : MonoBehaviour
 
     public void StartTrap()
     {
-        Trap trap = ((Trap[])Enum.GetValues(typeof(Trap)))[UnityEngine.Random.Range(0, Enum.GetValues(typeof(Trap)).Length)];
+        List<Trap> choices = new([Trap.OneTime]);
+        if (!birdTrapRunning) choices.Add(Trap.Birds);
+        if (!nightTrapRunning) choices.Add(Trap.Night);
+        if (!holdsTrapRunning) choices.Add(Trap.Holds);
+        if (!gravityTrapRunning) choices.Add(Trap.Gravity);
+        Trap trap = choices[UnityEngine.Random.Range(0, choices.Count)];
         switch (trap)
         {
             case Trap.Birds:
                 {
-                    if (!StartBirdTrap())
-                    {
-                        StartOneTimeTrap();
-                    }
+                    StartBirdTrap();
                     break;
                 }
             case Trap.Night:
                 {
-                    if (!StartNightTrap())
-                    {
-                        StartOneTimeTrap();
-                    }
+                    StartNightTrap();
                     break;
                 }
             case Trap.Holds:
                 {
-                    if (!StartHoldsTrap())
-                    {
-                        StartOneTimeTrap();
-                    }
+                    StartHoldsTrap();
                     break;
                 }
             case Trap.Gravity:
                 {
-                    if (!StartGravityTrap())
-                    {
-                        StartOneTimeTrap();
-                    }
+                    StartGravityTrap();
                     break;
                 }
             case Trap.OneTime:
@@ -97,39 +91,36 @@ class Traps : MonoBehaviour
         }
     }
 
-    public bool StartGravityTrap()
+    public void StartGravityTrap()
     {
-        if (!gravityTrapRunning)
-        {
-            StartCoroutine(GravityTrap());
-            return true;
-        }
-        return false;
+        StartCoroutine(GravityTrap());
     }
 
 
-    public bool StartBirdTrap()
+    public void StartBirdTrap()
     {
-        if (!birdTrapRunning)
-        {
-            StartCoroutine(BirdsTrap());
-            return true;
-        }
-        return false;
+        StartCoroutine(BirdsTrap());
     }
 
-    public bool StartNightTrap()
+    public void StartNightTrap()
     {
-        if (!nightTrapRunning)
-        {
-            StartCoroutine(NightTrap());
-            return true;
-        }
-        return false;
+        StartCoroutine(NightTrap());
     }
 
     public void StartOneTimeTrap()
     {
+        List<SingleTimeTrap> choices = [];
+        if (playerData.items.rope) choices.Add(SingleTimeTrap.Ropes);
+        if (playerData.items.coffee) choices.Add(SingleTimeTrap.Coffee);
+        if (playerData.items.chalkbag) choices.AddRange([SingleTimeTrap.Chalk, SingleTimeTrap.Seeds]);
+
+        if (choices.Count == 0)
+        {
+            UIHandler.instance.Notify("Nothing Happened...");
+            return;
+        }
+
+        SingleTimeTrap choice = choices[UnityEngine.Random.Range(0, choices.Count)];
         switch ((SingleTimeTrap)UnityEngine.Random.Range(0, 4))
         {
             case SingleTimeTrap.Ropes:
@@ -181,18 +172,12 @@ class Traps : MonoBehaviour
                     return;
                 }
         }
-        UIHandler.instance.Notify("Nothing Happened...");
     }
 
-    public bool StartHoldsTrap()
+    public void StartHoldsTrap()
     {
-        if (!holdsTrapRunning)
-        {
-            string[] traps = ["CrimpsTrap", "SlopersTrap", "PitchesTrap"];
-            StartCoroutine(traps[UnityEngine.Random.Range(0, traps.Length)]);
-            return true;
-        }
-        return false;
+        string[] traps = ["CrimpsTrap", "SlopersTrap", "PitchesTrap"];
+        StartCoroutine(traps[UnityEngine.Random.Range(0, traps.Length)]);
     }
 
     private IEnumerator NightTrap()
