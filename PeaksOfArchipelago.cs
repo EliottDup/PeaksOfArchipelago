@@ -274,6 +274,43 @@ public class PeaksOfArchipelagoMod : ModClass
         }
     }
 
+    // [HarmonyPatch(typeof(IntermediateJournal), "JournalPageUpdate")]
+    // public class IJournalPageUpdatePatch
+    // {
+    //     public static void Postfix(IntermediateJournal __instance)
+    //     {
+    //         logger.LogInfo($"IntermediateJournal {__instance.name} found");
+    //         __instance.leftPageCol.enabled = false;
+    //     }
+    // }
+
+    // [HarmonyPatch(typeof(AdvancedJournal), "JournalPageUpdate")]
+    // public class AJournalPageUpdatePatch
+    // {
+    //     public static void Postfix(AdvancedJournal __instance)
+    //     {
+    //         logger.LogInfo($"AdvancedJournal {__instance.name} found");
+    //         __instance.leftPageCol.enabled = false;
+    //     }
+    // }
+
+    // [HarmonyPatch(typeof(PeakJournal), "Update")]
+    // public class JournalUpdatePatch
+    // {
+    //     static List<int> disabledPeaks = new List<int> { 0, 5, 7, 8 };
+    //     public static void Postfix(PeakJournal __instance)
+    //     {
+    //         if (disabledPeaks.Contains(__instance.currentPage))
+    //         {
+    //             __instance.rightPageCol.enabled = false;
+    //         }
+    //         if (disabledPeaks.Contains(__instance.currentPage - 1))
+    //         {
+    //             __instance.leftPageCol.enabled = false;
+    //         }
+    //     }
+    // }
+
     [HarmonyPatch(typeof(ResetPosition), "FadeToBlack")]
     public class ResetPositionPatch
     {
