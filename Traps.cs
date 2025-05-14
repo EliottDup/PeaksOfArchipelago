@@ -335,11 +335,7 @@ class Traps : MonoBehaviour
         GameObject c = UIHandler.CreateClock("clock", Color.white, p.transform, Vector2.zero, 36);
         Image i = c.GetComponent<Image>();
         // i.rectTransform.sizeDelta = Vector2.one * t.rectTransform.sizeDelta.y;
-        logger.LogInfo(t.rectTransform.sizeDelta.y);
-        logger.LogInfo(i.rectTransform.sizeDelta);
         yield return null;
-        logger.LogInfo(i.rectTransform.sizeDelta);
-
 
         float timer = 0;
         while (timer <= 1)
@@ -348,7 +344,6 @@ class Traps : MonoBehaviour
             i.fillAmount = 1 - timer;
             yield return null;
         }
-        logger.LogInfo(i.rectTransform.sizeDelta);
         Destroy(p);
         if (trapList.transform.childCount == 0)
         {
