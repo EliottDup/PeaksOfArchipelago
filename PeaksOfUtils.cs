@@ -174,7 +174,7 @@ class CheckList<T> where T : struct, Enum   // I would use enum flags, but they 
         }
     }
 
-    public void SetCheck(T value, bool check)
+    public void SetCheck(T value, bool check = true)
     {
         checks[value] = check;
     }

@@ -14,6 +14,7 @@ using System.Collections;
 using System.Linq;
 using System;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace PeaksOfArchipelago;
 
@@ -294,22 +295,78 @@ public class PeaksOfArchipelagoMod : ModClass
     //     }
     // }
 
-    // [HarmonyPatch(typeof(PeakJournal), "Update")]
-    // public class JournalUpdatePatch
-    // {
-    //     static List<int> disabledPeaks = new List<int> { 0, 5, 7, 8 };
-    //     public static void Postfix(PeakJournal __instance)
-    //     {
-    //         if (disabledPeaks.Contains(__instance.currentPage))
-    //         {
-    //             __instance.rightPageCol.enabled = false;
-    //         }
-    //         if (disabledPeaks.Contains(__instance.currentPage - 1))
-    //         {
-    //             __instance.leftPageCol.enabled = false;
-    //         }
-    //     }
-    // }
+    [HarmonyPatch(typeof(PeakSelection), "OnMouseSpriteDown")]
+    public class PeakSelectionPatch
+    {
+        static List<int> disabledPeaks = [0, 5, 7, 8];
+
+        static bool Prefix(PeakSelection __instance)
+        {
+            logger.LogInfo("Prefixing PeakSelectionLOL");
+            PeakJournal journal = (PeakJournal)typeof(PeakSelection).GetField("peakJournal", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
+            if ((__instance.leftPage && disabledPeaks.Contains(journal.currentPage - 1))
+            || (!__instance.leftPage && disabledPeaks.Contains(journal.currentPage)))
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(PeakSelection), "OnMouseSpriteOver")]
+    public class PeakSelectionColorPatch
+    {
+        static List<int> disabledPeaks = [0, 5, 7, 8];
+
+        static void Prefix(PeakSelection __instance)
+        {
+            PeakJournal journal = (PeakJournal)typeof(PeakSelection).GetField("peakJournal", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
+            MeshRenderer rightRenderer = __instance.rightSelectOutlineOBJ.GetComponent<MeshRenderer>();
+            MeshRenderer leftRenderer = __instance.leftSelectOutlineOBJ.GetComponent<MeshRenderer>();
+            if (__instance.leftPage && session.playerData.items.peaks.IsChecked((Peaks)(journal.currentPage - 1)))
+            {
+                leftRenderer.material.color = new Color(2, 0, 0);
+            }
+            else
+            {
+                leftRenderer.material.color = new Color(1, 1, 1, 0.349f);
+            }
+            if (!__instance.leftPage && session.playerData.items.peaks.IsChecked((Peaks)(journal.currentPage)))
+            {
+                rightRenderer.material.color = new Color(2, 0, 0);
+            }
+            else
+            {
+                rightRenderer.material.color = new Color(1, 1, 1, 0.349f);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(PeakJournal), "PageTurnSound")]
+    public class JournalColorPatch
+    {
+
+        static void Postfix(PeakJournal __instance)
+        {
+            session.playerData.items.peaks.SetCheck(Peaks.HangmansLeap);
+            if (__instance.journalPageAnim.clip == __instance.journalPage_TurnLeft)
+            {
+                logger.LogInfo("RightTurn");
+                __instance.backPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage - 1)) ? Color.red : Color.white;
+                __instance.frontPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage - 2)) ? Color.red : Color.white;
+                __instance.rightPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage + 0)) ? Color.red : Color.white;
+                __instance.leftPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage - 3)) ? Color.red : Color.white;
+            }
+            else
+            {
+                logger.LogInfo("LeftTurn");
+                __instance.backPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage + 1)) ? Color.red : Color.white;
+                __instance.frontPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage + 0)) ? Color.red : Color.white;
+                __instance.rightPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage + 2)) ? Color.red : Color.white;
+                __instance.leftPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage - 1)) ? Color.red : Color.white;
+            }
+        }
+    }
 
     [HarmonyPatch(typeof(ResetPosition), "FadeToBlack")]
     public class ResetPositionPatch
