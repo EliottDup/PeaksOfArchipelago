@@ -526,4 +526,26 @@ public static class Utils
     {
         return (BirdSeeds)seedCollectable.extraBirdSeedNumber;
     }
+
+    internal static bool IsJournalPageUnlocked(int page, Books book, PlayerData playerData)
+    {
+        Peaks peak = BookPageToPeaks(page, book);
+        if (peak == (Peaks)(-1)) return true;
+        return playerData.items.peaks.IsChecked(peak);
+    }
+
+    public static Peaks BookPageToPeaks(int page, Books book)
+    {
+        page--;
+        if (page < 0) return (Peaks)(-1);
+        if (book == Books.Fundamentals)
+        {
+            Peaks peak = (Peaks)page;
+            if (peak == Peaks.HangmansLeap) peak = Peaks.LandsEnd;
+            else if (peak == Peaks.LandsEnd) peak = Peaks.HangmansLeap;
+            if (peak > Peaks.WutheringCrest) return (Peaks)(-1);
+            return peak;
+        }
+        return Peaks.GreenhornsTop;
+    }
 }

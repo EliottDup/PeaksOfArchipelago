@@ -127,6 +127,9 @@ public class PeaksOfArchipelagoMod : ModClass
         GameObject go = GameObject.Find("PeaksOfArchipelagoScriptHolder") ?? new GameObject("PeaksOfArchipelagoScriptHolder");
         go.transform.SetParent(UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()[0].transform);
         go.AddComponent<UIHandler>();
+        session.playerData.items.peaks.SetCheck(Peaks.HangmansLeap);    //!DEBUG
+        session.playerData.items.peaks.SetCheck(Peaks.GreenhornsTop);   //!
+        session.playerData.items.peaks.SetCheck(Peaks.GrayGully);       //!DEBUG
     }
 
     private string GetUri()
@@ -272,99 +275,6 @@ public class PeaksOfArchipelagoMod : ModClass
         static void Postfix()
         {
             session.HandleDeath();
-        }
-    }
-
-    // [HarmonyPatch(typeof(IntermediateJournal), "JournalPageUpdate")]
-    // public class IJournalPageUpdatePatch
-    // {
-    //     public static void Postfix(IntermediateJournal __instance)
-    //     {
-    //         logger.LogInfo($"IntermediateJournal {__instance.name} found");
-    //         __instance.leftPageCol.enabled = false;
-    //     }
-    // }
-
-    // [HarmonyPatch(typeof(AdvancedJournal), "JournalPageUpdate")]
-    // public class AJournalPageUpdatePatch
-    // {
-    //     public static void Postfix(AdvancedJournal __instance)
-    //     {
-    //         logger.LogInfo($"AdvancedJournal {__instance.name} found");
-    //         __instance.leftPageCol.enabled = false;
-    //     }
-    // }
-
-    [HarmonyPatch(typeof(PeakSelection), "OnMouseSpriteDown")]
-    public class PeakSelectionPatch
-    {
-        static List<int> disabledPeaks = [0, 5, 7, 8];
-
-        static bool Prefix(PeakSelection __instance)
-        {
-            logger.LogInfo("Prefixing PeakSelectionLOL");
-            PeakJournal journal = (PeakJournal)typeof(PeakSelection).GetField("peakJournal", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
-            if ((__instance.leftPage && disabledPeaks.Contains(journal.currentPage - 1))
-            || (!__instance.leftPage && disabledPeaks.Contains(journal.currentPage)))
-            {
-                return false;
-            }
-            return true;
-        }
-    }
-
-    [HarmonyPatch(typeof(PeakSelection), "OnMouseSpriteOver")]
-    public class PeakSelectionColorPatch
-    {
-        static List<int> disabledPeaks = [0, 5, 7, 8];
-
-        static void Prefix(PeakSelection __instance)
-        {
-            PeakJournal journal = (PeakJournal)typeof(PeakSelection).GetField("peakJournal", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
-            MeshRenderer rightRenderer = __instance.rightSelectOutlineOBJ.GetComponent<MeshRenderer>();
-            MeshRenderer leftRenderer = __instance.leftSelectOutlineOBJ.GetComponent<MeshRenderer>();
-            if (__instance.leftPage && session.playerData.items.peaks.IsChecked((Peaks)(journal.currentPage - 1)))
-            {
-                leftRenderer.material.color = new Color(2, 0, 0);
-            }
-            else
-            {
-                leftRenderer.material.color = new Color(1, 1, 1, 0.349f);
-            }
-            if (!__instance.leftPage && session.playerData.items.peaks.IsChecked((Peaks)(journal.currentPage)))
-            {
-                rightRenderer.material.color = new Color(2, 0, 0);
-            }
-            else
-            {
-                rightRenderer.material.color = new Color(1, 1, 1, 0.349f);
-            }
-        }
-    }
-
-    [HarmonyPatch(typeof(PeakJournal), "PageTurnSound")]
-    public class JournalColorPatch
-    {
-
-        static void Postfix(PeakJournal __instance)
-        {
-            session.playerData.items.peaks.SetCheck(Peaks.HangmansLeap);
-            if (__instance.journalPageAnim.clip == __instance.journalPage_TurnLeft)
-            {
-                logger.LogInfo("RightTurn");
-                __instance.backPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage - 1)) ? Color.red : Color.white;
-                __instance.frontPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage - 2)) ? Color.red : Color.white;
-                __instance.rightPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage + 0)) ? Color.red : Color.white;
-                __instance.leftPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage - 3)) ? Color.red : Color.white;
-            }
-            else
-            {
-                logger.LogInfo("LeftTurn");
-                __instance.backPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage + 1)) ? Color.red : Color.white;
-                __instance.frontPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage + 0)) ? Color.red : Color.white;
-                __instance.rightPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage + 2)) ? Color.red : Color.white;
-                __instance.leftPage.color = session.playerData.items.peaks.IsChecked((Peaks)(__instance.currentPage - 1)) ? Color.red : Color.white;
-            }
         }
     }
 
@@ -767,6 +677,121 @@ public class PeaksOfArchipelagoMod : ModClass
         {
             logger.LogInfo("Blocking collection Text");
             return false;
+        }
+    }
+
+    // JOURNAL LOCKING LOGIC :/
+
+    // [HarmonyPatch(typeof(IntermediateJournal), "JournalPageUpdate")]
+    // public class IJournalPageUpdatePatch
+    // {
+    //     public static void Postfix(IntermediateJournal __instance)
+    //     {
+    //         logger.LogInfo($"IntermediateJournal {__instance.name} found");
+    //         __instance.leftPageCol.enabled = false;
+    //     }
+    // }
+
+    // [HarmonyPatch(typeof(AdvancedJournal), "JournalPageUpdate")]
+    // public class AJournalPageUpdatePatch
+    // {
+    //     public static void Postfix(AdvancedJournal __instance)
+    //     {
+    //         logger.LogInfo($"AdvancedJournal {__instance.name} found");
+    //         __instance.leftPageCol.enabled = false;
+    //     }
+    // }
+
+    [HarmonyPatch(typeof(PeakSelection), "OnMouseSpriteDown")]
+    public class FundamentalPeakSelectionPatch
+    {
+        static bool Prefix(PeakSelection __instance)
+        {
+            logger.LogInfo("Prefixing PeakSelectionLOL");
+            PeakJournal journal = (PeakJournal)typeof(PeakSelection).GetField("peakJournal", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
+            if ((__instance.leftPage && !Utils.IsJournalPageUnlocked(journal.currentPage, Books.Fundamentals, session.playerData))
+            || (!__instance.leftPage && !Utils.IsJournalPageUnlocked(journal.currentPage + 1, Books.Fundamentals, session.playerData)))
+            {
+                logger.LogInfo(journal.currentPage);
+                logger.LogInfo(Utils.BookPageToPeaks(journal.currentPage, Books.Fundamentals));
+                logger.LogInfo(Utils.BookPageToPeaks(journal.currentPage + 1, Books.Fundamentals));
+                logger.LogInfo(Utils.IsJournalPageUnlocked(journal.currentPage + 1, Books.Fundamentals, session.playerData));
+                return false;
+            }
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(PeakSelection), "OnMouseSpriteOver")]
+    public class FundamentalPeakSelectionColorPatch
+    {
+        static void Prefix(PeakSelection __instance)
+        {
+            PeakJournal journal = (PeakJournal)typeof(PeakSelection).GetField("peakJournal", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
+            MeshRenderer rightRenderer = __instance.rightSelectOutlineOBJ.GetComponent<MeshRenderer>();
+            MeshRenderer leftRenderer = __instance.leftSelectOutlineOBJ.GetComponent<MeshRenderer>();
+            if (__instance.leftPage && !Utils.IsJournalPageUnlocked(journal.currentPage, Books.Fundamentals, session.playerData))
+            {
+                leftRenderer.material.color = new Color(2, 0, 0);
+            }
+            else
+            {
+                leftRenderer.material.color = new Color(1, 1, 1, 0.349f);
+            }
+            if (!__instance.leftPage && !Utils.IsJournalPageUnlocked(journal.currentPage + 1, Books.Fundamentals, session.playerData))
+            {
+                rightRenderer.material.color = new Color(2, 0, 0);
+            }
+            else
+            {
+                rightRenderer.material.color = new Color(1, 1, 1, 0.349f);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(PeakJournal), "PageTurnSound")]
+    public class FundamentalJournalColorPatch
+    {
+        static void Postfix(PeakJournal __instance)
+        {
+            if (__instance.journalPageAnim.clip == __instance.journalPage_TurnLeft)
+            {
+                logger.LogInfo("RightTurn");
+                __instance.backPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage + 0, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+                __instance.frontPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage - 1, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+                __instance.rightPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage + 1, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+                __instance.leftPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage - 2, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+            }
+            else
+            {
+                logger.LogInfo("LeftTurn");
+                __instance.backPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage + 2, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+                __instance.frontPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage + 1, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+                __instance.rightPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage + 3, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+                __instance.leftPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage + 0, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(PeakJournal), "UpdatePage")]
+    public class FundamentalUpdatePagePatch
+    {
+        static void Postfix(PeakJournal __instance)
+        {
+            __instance.backPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage + 2, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+            __instance.frontPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage + 1, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+            __instance.rightPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage + 3, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+            __instance.leftPage.color = !Utils.IsJournalPageUnlocked(__instance.currentPage + 0, Books.Fundamentals, session.playerData) ? Color.red : Color.white;
+        }
+    }
+
+    [HarmonyPatch(typeof(StamperPeakSummit), "JournalPageUpdate")]
+    public class StamperJournalColorPatch
+    {
+        static void Postfix(StamperPeakSummit __instance)
+        {
+            __instance.leftPage.color = Color.white;
+            __instance.rightPage.color = Color.white;
         }
     }
 
