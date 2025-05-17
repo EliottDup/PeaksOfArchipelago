@@ -546,6 +546,13 @@ public static class Utils
             if (peak > Peaks.WutheringCrest) return (Peaks)(-1);
             return peak;
         }
+        if (book == Books.Intermediate)
+        {
+            Peaks peak = (Peaks)page + 20;
+
+            if (peak > Peaks.Cromlech) return (Peaks)(-1);
+            return peak;
+        }
         return Peaks.GreenhornsTop;
     }
 }
