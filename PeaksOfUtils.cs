@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using UnityEngine;
 
 namespace PeaksOfArchipelago;
 
@@ -527,10 +528,19 @@ public static class Utils
         return (BirdSeeds)seedCollectable.extraBirdSeedNumber;
     }
 
+    internal static Color GetJournalPageColor(int page, Books book, PlayerData playerData)
+    {
+        Peaks peak = BookPageToPeaks(page, book);
+        if (peak == (Peaks)(-1)) return Color.white;
+        if (peak == (Peaks)(-2)) return Color.red;
+        return getPeakColor(peak, playerData);
+    }
+
     internal static bool IsJournalPageUnlocked(int page, Books book, PlayerData playerData)
     {
         Peaks peak = BookPageToPeaks(page, book);
         if (peak == (Peaks)(-1)) return true;
+        if (peak == (Peaks)(-2)) return false;
         return playerData.items.peaks.IsChecked(peak);
     }
 
@@ -553,6 +563,24 @@ public static class Utils
             if (peak > Peaks.Cromlech) return (Peaks)(-1);
             return peak;
         }
-        return Peaks.GreenhornsTop;
+        if (book == Books.Advanced)
+        {
+            Peaks peak = (Peaks)page + 30;
+            if (peak == Peaks.Eldenhorn) peak = Peaks.GreatGaol;
+            else if (peak == Peaks.GreatGaol) peak = Peaks.Eldenhorn;
+            if (peak > Peaks.YmirsShadow) return (Peaks)(-1);
+            return peak;
+        }
+        return (Peaks)(-2);
+    }
+
+    internal static Color getPeakColor(Peaks peak, PlayerData playerData)
+    {
+        return playerData.items.peaks.IsChecked(peak) ? Color.white : CLerp(Color.red, Color.white, 0.5f);
+    }
+
+    private static Color CLerp(Color c1, Color c2, float t)
+    {
+        return c1 + (c2 - c1) * t;
     }
 }
