@@ -11,10 +11,8 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
-using System.Linq;
 using System;
 using System.Reflection;
-using System.ComponentModel;
 
 namespace PeaksOfArchipelago;
 
@@ -127,17 +125,6 @@ public class PeaksOfArchipelagoMod : ModClass
         GameObject go = GameObject.Find("PeaksOfArchipelagoScriptHolder") ?? new GameObject("PeaksOfArchipelagoScriptHolder");
         go.transform.SetParent(UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()[0].transform);
         go.AddComponent<UIHandler>();
-        session.playerData.items.peaks.SetCheck(Peaks.HangmansLeap);    //!DEBUG
-        session.playerData.items.peaks.SetCheck(Peaks.GreenhornsTop);   //!
-        session.playerData.items.peaks.SetCheck(Peaks.GrayGully);       //!DEBUG
-        session.playerData.items.peaks.SetCheck(Peaks.PortersBoulders);       //!DEBUG
-        session.playerData.items.peaks.SetCheck(Peaks.Cromlech);       //!DEBUG
-        session.playerData.items.peaks.SetCheck(Peaks.GiantsNose);       //!DEBUG
-        session.playerData.items.peaks.SetCheck(Peaks.WaltersBoulder);       //!DEBUG
-        session.playerData.items.peaks.SetCheck(Peaks.YmirsShadow);       //!DEBUG
-        session.playerData.items.peaks.SetCheck(Peaks.Eldenhorn);       //!DEBUG
-        session.playerData.items.peaks.SetCheck(Peaks.StHaelga);       //!DEBUG
-
     }
 
     private string GetUri()
@@ -604,6 +591,7 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static void Prefix(EnterPeakScene __instance)
         {
+            if (session.currentScene == "IceWaterfallDemo") return;
             string peak = GameObject.FindGameObjectWithTag("SummitBox").GetComponent<StamperPeakSummit>().peakNames.ToString();
             logger.LogInfo("Entering peak: " + peak);
 
@@ -891,7 +879,6 @@ public class PeaksOfArchipelagoMod : ModClass
             AdvancedJournal journal = __instance.peakJournal;
             MeshRenderer rightRenderer = __instance.rightSelectOutlineOBJ.GetComponent<MeshRenderer>();
             MeshRenderer leftRenderer = __instance.leftSelectOutlineOBJ.GetComponent<MeshRenderer>();
-            logger.LogInfo($"Hovering over {Utils.BookPageToPeaks(journal.currentPage, Books.Advanced)}");
             if (__instance.leftPage && !Utils.IsJournalPageUnlocked(journal.currentPage, Books.Advanced, session.playerData))
             {
                 leftRenderer.material.color = new Color(2, 0, 0);
@@ -944,6 +931,45 @@ public class PeaksOfArchipelagoMod : ModClass
             __instance.leftPage.color = Utils.GetJournalPageColor(__instance.currentPage + 0, Books.Advanced, session.playerData);
         }
     }
+
+    // * Expert Peaks Patches
+
+    [HarmonyPatch(typeof(DisableCabin4Flag), "CheckFlag")]  // remove/show ST mummery Tent travel thing
+    public class DisableCabin4Things
+    {
+        static void Postfix(DisableCabin4Flag __instance)
+        {
+            __instance.solemnTempestGateway.SetActive(session.playerData.items.peaks.IsChecked(Peaks.SolemnTempest));
+        }
+    }
+
+    [HarmonyPatch(typeof(Category4CabinLeave), "Update")]
+    public class BulwarkStopperPatch
+    {
+        static bool Prefix(Category4CabinLeave __instance)
+        {
+            __instance.StopCoroutine("GlowDoor");
+            __instance.itemMat.SetColor("_EmissionColor", Color.black);
+            return session.playerData.items.peaks.IsChecked(Peaks.GreatBulwark);
+        }
+    }
+
+    [HarmonyPatch(typeof(Cabin4Map), "Update")]
+    public class SolemnTempestLoaderTranspiler
+    {
+        static bool didBulwark = false;
+        static void Prefix()
+        {
+            didBulwark = GameManager.control.greatbulwark;
+            GameManager.control.greatbulwark = session.playerData.items.peaks.IsChecked(Peaks.SolemnTempest);
+        } // this is done to bypass a check that forces the player to complete the Great Bulwark of the North before Solemn Tempest
+
+        static void Postfix()
+        {
+            GameManager.control.greatbulwark = didBulwark;
+        }
+    }
+
 
     [HarmonyPatch(typeof(StamperPeakSummit), "JournalPageUpdate")]
     public class StamperJournalColorPatch

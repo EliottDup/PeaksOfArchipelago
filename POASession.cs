@@ -364,6 +364,12 @@ class POASession(PlayerData playerData)
 
     internal string UnlockById(long id)
     {
+        if (id < Utils.ropeOffset)
+        {
+            Peaks peak = Utils.IdtoPeak(id);
+            UnlockPeak(peak);
+            return peak.ToString();
+        }
         if (id < Utils.artefactOffset)
         {
             Ropes rope = Utils.IdtoRope(id);
@@ -395,6 +401,11 @@ class POASession(PlayerData playerData)
         ExtraItems extraItem = Utils.IdToExtraItem(id);
         UnlockExtraItem(extraItem);
         return extraItem.ToString();
+    }
+
+    private void UnlockPeak(Peaks peak)
+    {
+        playerData.items.peaks.SetCheck(peak, true);
     }
 
     private void UnlockRope(Ropes rope)
