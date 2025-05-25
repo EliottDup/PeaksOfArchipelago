@@ -111,6 +111,25 @@ class POASession(PlayerData playerData)
             instantRope = Convert.ToInt32(ropeUnlockMode) == 0;
         }
 
+        if (loginSuccessful.SlotData.TryGetValue("gameMode", out var gameMode))
+        {
+            logger.LogInfo($"gamemode: {Convert.ToInt32(gameMode)}");
+            if (Convert.ToInt32(gameMode) == 0)
+            {
+                foreach (Peaks peak in Enum.GetValues(typeof(Peaks)))
+                {
+                    playerData.items.peaks.SetCheck(peak, true);
+                }
+            }
+            else
+            {
+                foreach (Books book in Enum.GetValues(typeof(Books)))
+                {
+                    playerData.items.books.SetCheck(book, true);
+                }
+            }
+        }
+
         await LoadLocationDetails();
 
         session.MessageLog.OnMessageReceived += (logMessage) =>

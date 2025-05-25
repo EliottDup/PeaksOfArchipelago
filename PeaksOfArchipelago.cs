@@ -118,6 +118,13 @@ public class PeaksOfArchipelagoMod : ModClass
         if (session.currentScene == "Cabin")
         {
             session.fundamentalsBook = GameObject.Find("PEAKJOURNAL");
+            foreach (Books book in Enum.GetValues(typeof(Books)))
+            {
+                if (session.playerData.items.books.IsChecked(book))
+                {
+                    session.UnlockById(Utils.BookToId(book));
+                }
+            }
         }
         logger.LogInfo($"You have {GameManager.control.extraBirdSeedUses} birdseeds");
 
