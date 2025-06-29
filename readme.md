@@ -23,3 +23,12 @@ For Linux/MacOS:
 ```bash
 export LocalModFolder="/path/to/mods/folder"
 ```
+
+A better option is making a file called `Local.settings.props` with the following contents
+```xml
+<Project>
+  <PropertyGroup>
+    <LocalModFolder>C:/path/to/folder</LocalModFolder>
+  </PropertyGroup>
+</Project>
+```
