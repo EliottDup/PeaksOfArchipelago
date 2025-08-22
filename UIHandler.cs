@@ -41,6 +41,12 @@ class UIHandler : MonoBehaviour
         }
     }
 
+    void OnDestroy()
+    {
+        Destroy(chatBoxTransform?.gameObject);
+        Destroy(unlockNotifsTransform?.gameObject);
+    }
+
     void CreateUI()
     {
         // Chat messages
