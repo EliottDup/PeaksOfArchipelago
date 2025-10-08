@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Run Game": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Windows\\System32\\cmd.exe",
+      "commandLineArgs": "/c\r\nstart steam://rungameid/2236070"
+    }
+  }
+}
