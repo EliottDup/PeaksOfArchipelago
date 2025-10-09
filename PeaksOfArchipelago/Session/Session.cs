@@ -9,15 +9,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PeaksOfArchipelago
+namespace PeaksOfArchipelago.Session
 {
-    internal class Session
+    internal class PeaksSession
     {
         ArchipelagoSession session;
         ManualLogSource logger;
         private LoginSuccessful login;
 
-        public Session() {
+        public PeaksSession() {
             logger = PeaksOfArchipelago.Logger;
         }
 

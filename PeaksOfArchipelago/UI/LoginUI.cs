@@ -58,7 +58,7 @@ namespace PeaksOfArchipelago.UI
 
             if (res)
             {
-                panel.gameObject.SetActive(false);
+                GameObject.Destroy(panel.gameObject);
             }
             else {
                 statusText.text = "<color=red>Error, please check the console and try again</color>";

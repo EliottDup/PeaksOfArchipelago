@@ -1,10 +1,12 @@
-﻿using System;
+﻿using BepInEx.Logging;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Font = UnityEngine.Font;
 
@@ -13,6 +15,42 @@ namespace PeaksOfArchipelago.UI
     internal class UIManager
     {
         private static Font _gameFont;
+
+        private Canvas canvas;
+        private Transform chatBox;
+        private ManualLogSource logger;
+
+        public UIManager()
+        {
+            logger = PeaksOfArchipelago.Logger;
+        }
+
+        private void MakeUI()
+        {
+            canvas = GameObject.FindObjectOfType<Canvas>();
+            if (canvas == null)
+            {
+                logger.LogError("Canvas not found!");
+                return;
+            }
+
+            // Make ChatBox
+        }
+
+        public void SendChatMessage(string message) {
+            if (chatBox == null) return;
+            var t = UIElementFactory.CreateText(chatBox, "Text", message, 25, TextAnchor.LowerLeft);
+        }
+
+        public void OnSceneLoaded()
+        {
+            MakeUI();
+        }
+
+        public void OnSceneUnloaded()
+        {
+
+        }
 
         public static Font GetFont()
         {

@@ -108,6 +108,8 @@ namespace PeaksOfArchipelago.UI
                 go.GetComponent<RectTransform>().offsetMin = Vector2.zero;
                 go.GetComponent<RectTransform>().offsetMax = Vector2.zero;
             }
+            text.lineSpacing = 2;
+            text.alignByGeometry = true;
             return text;
         }
 
