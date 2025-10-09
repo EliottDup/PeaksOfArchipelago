@@ -364,3 +364,5 @@ FodyWeavers.xsd
 
 # remove Gamepath.props
 PeaksOfArchipelago/GamePath.props
+/PeaksOfArchipelago/GamePath.props
+/PeaksOfArchipelago/Paths.props
