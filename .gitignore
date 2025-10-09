@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# remove Gamepath.props
+PeaksOfArchipelago/Gamepath.props
