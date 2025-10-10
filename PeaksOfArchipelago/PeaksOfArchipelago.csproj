@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<AssemblyName>c0der23.PeaksOfArchipelago</AssemblyName>
+		<AssemblyName>com.c0der23.PeaksOfArchipelago</AssemblyName>
 		<Product>Peaks Of Archipelago</Product>
 		<Version>0.0.1</Version>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -15,6 +15,11 @@
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PlatformTarget>x64</PlatformTarget>
+		<RestoreAdditionalProjectSources>
+			https://api.nuget.org/v3/index.json;
+			https://nuget.bepinex.dev/v3/index.json;
+			https://nuget.samboy.dev/v3/index.json
+		</RestoreAdditionalProjectSources>
 	</PropertyGroup>
 
 	<Import Project="Paths.props" Condition="Exists('Paths.props')" />
