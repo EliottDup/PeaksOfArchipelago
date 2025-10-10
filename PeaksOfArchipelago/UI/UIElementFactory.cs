@@ -74,9 +74,6 @@ namespace PeaksOfArchipelago.UI
             return new LayoutData() { gameObject = go, rectTransform = go.GetComponent<RectTransform>(), layoutGroup = layout };
         }
 
-
-
-
         public static UnityEngine.UI.Button CreateButton(Transform parent, string label, System.Action onClick)
         {
             GameObject go = new GameObject($"{label}button", typeof(Image), typeof(UnityEngine.UI.Button));

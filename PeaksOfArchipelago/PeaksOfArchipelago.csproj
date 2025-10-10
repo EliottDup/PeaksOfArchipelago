@@ -253,6 +253,7 @@
 	<ItemGroup>
 		<Compile Include="PeaksOfArchipelago.cs" />
 		<Compile Include="Session\Session.cs" />
+		<Compile Include="UI\ChatBox.cs" />
 		<Compile Include="UI\LoginUI.cs" />
 		<Compile Include="UI\NotificationSystem.cs" />
 		<Compile Include="UI\UIElementFactory.cs" />

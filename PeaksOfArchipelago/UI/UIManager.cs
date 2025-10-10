@@ -17,8 +17,9 @@ namespace PeaksOfArchipelago.UI
         private static Font _gameFont;
 
         private Canvas canvas;
-        private Transform chatBox;
+        private GameObject scriptHolder;
         private ManualLogSource logger;
+        private ChatBox chat;
 
         public UIManager()
         {
@@ -35,11 +36,13 @@ namespace PeaksOfArchipelago.UI
             }
 
             // Make ChatBox
+            scriptHolder = new GameObject("UIManager_ScriptHolder");
+            chat = scriptHolder.AddComponent<ChatBox>();
         }
 
         public void SendChatMessage(string message) {
-            if (chatBox == null) return;
-            var t = UIElementFactory.CreateText(chatBox, "Text", message, 25, TextAnchor.LowerLeft);
+            //if (chatBox == null) return;
+            //var t = UIElementFactory.CreateText(chatBox, "Text", message, 25, TextAnchor.LowerLeft);
         }
 
         public void OnSceneLoaded()
