@@ -50,6 +50,7 @@ namespace PeaksOfArchipelago.UI
             rt.anchorMax = new Vector2(1, 0.6f);
             rt.sizeDelta = new Vector2(Screen.width * 400 / 1920, Screen.height * 300 / 1080);
             rt.anchoredPosition = new Vector2(-10, 0);
+            chatBoxRoot.AddComponent<Mask>();
 
             GameObject holder = new GameObject("MessageHolder");
             holder.transform.SetParent(chatBoxRoot.transform, false);
@@ -85,8 +86,8 @@ namespace PeaksOfArchipelago.UI
 
         public void AddChatMessage(string message)
         {
-            logger.LogInfo("AddChatMessage: " + message);
             if (messageHolder == null) return;
+            logger.LogInfo("AddChatMessage: " + message);
             GameObject go = new GameObject("Text");
             go.transform.SetParent(messageHolder, false);
             Text t = go.AddComponent<Text>();

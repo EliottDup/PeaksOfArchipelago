@@ -27,6 +27,7 @@ namespace PeaksOfArchipelago.Session
 
             session.Socket.ErrorReceived += (Exception e, string message) =>
             {
+                logger.LogInfo("Socket error incoming lmao");
                 logger.LogError(e);
             };
 
@@ -34,9 +35,11 @@ namespace PeaksOfArchipelago.Session
             
             Task connectTask = session.ConnectAsync();
 
-            if (await Task.WhenAny(connectTask, Task.Delay(4_000)) != connectTask)
+            if (await Task.WhenAny(connectTask, Task.Delay(4000)) != connectTask)
             {
                 logger.LogError("Connection timed out");
+                logger.LogInfo("Pushing to chat");
+                PeaksOfArchipelago.ui.SendChatMessage("<color=red>Connection timed out.</color>");
                 return false;
             }
 

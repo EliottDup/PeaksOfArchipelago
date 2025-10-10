@@ -11,7 +11,7 @@ namespace PeaksOfArchipelago
     public class PeaksOfArchipelago : BaseUnityPlugin
     {
         internal static new ManualLogSource Logger;
-        private UIManager ui;
+        public static UIManager ui;
         public void Awake()
         {
             ui = new UIManager();

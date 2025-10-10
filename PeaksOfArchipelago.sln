@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178 d17.12
+VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeaksOfArchipelago", "PeaksOfArchipelago\PeaksOfArchipelago.csproj", "{081AB4AE-5D09-4AB2-912A-02589737E45B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PeaksOfArchipelago", "PeaksOfArchipelago\PeaksOfArchipelago.csproj", "{081AB4AE-5D09-4AB2-912A-02589737E45B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +18,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8FBC339A-496B-4188-BC91-BEBC8E891F2C}
 	EndGlobalSection
 EndGlobal

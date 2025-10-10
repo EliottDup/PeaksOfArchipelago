@@ -3,7 +3,7 @@
     "Run Game": {
       "commandName": "Executable",
       "executablePath": "C:\\Windows\\System32\\cmd.exe",
-      "commandLineArgs": "/c\r\nstart steam://rungameid/2236070"
+      "commandLineArgs": "/c start steam://rungameid/2236070"
     }
   }
 }

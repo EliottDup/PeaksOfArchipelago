@@ -12,7 +12,7 @@ using Font = UnityEngine.Font;
 
 namespace PeaksOfArchipelago.UI
 {
-    internal class UIManager
+    public class UIManager
     {
         private static Font _gameFont;
 
@@ -41,8 +41,8 @@ namespace PeaksOfArchipelago.UI
         }
 
         public void SendChatMessage(string message) {
-            //if (chatBox == null) return;
-            //var t = UIElementFactory.CreateText(chatBox, "Text", message, 25, TextAnchor.LowerLeft);
+            if (chat == null) return;
+            chat.AddChatMessage(message);
         }
 
         public void OnSceneLoaded()
