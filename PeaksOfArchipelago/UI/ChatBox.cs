@@ -31,6 +31,7 @@ namespace PeaksOfArchipelago.UI
             AddChatMessage("test Message 3: very long line that should overflow and not explode everything (hopefully), if it does I will be sad");
             AddChatMessage("test Message 3: very long line that should overflow and not explode everything (hopefully), if it does I will be sad");
             AddChatMessage("test Message 3: very long line that should overflow and not explode everything (hopefully), if it does I will be sad");
+            AddChatMessage("cool message now with <color=#FF0000>C</color><color=#FFFF00>o</color><color=#00FF00>l</color><color=#00FEFF>o</color><color=#0000FF>r</color><color=#FF00FE>s</color>");
         }
 
         void CreateChatBox()
@@ -40,71 +41,17 @@ namespace PeaksOfArchipelago.UI
                 logger.LogError("Canvas not found!");
                 return;
             }
-            chatBoxRoot = new GameObject("ChatPanel");
-            Image i = chatBoxRoot.AddComponent<Image>();
-            i.color = new Color(0, 0, 0, 0.5f);
-            chatBoxRoot.transform.SetParent(canvas.transform, false);
-            RectTransform rt = chatBoxRoot.GetComponent<RectTransform>();
-            rt.pivot = new Vector2(1, 0.5f);
-            rt.anchorMin = new Vector2(1, 0.6f);
-            rt.anchorMax = new Vector2(1, 0.6f);
-            rt.sizeDelta = new Vector2(Screen.width * 400 / 1920, Screen.height * 300 / 1080);
-            rt.anchoredPosition = new Vector2(-10, 0);
-            chatBoxRoot.AddComponent<Mask>();
-
-            GameObject holder = new GameObject("MessageHolder");
-            holder.transform.SetParent(chatBoxRoot.transform, false);
-
-            RectTransform mhRT = holder.GetComponent<RectTransform>() ?? holder.AddComponent<RectTransform>();
-            mhRT.pivot = new Vector2(0.5f, 0);
-            mhRT.anchorMin = new Vector2(0, 0);
-            mhRT.anchorMax = new Vector2(1, 1);
-            mhRT.position = new Vector2(0, 0);
-            mhRT.anchoredPosition = new Vector2(0, 0);
-            mhRT.offsetMax = new Vector2(0, 0);
-            mhRT.offsetMin = new Vector2(0, 0);
-
-            VerticalLayoutGroup vlt = holder.AddComponent<VerticalLayoutGroup>();
-            vlt.childAlignment = TextAnchor.LowerRight;
-            vlt.childForceExpandWidth = true;
-            vlt.childControlWidth = true;
-
-            vlt.childForceExpandHeight = false;
-            vlt.childControlHeight = false;
-            // padding
-            vlt.padding = new RectOffset(5, 10, 5, 20);
-            vlt.spacing = 25;
-
-            ContentSizeFitter csf = holder.AddComponent<ContentSizeFitter>();
-            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
-
-            holder.AddComponent<LayoutElement>().ignoreLayout = true;
-
-            messageHolder = holder.transform;
-
-            GameObject ChatBoxAsset = PeaksOfArchipelago.PeaksOfAssets.LoadAsset<GameObject>("ChatBox");
-            GameObject chatBoxInstance = Instantiate(ChatBoxAsset, canvas.transform, false);
-            Transform msgholder = chatBoxInstance.transform.GetChild(0);
-            GameObject MsgAsset = PeaksOfArchipelago.PeaksOfAssets.LoadAsset<GameObject>("ChatMessage");
-            Instantiate(MsgAsset, msgholder, false);
+            chatBoxRoot = Instantiate(Assets.PeaksOfAssets.ChatBoxPrefab, canvas.transform, false);
+            messageHolder = chatBoxRoot.transform.GetChild(0);
         }
 
         public void AddChatMessage(string message)
         {
             if (messageHolder == null) return;
             logger.LogInfo("AddChatMessage: " + message);
-            GameObject go = new GameObject("Text");
-            go.transform.SetParent(messageHolder, false);
-            Text t = go.AddComponent<Text>();
-            t.font = UIManager.GetFont();
-            t.fontSize = 25;
+            GameObject messageObject = Instantiate(Assets.PeaksOfAssets.ChatMessagePrefab, messageHolder);
+            Text t = messageObject.GetComponentInChildren<Text>();
             t.text = message;
-            t.alignment = TextAnchor.LowerLeft;
-            t.lineSpacing = 2.5f;
-            t.horizontalOverflow = HorizontalWrapMode.Wrap;
-            ContentSizeFitter csf = go.AddComponent<ContentSizeFitter>();
-            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         }
     }
 }

@@ -12,8 +12,6 @@ namespace PeaksOfArchipelago
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class PeaksOfArchipelago : BaseUnityPlugin
     {
-        public static AssetBundle PeaksOfAssets;
-        public static string AssetsFolderPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Assets");
         internal static new ManualLogSource Logger;
         public static UIManager ui;
 
@@ -21,16 +19,8 @@ namespace PeaksOfArchipelago
 
         public void Awake()
         { 
-            
             Logger = base.Logger;
-
-            PeaksOfAssets = AssetBundle.LoadFromFile(Path.Combine(AssetsFolderPath, "peaksofbundle"));
-
-            foreach (string s in PeaksOfAssets.GetAllAssetNames())
-            {
-                Logger.LogInfo($"Found Asset: {s}");
-            }
-
+            Assets.PeaksOfAssets.LoadAssets();
             this.harmony = new(MyPluginInfo.PLUGIN_GUID + "_Patcher");
             try
             {
@@ -45,7 +35,7 @@ namespace PeaksOfArchipelago
 
             ui = new UIManager();
             SceneManager.sceneLoaded += OnSceneLoad;
-            Logger.LogMessage($"Plugin c0der23.PeaksOfArchipelago is loaded!");
+            Logger.LogMessage($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
         }
 
         public void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
