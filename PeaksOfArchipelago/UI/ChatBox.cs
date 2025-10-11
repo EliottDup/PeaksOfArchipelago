@@ -82,6 +82,12 @@ namespace PeaksOfArchipelago.UI
             holder.AddComponent<LayoutElement>().ignoreLayout = true;
 
             messageHolder = holder.transform;
+
+            GameObject ChatBoxAsset = PeaksOfArchipelago.PeaksOfAssets.LoadAsset<GameObject>("ChatBox");
+            GameObject chatBoxInstance = Instantiate(ChatBoxAsset, canvas.transform, false);
+            Transform msgholder = chatBoxInstance.transform.GetChild(0);
+            GameObject MsgAsset = PeaksOfArchipelago.PeaksOfAssets.LoadAsset<GameObject>("ChatMessage");
+            Instantiate(MsgAsset, msgholder, false);
         }
 
         public void AddChatMessage(string message)

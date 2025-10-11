@@ -278,6 +278,10 @@
 	  <PackageReference Include="BepInEx.Core" Version="5.4.21" />
 	  <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Bundles\" />
+	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;$(GameDir)\BepInEx\plugins&quot;" />

@@ -5,6 +5,7 @@ using PeaksOfArchipelago.UI;
 using UnityEngine;
 using HarmonyLib;
 using UnityEngine.SceneManagement;
+using System.Reflection;
 
 namespace PeaksOfArchipelago
 {
@@ -12,6 +13,7 @@ namespace PeaksOfArchipelago
     public class PeaksOfArchipelago : BaseUnityPlugin
     {
         public static AssetBundle PeaksOfAssets;
+        public static string AssetsFolderPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Assets");
         internal static new ManualLogSource Logger;
         public static UIManager ui;
 
@@ -21,6 +23,13 @@ namespace PeaksOfArchipelago
         { 
             
             Logger = base.Logger;
+
+            PeaksOfAssets = AssetBundle.LoadFromFile(Path.Combine(AssetsFolderPath, "peaksofbundle"));
+
+            foreach (string s in PeaksOfAssets.GetAllAssetNames())
+            {
+                Logger.LogInfo($"Found Asset: {s}");
+            }
 
             this.harmony = new(MyPluginInfo.PLUGIN_GUID + "_Patcher");
             try
