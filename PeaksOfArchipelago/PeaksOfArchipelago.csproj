@@ -256,6 +256,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="Patches\AchievementBlockPatches.cs" />
 		<Compile Include="PeaksOfArchipelago.cs" />
 		<Compile Include="Session\Session.cs" />
 		<Compile Include="UI\ChatBox.cs" />
