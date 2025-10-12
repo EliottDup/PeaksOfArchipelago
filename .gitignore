@@ -366,3 +366,5 @@ FodyWeavers.xsd
 PeaksOfArchipelago/GamePath.props
 /PeaksOfArchipelago/GamePath.props
 /PeaksOfArchipelago/Paths.props
+/Assets/AssetBundles/AssetBundles
+*.manifest

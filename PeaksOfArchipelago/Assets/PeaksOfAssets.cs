@@ -9,9 +9,10 @@ namespace PeaksOfArchipelago.Assets
     internal class PeaksOfAssets
     {
         private static bool loaded = false;
+        private static AssetBundle assetBundle;
         public static GameObject ChatBoxPrefab { get; private set; }
         public static GameObject ChatMessagePrefab { get; private set; }
-        private static AssetBundle assetBundle;
+        public static GameObject LoginScreen { get; private set; }
 
         public static void LoadAssets()
         {
@@ -23,6 +24,7 @@ namespace PeaksOfArchipelago.Assets
             assetBundle = AssetBundle.LoadFromFile(Path.Combine(assetsFolder, "peaksofbundle"));
             ChatBoxPrefab = assetBundle.LoadAsset<GameObject>("ChatBox");
             ChatMessagePrefab = assetBundle.LoadAsset<GameObject>("ChatMessage");
+            LoginScreen = assetBundle.LoadAsset<GameObject>("LogInPrefab");
 
             PeaksOfArchipelago.Logger.LogInfo("Assets Loaded");
             loaded = true;

@@ -48,12 +48,6 @@ namespace PeaksOfArchipelago.UI
         public void OnSceneLoaded()
         {
             MakeUI();
-            logger.LogInfo("FontS!!");
-            logger.LogInfo(_gameFont.name);
-            foreach (string s in _gameFont.fontNames)
-            {
-                logger.LogInfo(s);
-            }
         }
 
         public void OnSceneUnloaded()
