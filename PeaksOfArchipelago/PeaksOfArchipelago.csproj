@@ -263,7 +263,6 @@
 		<Compile Include="UI\ChatBox.cs" />
 		<Compile Include="UI\LoginUI.cs" />
 		<Compile Include="UI\NotificationSystem.cs" />
-		<Compile Include="UI\UIElementFactory.cs" />
 		<Compile Include="UI\UIManager.cs" />
 	</ItemGroup>
 
