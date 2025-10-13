@@ -280,6 +280,33 @@
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;$(GameDir)\BepInEx\plugins&quot;" />
+
+		<PropertyGroup>
+			<DestDir>$(ProjectDir)..\Build\Dev\$(AssemblyName)\</DestDir>
+		</PropertyGroup>
+		
+		<PropertyGroup>
+			<AssetsDir>$(DestDir)Assets\</AssetsDir>
+		</PropertyGroup>
+
+		<MakeDir Directories="$(DestDir)" />
+		<MakeDir Directories="$(AssetsDir)" />
+		
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DestDir)" />
+		
+		<Copy SourceFiles="$(TargetDir)Archipelago.MultiClient.Net.dll" DestinationFolder="$(DestDir)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(TargetDir)Newtonsoft.Json.dll" DestinationFolder="$(DestDir)" SkipUnchangedFiles="true" />
+
+		<Copy SourceFiles="$(ProjectDir)..\Assets\AssetBundles\peaksofbundle" DestinationFolder="$(AssetsDir)" SkipUnchangedFiles="true" />
+
+		<PropertyGroup>
+			<PluginDir>$(GameDir)\BepInEx\plugins\$(AssemblyName)\</PluginDir>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<AllBuiltFiles Include="$(DestDir)**\*"></AllBuiltFiles>
+		</ItemGroup>
+		
+		<Copy SourceFiles="@(AllBuiltFiles)" DestinationFiles="@(AllBuiltFiles-> '$(PluginDir)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 	</Target>
 </Project>

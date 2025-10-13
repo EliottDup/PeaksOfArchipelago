@@ -24,14 +24,6 @@ namespace PeaksOfArchipelago.UI
         {
             CreateChatBox();
             AddChatMessage("test Message 1");
-            AddChatMessage("test Message 2\n2lines now :)");
-            AddChatMessage("test Message 3: very long line that should overflow and not explode everything (hopefully), if it does I will be sad");
-            AddChatMessage("test Message 3: very long line that should overflow and not explode everything (hopefully), if it does I will be sad");
-            AddChatMessage("test Message 3: very long line that should overflow and not explode everything (hopefully), if it does I will be sad");
-            AddChatMessage("test Message 3: very long line that should overflow and not explode everything (hopefully), if it does I will be sad");
-            AddChatMessage("test Message 3: very long line that should overflow and not explode everything (hopefully), if it does I will be sad");
-            AddChatMessage("test Message 3: very long line that should overflow and not explode everything (hopefully), if it does I will be sad");
-            AddChatMessage("cool message now with <color=#FF0000>C</color><color=#FFFF00>o</color><color=#00FF00>l</color><color=#00FEFF>o</color><color=#0000FF>r</color><color=#FF00FE>s</color>");
         }
 
         void CreateChatBox()
