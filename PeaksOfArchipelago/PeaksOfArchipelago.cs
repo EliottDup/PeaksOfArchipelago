@@ -17,6 +17,13 @@ namespace PeaksOfArchipelago
 
         private Harmony harmony;
 
+        public enum PlayerState
+        {
+            InMainMenu,
+            InCabin,
+            InPeak
+        }
+
         public void Awake()
         { 
             Logger = base.Logger;
@@ -48,7 +55,7 @@ namespace PeaksOfArchipelago
         private async Task<bool> AttemptLogin(string username, string ip, string password)
         {
             Logger.LogInfo("creating session");
-            PeaksSession session = new();
+            Connection session = new();
             Logger.LogInfo("Session Created");
             return await session.ConnectAndLogin(username, ip, password);
         }

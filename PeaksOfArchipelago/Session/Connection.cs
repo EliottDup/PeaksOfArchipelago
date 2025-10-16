@@ -1,7 +1,9 @@
 ﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
-using Archipelago.MultiClient.Net.Packets;
+using Archipelago.MultiClient.Net.Helpers;
+using Archipelago.MultiClient.Net.Models;
 using BepInEx.Logging;
+using PeaksOfArchipelago.GameData;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -11,13 +13,18 @@ using System.Threading.Tasks;
 
 namespace PeaksOfArchipelago.Session
 {
-    internal class PeaksSession
+    internal class Connection
     {
         ArchipelagoSession session;
         ManualLogSource logger;
-        private LoginSuccessful login;
+        private Dictionary<string, object> slotOptions;
+        private ISlotData slotData;
+        private List<ItemInfo> uncollectedItems;
+        private List<ItemInfo> instantCollectItems;
 
-        public PeaksSession() {
+        private int itemCount = 0;
+
+        public Connection() {
             logger = PeaksOfArchipelago.Logger;
         }
 
@@ -64,9 +71,53 @@ namespace PeaksOfArchipelago.Session
             }
             logger.LogInfo($"Logged in as {username}");
             session.SetClientState(ArchipelagoClientState.ClientConnected);
-            login = (LoginSuccessful)result;
+            slotOptions = ((LoginSuccessful)result).SlotData;
+            session.DataStorage["ItemCount"].Initialize(0);
+            
+            LoadData();
+
+            // event listeners
+            session.Items.ItemReceived += (ReceivedItemsHelper h) => OnItemReceived(h.AllItemsReceived.Last());
 
             return true;
+        }
+
+        private void LoadData()
+        {
+            // init this.slotData
+
+            itemCount = (int)session.DataStorage["ItemCount"];
+            instantCollectItems = [.. session.Items.AllItemsReceived.Take(itemCount).Where(item => item.ItemName != "Trap")];
+            uncollectedItems = [.. session.Items.AllItemsReceived.Skip(itemCount).Where(item => item.ItemName != "Trap")];
+
+            logger.LogInfo($"Loaded {instantCollectItems.Count} old items and {uncollectedItems.Count} new items");
+        }
+
+        private void OnEnterCabin(Cabins cabin)
+        {
+            if (instantCollectItems.Count > 0)
+            {
+                foreach (ItemInfo item in instantCollectItems)
+                {
+                    UnlockItem(item);
+                }
+                itemCount += instantCollectItems.Count;
+                session.DataStorage["ItemCount"] = itemCount;
+                instantCollectItems.Clear();
+            }
+            // TODO: Collect Items
+        }
+
+        private void OnItemReceived(ItemInfo item)
+        {
+            uncollectedItems.Add(item);
+            // TODO: Notify player ??
+        }
+
+        private void UnlockItem(ItemInfo item)
+        {
+            ArchipelagoItem APItem = ArchipelagoItem.Create(item);
+            APItem.Unlock(slotData);
         }
     }
 }

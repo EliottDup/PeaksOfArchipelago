@@ -257,9 +257,19 @@
 
 	<ItemGroup>
 		<Compile Include="Assets\PeaksOfAssets.cs" />
+		<Compile Include="GameData\ArchipelagoItem.cs" />
+		<Compile Include="GameData\Constants.cs" />
+		<Compile Include="GameData\ArchipelagoLocation.cs" />
+		<Compile Include="GameData\IPeakCollectable.cs" />
+		<Compile Include="GameData\ISlotData.cs" />
+		<Compile Include="GameData\Peak.cs" />
+		<Compile Include="GameData\PeakCollectable.cs" />
+		<Compile Include="GameData\SessionSettings.cs" />
+		<Compile Include="GameData\SlotData.cs" />
 		<Compile Include="Patches\AchievementBlockPatches.cs" />
 		<Compile Include="PeaksOfArchipelago.cs" />
-		<Compile Include="Session\Session.cs" />
+		<Compile Include="Session\Connection.cs" />
+		<Compile Include="Session\Player.cs" />
 		<Compile Include="UI\ChatBox.cs" />
 		<Compile Include="UI\LoginUI.cs" />
 		<Compile Include="UI\NotificationSystem.cs" />
@@ -277,6 +287,10 @@
 	  </PackageReference>
 	  <PackageReference Include="BepInEx.Core" Version="5.4.21" />
 	  <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="ItemDeliverySystem\" />
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
