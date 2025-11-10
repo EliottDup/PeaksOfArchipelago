@@ -14,8 +14,10 @@ namespace PeaksOfArchipelago
     {
         internal static new ManualLogSource Logger;
         public static UIManager ui;
+        public static PlayerState playerState { get; private set; } = PlayerState.InMainMenu;
 
         private Harmony harmony;
+        private Connection connection;
 
         public enum PlayerState
         {
@@ -50,14 +52,44 @@ namespace PeaksOfArchipelago
             UIManager.CreateLoginUI(AttemptLogin);
             ui.OnSceneLoaded();
             Logger.LogInfo($"Loaded scene index: {scene.buildIndex}");
+            // Scene buildIndex:
+            // 0 = Main Menu
+            // 1 = Cabin
+            // 37 = Cabin4
+            // 67 = Alpine Express
+            if (connection == null) throw new Exception("How tf did you enter the game without connecting??");
+            switch (scene.buildIndex)
+            {
+                case 0:
+                    playerState = PlayerState.InMainMenu;
+                    break;
+                case 1:
+                    playerState = PlayerState.InCabin;
+                    connection.OnEnterCabin(GameData.Cabins.Cabin);
+                    Logger.LogInfo("In Cabin");
+                    break;
+                case 37:
+                    playerState = PlayerState.InCabin;
+                    connection.OnEnterCabin(GameData.Cabins.CabinExpert);
+                    Logger.LogInfo("In Cabin");
+                    break;
+                case 67:
+                    playerState = PlayerState.InPeak;
+                    connection.OnEnterCabin(GameData.Cabins.CabinAlps);
+                    Logger.LogInfo("In Peak");
+                    break;
+                default:
+                    playerState = PlayerState.InPeak;
+                    break;
+            }
         }
 
         private async Task<bool> AttemptLogin(string username, string ip, string password)
         {
             Logger.LogInfo("creating session");
-            Connection session = new();
+            connection = new();
             Logger.LogInfo("Session Created");
-            return await session.ConnectAndLogin(username, ip, password);
+            return await connection.ConnectAndLogin(username, ip, password);
         }
     }
 }

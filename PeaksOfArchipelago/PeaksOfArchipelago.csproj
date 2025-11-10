@@ -257,6 +257,10 @@
 
 	<ItemGroup>
 		<Compile Include="Assets\PeaksOfAssets.cs" />
+		<Compile Include="CabinHandlers\AlpsCabinHandler.cs" />
+		<Compile Include="CabinHandlers\BaseCabinHandler.cs" />
+		<Compile Include="CabinHandlers\CabinHandler.cs" />
+		<Compile Include="CabinHandlers\ExpertCabinHandler.cs" />
 		<Compile Include="GameData\ArchipelagoItem.cs" />
 		<Compile Include="GameData\Constants.cs" />
 		<Compile Include="GameData\ArchipelagoLocation.cs" />
@@ -287,10 +291,6 @@
 	  </PackageReference>
 	  <PackageReference Include="BepInEx.Core" Version="5.4.21" />
 	  <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="ItemDeliverySystem\" />
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

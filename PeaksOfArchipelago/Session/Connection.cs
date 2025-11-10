@@ -3,6 +3,7 @@ using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
 using BepInEx.Logging;
+using PeaksOfArchipelago.CabinHandlers;
 using PeaksOfArchipelago.GameData;
 using Steamworks;
 using System;
@@ -93,7 +94,7 @@ namespace PeaksOfArchipelago.Session
             logger.LogInfo($"Loaded {instantCollectItems.Count} old items and {uncollectedItems.Count} new items");
         }
 
-        private void OnEnterCabin(Cabins cabin)
+        public void OnEnterCabin(Cabins cabin)
         {
             if (instantCollectItems.Count > 0)
             {
@@ -106,6 +107,8 @@ namespace PeaksOfArchipelago.Session
                 instantCollectItems.Clear();
             }
             // TODO: Collect Items
+            CabinHandler handler = CabinHandler.New(cabin, slotData);
+            handler.OnEnterCabin();
         }
 
         private void OnItemReceived(ItemInfo item)
