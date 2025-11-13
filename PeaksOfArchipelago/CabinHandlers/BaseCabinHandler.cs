@@ -1,19 +1,172 @@
-﻿using PeaksOfArchipelago.GameData;
+﻿using Archipelago.MultiClient.Net.Models;
+using PeaksOfArchipelago.Assets;
+using PeaksOfArchipelago.GameData;
+using PeaksOfArchipelago.Session;
+using System.Runtime.InteropServices.ComTypes;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace PeaksOfArchipelago.CabinHandlers
 {
-    internal class BaseCabinHandler : CabinHandler
+    internal class BaseCabinHandler(ISlotData slotData) : CabinHandler(slotData)
     {
+        bool hasSpawnedInAPLogo = false;
 
-        public BaseCabinHandler(ISlotData slotData): base(slotData)
+        public override void CollectItems(List<ItemInfo> itemInfos)
         {
+            itemInfos = itemInfos.Where(i => i.ItemName != "Trap").ToList();
+
+            if (itemInfos.Count == 0)
+            {
+                return;
+            }
+            NPCEvents npcEvents = GameObject.FindObjectOfType<NPCEvents>();
+
+            npcEvents.eventName = "AllArtefacts"; // Hijacking the AllArtefacts event for AP parcel delivery
+            Text textElem = npcEvents.allArtefactsInfo.GetComponentInChildren<Text>();
+
+            textElem.text = $"You have received:\n {itemInfos[0].ItemName}";
+            for (int i = 1; i < itemInfos.Count; i++)
+            {
+                textElem.text += $", {itemInfos[i].ItemName}";
+            }
+
+            if (!hasSpawnedInAPLogo)
+            {
+                GameObject apLogo = GameObject.Instantiate(PeaksOfAssets.APLogo);
+                apLogo.layer = npcEvents.packageContentAllArtefacts.layer;
+                apLogo.transform.GetChild(0).gameObject.layer = npcEvents.packageContentAllArtefacts.layer;
+                apLogo.transform.SetParent(npcEvents.packageContentAllArtefacts.transform.parent, false);
+                apLogo.transform.localPosition = npcEvents.packageContentAllArtefacts.transform.localPosition;
+                apLogo.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+                apLogo.transform.rotation = npcEvents.packageContentAllArtefacts.transform.rotation;
+                npcEvents.packageContentAllArtefacts = apLogo;
+                npcEvents.packageContentAllArtefacts.SetActive(false);
+                hasSpawnedInAPLogo = true;
+            }
+
+            npcEvents.runningEvent = true;
+            npcEvents.npcParcelDeliverySystem.StartCoroutine("FadeScreenAndStartUnpackEvent");
         }
 
-        public override void OnEnterCabin()
+        public override void LoadProgress()
         {
             // If not alps, disable ticket & suitcase
+            if (true /*Not Alps*/)
+            {
+                // Disable Alps Bed
+                // Enable Normal Bed
+                logger.LogInfo("Alps disabled, disabling ticket (if existing)");
+                GameObject.Find("bed_original")?.SetActive(true);
 
-            throw new NotImplementedException();
+                GameObject alps_bed = GameObject.Find("AlpsGateway");
+                if (alps_bed != null)
+                {
+                    alps_bed.SetActive(false);
+                }
+                else
+                {
+                    logger.LogInfo("Alps bed not found!");
+                }
+            }
+            PeaksOfArchipelago.Logger.LogInfo("Entered Base Cabin");
+
+            // book loading
+
+            GameObject book1 = GameObject.Find("MAPJOURNAL");
+
+            if (book1 == null)
+            {
+                logger.LogWarning("Didnt find book object TwT");
+            }
+
+            book1.SetActive(false);
+            
+            NPCEvents npcEvents = GameObject.FindObjectOfType<NPCEvents>();
+
+            if (npcEvents == null)
+            {
+                logger.LogInfo("npc events is null :c");
+            }
+
+            npcEvents.cabin_Category2.SetActive(slotData.HasBook(Books.Intermediate));
+            npcEvents.cabin_Category3.SetActive(slotData.HasBook(Books.Advanced));
+            npcEvents.cabinIceaxes.SetActive(slotData.HasBook(Books.Expert));
+
+            // artefact loading
+            ArtefactLoaderCabin alc = GameObject.FindObjectOfType<ArtefactLoaderCabin>();
+
+            Dictionary<Artefacts, GameObject> artefactsToGameObjects = new() // Can't really blame Andos for doing it this way, but I hate it :D
+            {   // It could have been done with a Hashmap or something (he even has a whole enum with all the artefacts), but noooo, we have 20123 individual fields in GameManager.
+                // INSTEAD OF 3 HASHMAPS
+                {Artefacts.Hat1, alc.clean_hat1},
+                {Artefacts.Hat2, alc.clean_hat2},
+                {Artefacts.Helmet, alc.clean_helmet},
+                {Artefacts.Shoe, alc.clean_shoe},
+                {Artefacts.Shovel, alc.clean_shovel},
+                {Artefacts.Sleepingbag, alc.clean_sleepingbag},
+                {Artefacts.Backpack, alc.clean_backpack},
+                {Artefacts.Coffebox_1, alc.clean_coffeebox1},
+                {Artefacts.Coffebox_2, alc.clean_coffeebox2},
+                {Artefacts.Chalkbox_1, alc.clean_chalkbox1},
+                {Artefacts.Chalkbox_2, alc.clean_chalkbox2},
+                {Artefacts.ClimberStatue1, alc.clean_statue1},
+                {Artefacts.ClimberStatue2, alc.clean_statue2},
+                {Artefacts.ClimberStatue3, alc.clean_statue3},
+                {Artefacts.Photograph_1, alc.clean_photograph1},
+                {Artefacts.Photograph_2, alc.clean_photograph2},
+                {Artefacts.Photograph_3, alc.clean_photograph3},
+                {Artefacts.Photograph_4, alc.clean_photograph4},
+                {Artefacts.PhotographFrame, alc.clean_photographframe},
+                {Artefacts.ClimberStatue0, alc.clean_statue0}
+            };
+
+            foreach (Artefacts a in artefactsToGameObjects.Keys)
+            {
+                artefactsToGameObjects[a].SetActive(slotData.HasArtefact(a));
+            }
+
+            // Tools Showing / loading
+            
+            if (npcEvents.cabinRope){
+                npcEvents.cabinRope.SetActive(slotData.HasTool(Tools.Rope));
+            }
+
+            if (npcEvents.cabinPocketwatch)
+            {
+                npcEvents.cabinPocketwatch.SetActive(slotData.HasTool(Tools.Pocketwatch));
+                npcEvents.cabinScoreboard.SetActive(slotData.HasTool(Tools.Pocketwatch));
+            }
+
+            // Crampon loading...
+            if (slotData.cramponLevel > 0)
+            {
+                npcEvents.cabinCramponsCollider.SetActive(true);
+                if (slotData.cramponLevel > 1 && PlayerPrefs.GetInt("UseBasicCrampons") == 1)
+                {
+                    npcEvents.cramponsEditionTxt.text = "10-";
+                    npcEvents.cabinCrampons_10Point.SetActive(true);
+                    npcEvents.cabinCrampons_6Point.SetActive(false);
+                }
+                else
+                {
+                    npcEvents.cramponsEditionTxt.text = "6-";
+                    npcEvents.cabinCrampons_6Point.SetActive(true);
+                    npcEvents.cabinCrampons_10Point.SetActive(false);
+                }
+            }
+
+            if (npcEvents.cabinChalkbag)
+            {
+                npcEvents.cabinChalkbag.SetActive(slotData.HasTool(Tools.Chalkbag));
+            }
+
+            if (npcEvents.cabinPipe)
+            {
+                npcEvents.cabinPipe.SetActive(slotData.HasTool(Tools.Pipe));
+            }
+            
+
         }
     }
 }

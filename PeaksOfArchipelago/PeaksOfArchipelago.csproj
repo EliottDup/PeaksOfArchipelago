@@ -271,6 +271,7 @@
 		<Compile Include="GameData\SessionSettings.cs" />
 		<Compile Include="GameData\SlotData.cs" />
 		<Compile Include="Patches\AchievementBlockPatches.cs" />
+		<Compile Include="Patches\CabinPatches.cs" />
 		<Compile Include="PeaksOfArchipelago.cs" />
 		<Compile Include="Session\Connection.cs" />
 		<Compile Include="Session\Player.cs" />

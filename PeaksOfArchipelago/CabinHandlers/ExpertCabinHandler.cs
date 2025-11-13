@@ -1,4 +1,5 @@
-﻿using PeaksOfArchipelago.GameData;
+﻿using Archipelago.MultiClient.Net.Models;
+using PeaksOfArchipelago.GameData;
 
 namespace PeaksOfArchipelago.CabinHandlers
 {
@@ -8,7 +9,12 @@ namespace PeaksOfArchipelago.CabinHandlers
         {
         }
 
-        public override void OnEnterCabin()
+        public override void CollectItems(List<ItemInfo> itemInfos)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void LoadProgress()
         {
             throw new NotImplementedException();
         }

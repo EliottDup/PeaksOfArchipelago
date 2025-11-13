@@ -1,4 +1,6 @@
-﻿using PeaksOfArchipelago.GameData;
+﻿using Archipelago.MultiClient.Net.Models;
+using BepInEx.Logging;
+using PeaksOfArchipelago.GameData;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,13 +10,16 @@ namespace PeaksOfArchipelago.CabinHandlers
 {
     internal abstract class CabinHandler
     {
-        public abstract void OnEnterCabin();
+        public abstract void LoadProgress();
+        public abstract void CollectItems(List<ItemInfo> itemInfos);
+        protected ManualLogSource logger;
 
         protected ISlotData slotData;
 
         public CabinHandler(ISlotData slotData)
         {
             this.slotData = slotData;
+            logger = PeaksOfArchipelago.Logger;
         }
         public static CabinHandler New(Cabins cabin, ISlotData slotData)
         {

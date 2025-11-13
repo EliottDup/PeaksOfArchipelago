@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BepInEx.Logging;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -55,8 +56,36 @@ namespace PeaksOfArchipelago.GameData
             this.excludeST = excludeST;
         }
 
+        public SessionSettings(Dictionary<string, object> optionsDict)
+        {
+            foreach (string s in optionsDict.Keys)
+            {
+                PeaksOfArchipelago.Logger.LogInfo($"Option key: {s}, value: {optionsDict[s].ToString()}");
+            }
+
+            deathLinkEnabled = LoadIntFromDict(optionsDict, "deathLink", false) == 1;
+            ropeUnlockMode = (RopeUnlockMode)LoadIntFromDict(optionsDict, "ropeUnlockMode", RopeUnlockMode.NORMAL);
+            goal = (Goal)LoadIntFromDict(optionsDict, "goal", Goal.ALL_PEAKS);
+            gameMode = (GameMode)LoadIntFromDict(optionsDict, "gameMode", GameMode.BOOK_UNLOCK);
+            excludeST = LoadIntFromDict(optionsDict, "disableSolemnTempest", true) == 1;
+        }
+
+        int LoadIntFromDict(Dictionary<string, object> dict, string v, object defaultValue)
+        {
+            PeaksOfArchipelago.Logger.LogInfo($"Loading option {v}");
+            PeaksOfArchipelago.Logger.LogInfo($"from dict {dict.ToString()}");
+            if (dict.TryGetValue(v, out var value))
+            {
+                PeaksOfArchipelago.Logger.LogInfo($"Found option {v} with value {value}");
+                return Convert.ToInt32(value);
+            }
+            PeaksOfArchipelago.Logger.LogInfo($"Option {v} not found, using default {defaultValue}");
+            return Convert.ToInt32(defaultValue);
+        }
+
         public bool IsBookEnabled(Book book)
         {
+            return true;
             return (booksEnabled & (int)book) != 0;
         }
 

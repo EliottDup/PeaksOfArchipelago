@@ -5,17 +5,13 @@ using Archipelago.MultiClient.Net.Models;
 using BepInEx.Logging;
 using PeaksOfArchipelago.CabinHandlers;
 using PeaksOfArchipelago.GameData;
-using Steamworks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PeaksOfArchipelago.Session
 {
     internal class Connection
     {
+        public static Connection Instance { get; private set; }
+
         ArchipelagoSession session;
         ManualLogSource logger;
         private Dictionary<string, object> slotOptions;
@@ -25,8 +21,11 @@ namespace PeaksOfArchipelago.Session
 
         private int itemCount = 0;
 
+
         public Connection() {
             logger = PeaksOfArchipelago.Logger;
+            PeaksOfArchipelago.Instance.OnEnterCabin += OnEnterCabin;
+            Instance = this;
         }
 
         public async Task<bool> ConnectAndLogin(string username, string uri, string password) {
@@ -70,6 +69,9 @@ namespace PeaksOfArchipelago.Session
                 }
                 return false;
             }
+
+            PeaksOfArchipelago.Instance.SaveUserCredentials(username, uri, password);
+
             logger.LogInfo($"Logged in as {username}");
             session.SetClientState(ArchipelagoClientState.ClientConnected);
             slotOptions = ((LoginSuccessful)result).SlotData;
@@ -86,6 +88,8 @@ namespace PeaksOfArchipelago.Session
         private void LoadData()
         {
             // init this.slotData
+            // This does not actually apply the loaded data to the GameManager (because that would break save 1 for some reason I think)
+            this.slotData = new SlotData(new SessionSettings(slotOptions));
 
             itemCount = (int)session.DataStorage["ItemCount"];
             instantCollectItems = [.. session.Items.AllItemsReceived.Take(itemCount).Where(item => item.ItemName != "Trap")];
@@ -94,10 +98,11 @@ namespace PeaksOfArchipelago.Session
             logger.LogInfo($"Loaded {instantCollectItems.Count} old items and {uncollectedItems.Count} new items");
         }
 
-        public void OnEnterCabin(Cabins cabin)
+        public void OnEnterCabin(object sender, Cabins cabin)
         {
             if (instantCollectItems.Count > 0)
             {
+                logger.LogInfo("Collecting previously unlocked items...");
                 foreach (ItemInfo item in instantCollectItems)
                 {
                     UnlockItem(item);
@@ -108,13 +113,24 @@ namespace PeaksOfArchipelago.Session
             }
             // TODO: Collect Items
             CabinHandler handler = CabinHandler.New(cabin, slotData);
-            handler.OnEnterCabin();
+            if (uncollectedItems.Count > 0)
+            {
+                logger.LogInfo("Collecting new items...");
+                handler.CollectItems(uncollectedItems);
+                foreach (ItemInfo item in uncollectedItems)
+                {
+                    UnlockItem(item);
+                }
+                itemCount += uncollectedItems.Count;
+                session.DataStorage["ItemCount"] = itemCount;
+            }
+            handler.LoadProgress();
         }
 
         private void OnItemReceived(ItemInfo item)
         {
             uncollectedItems.Add(item);
-            // TODO: Notify player ??
+            // TODO: Notify player
         }
 
         private void UnlockItem(ItemInfo item)

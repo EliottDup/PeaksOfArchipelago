@@ -34,6 +34,9 @@ namespace PeaksOfArchipelago.UI
             connectButton = LogInPanel.GetChild(4).GetComponent<UnityEngine.UI.Button>();
             connectButton.onClick.AddListener(() => _ = OnConnectClickedAsync());
 
+            usernameField.text = PeaksOfArchipelago.Instance.Username.Value;
+            ipField.text = PeaksOfArchipelago.Instance.ServerIP.Value;
+            passwordField.text = PeaksOfArchipelago.Instance.Password.Value;
         }
         
         private async Task OnConnectClickedAsync()

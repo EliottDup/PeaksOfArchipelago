@@ -14,6 +14,8 @@ namespace PeaksOfArchipelago.Assets
         public static GameObject ChatMessagePrefab { get; private set; }
         public static GameObject LoginScreen { get; private set; }
 
+        public static GameObject APLogo { get; private set; }
+
         public static void LoadAssets()
         {
             if (loaded) return;
@@ -25,6 +27,7 @@ namespace PeaksOfArchipelago.Assets
             ChatBoxPrefab = assetBundle.LoadAsset<GameObject>("ChatBox");
             ChatMessagePrefab = assetBundle.LoadAsset<GameObject>("ChatMessage");
             LoginScreen = assetBundle.LoadAsset<GameObject>("LogInPrefab");
+            APLogo = assetBundle.LoadAsset<GameObject>("APLogo");
 
             PeaksOfArchipelago.Logger.LogInfo("Assets Loaded");
             loaded = true;
