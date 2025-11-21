@@ -99,7 +99,40 @@ namespace PeaksOfArchipelago.GameData
         }
     }
 
-    public enum Peaks {
+    internal class LocationIDs
+    {
+        internal static long GetPeakLocationID(Peaks peak)
+        {
+            return (long)peak + Offsets.PeakIDOffset;
+        }
+
+        internal static long GetFSPeakLocationID(Peaks peak)
+        {
+            return (long)peak + Offsets.FreeSoloPeakIDOffset;
+        }
+
+        internal static long GetRopeLocationID(Ropes rope)
+        {
+            return (long)rope + Offsets.RopeIDOffset;
+        }
+
+        internal static long GetToolLocationID(Tools tool)
+        {
+            return (long)tool + Offsets.ToolIDOffset;
+        }
+
+        internal static long GetArtefactLocationID(Artefacts artefact)
+        {
+            return (long)artefact + Offsets.ArtefactIDOffset;
+        }
+
+        internal static long GetBirdSeedLocationID(BirdSeeds seed)
+        {
+            return (long)seed + Offsets.BirdSeedIDOffset;
+        }
+    }
+
+        public enum Peaks {
         GreenhornsTop,
         PaltryPeak,
         OldMill,
@@ -136,7 +169,30 @@ namespace PeaksOfArchipelago.GameData
         StHaelga,
         YmirsShadow,
         GreatBulwark,
-        SolemnTempest
+        SolemnTempest,
+        TutorTower,
+        StougrBoulder,
+        MarasArch,
+        GrainneSpire,
+        GreatBokTree,
+        Treppenwald,
+        CastleoftheSwanKing,
+        SeasideTribune,
+        IvoryGranites,
+        OldRekkja,
+        Quietude,
+        EljunsFolly,
+        EinvaldFalls,
+        AlmattrDam,
+        Dunderhorn,
+        MhorDruim,
+        WelkinPass,
+        SeigrCraeg,
+        UllrsChasm,
+        GreatSilf,
+        ToweringVisir,
+        EldrisWall,
+        MountMhorgorm
     }
     public enum Ropes
     {

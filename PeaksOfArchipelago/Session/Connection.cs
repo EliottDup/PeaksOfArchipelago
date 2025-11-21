@@ -22,13 +22,15 @@ namespace PeaksOfArchipelago.Session
         private int itemCount = 0;
 
 
-        public Connection() {
+        public Connection()
+        {
             logger = PeaksOfArchipelago.Logger;
             PeaksOfArchipelago.Instance.OnEnterCabin += OnEnterCabin;
             Instance = this;
         }
 
-        public async Task<bool> ConnectAndLogin(string username, string uri, string password) {
+        public async Task<bool> ConnectAndLogin(string username, string uri, string password)
+        {
 
             session = ArchipelagoSessionFactory.CreateSession(uri);
 
@@ -39,7 +41,7 @@ namespace PeaksOfArchipelago.Session
             };
 
             logger.LogInfo($"connecting to {session.Socket.Uri}");
-            
+
             Task connectTask = session.ConnectAsync();
 
             if (await Task.WhenAny(connectTask, Task.Delay(4000)) != connectTask)
@@ -53,7 +55,7 @@ namespace PeaksOfArchipelago.Session
             logger.LogInfo($"Connected to {session.Socket.Uri}");
 
             logger.LogInfo($"Logging in as {username}");
-            LoginResult result = await session.LoginAsync("Peaks of Yore", username, ItemsHandlingFlags.AllItems, password:  password);
+            LoginResult result = await session.LoginAsync("Peaks of Yore", username, ItemsHandlingFlags.AllItems, password: password);
             if (!result.Successful)
             {
                 logger.LogInfo($"Couldn't log in");
@@ -76,7 +78,7 @@ namespace PeaksOfArchipelago.Session
             session.SetClientState(ArchipelagoClientState.ClientConnected);
             slotOptions = ((LoginSuccessful)result).SlotData;
             session.DataStorage["ItemCount"].Initialize(0);
-            
+
             LoadData();
 
             // event listeners
@@ -137,6 +139,26 @@ namespace PeaksOfArchipelago.Session
         {
             ArchipelagoItem APItem = ArchipelagoItem.Create(item);
             APItem.Unlock(slotData);
+        }
+
+        public void CompletePeakLocation(Peaks peak)
+        {
+            if (session == null)
+            {
+                return;
+            }
+
+            session.Locations.CompleteLocationChecks(LocationIDs.GetPeakLocationID(peak));
+        }
+
+        public void completeFSPeakLocation(Peaks peak)
+        {
+            if (session == null)
+            {
+                return;
+            }
+
+            session.Locations.CompleteLocationChecks(LocationIDs.GetFSPeakLocationID(peak));
         }
     }
 }
