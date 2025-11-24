@@ -270,6 +270,8 @@
 		<Compile Include="GameData\PeakCollectable.cs" />
 		<Compile Include="GameData\SessionSettings.cs" />
 		<Compile Include="GameData\SlotData.cs" />
+		<Compile Include="MonoBehaviours\Notification.cs" />
+		<Compile Include="MonoBehaviours\Notificator.cs" />
 		<Compile Include="Patches\AchievementBlockPatches.cs" />
 		<Compile Include="Patches\CabinPatches.cs" />
 		<Compile Include="Patches\LocationDetectionPatches.cs" />
@@ -278,7 +280,6 @@
 		<Compile Include="Session\Player.cs" />
 		<Compile Include="UI\ChatBox.cs" />
 		<Compile Include="UI\LoginUI.cs" />
-		<Compile Include="UI\NotificationSystem.cs" />
 		<Compile Include="UI\UIManager.cs" />
 	</ItemGroup>
 

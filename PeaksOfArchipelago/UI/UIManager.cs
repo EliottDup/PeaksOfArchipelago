@@ -1,4 +1,6 @@
 ﻿using BepInEx.Logging;
+using PeaksOfArchipelago.Assets;
+using PeaksOfArchipelago.MonoBehaviours;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,9 +19,11 @@ namespace PeaksOfArchipelago.UI
         private static Font _gameFont;
 
         private Canvas canvas;
-        private GameObject scriptHolder;
+        private GameObject chatBoxObject;
         private ManualLogSource logger;
         private ChatBox chat;
+        private GameObject notificationSystemObject;
+        private Notificator notificationSystem;
 
         public UIManager()
         {
@@ -36,13 +40,24 @@ namespace PeaksOfArchipelago.UI
             }
 
             // Make ChatBox
-            scriptHolder = new GameObject("UIManager_ScriptHolder");
-            chat = scriptHolder.AddComponent<ChatBox>();
+            chatBoxObject = new GameObject("UIManager_ScriptHolder");
+            chat = chatBoxObject.AddComponent<ChatBox>();
+            notificationSystemObject = GameObject.Instantiate(PeaksOfAssets.Notificator, canvas.transform);
+
+            // Make Notification System
+            notificationSystem = notificationSystemObject.AddComponent<Notificator>();
+            notificationSystem.notificationPrefab = PeaksOfAssets.Notification;
         }
 
         public void SendChatMessage(string message) {
             if (chat == null) return;
             chat.AddChatMessage(message);
+        }
+
+        public void SendNotification(string message)
+        {
+            if (notificationSystem == null) return;
+            notificationSystem.CreateNotification(message);
         }
 
         public void OnSceneLoaded()

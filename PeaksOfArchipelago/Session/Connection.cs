@@ -5,6 +5,7 @@ using Archipelago.MultiClient.Net.Models;
 using BepInEx.Logging;
 using PeaksOfArchipelago.CabinHandlers;
 using PeaksOfArchipelago.GameData;
+using PeaksOfArchipelago.UI;
 using static PeaksOfArchipelago.GameData.LocationIDs;
 
 namespace PeaksOfArchipelago.Session
@@ -186,6 +187,7 @@ namespace PeaksOfArchipelago.Session
             {
                 return;
             }
+            PeaksOfArchipelago.ui.SendNotification("collected lolmao");
             // Notify player somehow
             session.Locations.CompleteLocationChecks(locationID);
         }
