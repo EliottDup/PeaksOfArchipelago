@@ -58,6 +58,18 @@ namespace PeaksOfArchipelago.GameData
                 return Types.Rope;
             return Types.Peak;
         }
+        
+        public static Peaks PeakfromStamper(StamperPeakSummit stamper)
+        {
+            int p = (int)stamper.peakNames;
+            if (p >= (int)StamperPeakSummit.PeakNames.IceWaterFallDemo)
+            {
+                p--;
+            }
+
+            return (Peaks)p;
+        }
+
     }
 
     internal class ItemIDs
@@ -130,9 +142,24 @@ namespace PeaksOfArchipelago.GameData
         {
             return (long)seed + Offsets.BirdSeedIDOffset;
         }
+
+        internal static long GetTATimePBLocationID(Peaks peak)
+        {
+            return (long)peak + Offsets.TATimeIDOffset;
+        }
+
+        internal static long GetTARopeLocationID(Peaks peak)
+        {
+            return (long)peak + Offsets.TARopeIDOffset;
+        }
+
+        internal static long GetTAHoldsLocationID(Peaks peak)
+        {
+            return (long)peak + Offsets.TAHoldsIDOffset;
+        }
     }
 
-        public enum Peaks {
+    public enum Peaks {
         GreenhornsTop,
         PaltryPeak,
         OldMill,

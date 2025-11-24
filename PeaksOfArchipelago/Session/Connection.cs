@@ -5,6 +5,7 @@ using Archipelago.MultiClient.Net.Models;
 using BepInEx.Logging;
 using PeaksOfArchipelago.CabinHandlers;
 using PeaksOfArchipelago.GameData;
+using static PeaksOfArchipelago.GameData.LocationIDs;
 
 namespace PeaksOfArchipelago.Session
 {
@@ -143,22 +144,50 @@ namespace PeaksOfArchipelago.Session
 
         public void CompletePeakLocation(Peaks peak)
         {
-            if (session == null)
-            {
-                return;
-            }
-
-            session.Locations.CompleteLocationChecks(LocationIDs.GetPeakLocationID(peak));
+            CompleteCheck(GetPeakLocationID(peak));
         }
 
-        public void completeFSPeakLocation(Peaks peak)
+        public void CompleteFSPeakLocation(Peaks peak)
+        {
+            CompleteCheck(GetFSPeakLocationID(peak));
+        }
+
+        public void CompleteArtefactLocation(Artefacts artefact)
+        {
+            CompleteCheck(GetArtefactLocationID(artefact));
+        }
+
+        internal void CompleteRopeLocation(Ropes rope)
+        {
+            CompleteCheck(GetRopeLocationID(rope));
+        }
+        internal void CompleteBirdSeedLocation(BirdSeeds seed)
+        {
+            CompleteCheck(GetBirdSeedLocationID(seed));
+        }
+        internal void CompleteTimePBLocation(Peaks peak)
+        {
+            CompleteCheck(GetTATimePBLocationID(peak));
+        }
+
+        internal void CompleteRopePBLocation(Peaks peak)
+        {
+            CompleteCheck(GetTARopeLocationID(peak));
+        }
+
+        internal void CompleteHoldPBLocation(Peaks peak)
+        {
+            CompleteCheck(GetTAHoldsLocationID(peak));
+        }
+
+        private void CompleteCheck(long locationID)
         {
             if (session == null)
             {
                 return;
             }
-
-            session.Locations.CompleteLocationChecks(LocationIDs.GetFSPeakLocationID(peak));
+            // Notify player somehow
+            session.Locations.CompleteLocationChecks(locationID);
         }
     }
 }
