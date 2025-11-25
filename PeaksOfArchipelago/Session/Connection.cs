@@ -20,7 +20,7 @@ namespace PeaksOfArchipelago.Session
         ArchipelagoSession session;
         readonly ManualLogSource logger;
         private Dictionary<string, object> slotOptions;
-        private ISlotData slotData;
+        public ISlotData slotData;
         private List<ItemInfo> uncollectedItems;
         private List<ItemInfo> instantCollectItems;
 

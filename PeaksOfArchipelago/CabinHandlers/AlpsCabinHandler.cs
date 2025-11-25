@@ -16,7 +16,7 @@ namespace PeaksOfArchipelago.CabinHandlers
 
         public override void LoadProgress()
         {
-            throw new NotImplementedException();
+            PeaksOfArchipelago.ui.SendNotification("Alps have not yet been implemented, please turn back :))");
         }
     }
 }

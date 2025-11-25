@@ -84,7 +84,7 @@ namespace PeaksOfArchipelago.GameData
 
         public override void Unlock(ISlotData slotData)
         {
-            slotData.UnlockBirdSeed(birdSeed);
+            slotData.RecieveBirdSeed(birdSeed);
             GameManager.control.extraBirdSeedUses++;
             GameManager.control.Save();
         }
@@ -100,7 +100,7 @@ namespace PeaksOfArchipelago.GameData
 
         public override void Unlock(ISlotData slotData)
         {
-            slotData.UnlockBook(book);
+            slotData.RecieveBook(book);
         }
     }
 
@@ -114,7 +114,7 @@ namespace PeaksOfArchipelago.GameData
 
         public override void Unlock(ISlotData slotData)
         {
-            slotData.UnlockArtefact(artefact);
+            slotData.RecieveArtefact(artefact);
             switch (artefact)
             {
                 case Artefacts.Coffebox_1:
@@ -140,7 +140,7 @@ namespace PeaksOfArchipelago.GameData
 
         public override void Unlock(ISlotData slotData)
         {
-            slotData.UnlockTool(tool);
+            slotData.ReceiveTool(tool);
             switch (tool)
             {
                 case Tools.Pipe:
@@ -185,17 +185,17 @@ namespace PeaksOfArchipelago.GameData
                     GameManager.control.coffee = true;
                     break;
                 case Tools.Lamp:
-                    slotData.UnlockTool(Tools.Lamp);
+                    slotData.ReceiveTool(Tools.Lamp);
                     break;
                 case Tools.RightHand:
-                    slotData.UnlockTool(Tools.RightHand);
+                    slotData.ReceiveTool(Tools.RightHand);
                     break;
                 case Tools.leftHand:
-                    slotData.UnlockTool(Tools.leftHand);
+                    slotData.ReceiveTool(Tools.leftHand);
                     break;
             }
             GameManager.control.Save();
-            slotData.UnlockTool(tool);
+            slotData.ReceiveTool(tool);
         }
     }
 
@@ -211,10 +211,10 @@ namespace PeaksOfArchipelago.GameData
         {
             if (slotData.ropeUnlockMode == SessionSettings.RopeUnlockMode.INSTANT)
             {
-                slotData.UnlockTool(Tools.Rope);
+                slotData.ReceiveTool(Tools.Rope);
                 GameManager.control.rope = true;
             }
-            slotData.UnlockRope(Rope);
+            slotData.RecieveRope(Rope);
             if (Rope < Ropes.ExtraFirst)
             {
                 GameManager.control.ropesCollected++;
@@ -237,7 +237,7 @@ namespace PeaksOfArchipelago.GameData
 
         public override void Unlock(ISlotData slotData)
         {
-            slotData.UnlockPeak(Peak);
+            slotData.RecievePeak(Peak);
             return;
         }
     }
