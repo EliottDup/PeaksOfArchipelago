@@ -12,13 +12,13 @@ namespace PeaksOfArchipelago.CabinHandlers
     {
         bool hasSpawnedInAPLogo = false;
 
-        public override void CollectItems(List<ItemInfo> itemInfos)
+        public override bool CollectItems(List<ItemInfo> itemInfos)
         {
             itemInfos = itemInfos.Where(i => i.ItemName != "Trap").ToList();
 
             if (itemInfos.Count == 0)
             {
-                return;
+                return true;
             }
             NPCEvents npcEvents = GameObject.FindObjectOfType<NPCEvents>();
 
@@ -47,6 +47,7 @@ namespace PeaksOfArchipelago.CabinHandlers
 
             npcEvents.runningEvent = true;
             npcEvents.npcParcelDeliverySystem.StartCoroutine("FadeScreenAndStartUnpackEvent");
+            return true;
         }
 
         public override void LoadProgress()
@@ -80,8 +81,6 @@ namespace PeaksOfArchipelago.CabinHandlers
                 logger.LogWarning("Didnt find book object TwT");
             }
 
-            book1.SetActive(false);
-            
             NPCEvents npcEvents = GameObject.FindObjectOfType<NPCEvents>();
 
             if (npcEvents == null)
@@ -89,6 +88,7 @@ namespace PeaksOfArchipelago.CabinHandlers
                 logger.LogInfo("npc events is null :c");
             }
 
+            book1.SetActive(slotData.HasBook(Books.Fundamentals));
             npcEvents.cabin_Category2.SetActive(slotData.HasBook(Books.Intermediate));
             npcEvents.cabin_Category3.SetActive(slotData.HasBook(Books.Advanced));
             npcEvents.cabinIceaxes.SetActive(slotData.HasBook(Books.Expert));
@@ -128,10 +128,13 @@ namespace PeaksOfArchipelago.CabinHandlers
             }
 
             // Tools Showing / loading
-            
-            if (npcEvents.cabinRope){
+
+            if (npcEvents.cabinRope)
+            {
                 npcEvents.cabinRope.SetActive(slotData.HasTool(Tools.Rope));
             }
+
+            // load pocketwatch
 
             if (npcEvents.cabinPocketwatch)
             {
@@ -142,29 +145,52 @@ namespace PeaksOfArchipelago.CabinHandlers
             // Crampon loading...
             if (slotData.cramponLevel > 0)
             {
+                //logger.LogInfo($"crampon level: {slotData.cramponLevel}");
+                //logger.LogInfo($"PlayerPrefs: {PlayerPrefs.GetInt("UseBasicCrampons")}");
+                //logger.LogInfo($"GameManager.crampons: {(GameManager.control.crampons ? "true" : "false")}");
+                //logger.LogInfo($"GameManager.cramponsUpgrade: {(GameManager.control.cramponsUpgrade ? "true" : "false")}");
                 npcEvents.cabinCramponsCollider.SetActive(true);
                 if (slotData.cramponLevel > 1 && PlayerPrefs.GetInt("UseBasicCrampons") == 1)
                 {
+                    logger.LogInfo("Showing 10-point crampons");
                     npcEvents.cramponsEditionTxt.text = "10-";
                     npcEvents.cabinCrampons_10Point.SetActive(true);
                     npcEvents.cabinCrampons_6Point.SetActive(false);
                 }
                 else
                 {
+                    logger.LogInfo("Showing 6-point crampons");
                     npcEvents.cramponsEditionTxt.text = "6-";
                     npcEvents.cabinCrampons_6Point.SetActive(true);
                     npcEvents.cabinCrampons_10Point.SetActive(false);
                 }
             }
+            else
+            {
+                logger.LogInfo("Showing no crampons");
+                npcEvents.cabinCramponsCollider.SetActive(false);
+                npcEvents.cabinCrampons_6Point.SetActive(false);
+                npcEvents.cabinCrampons_10Point.SetActive(false);
+            }
+
+            // load chalk
 
             if (npcEvents.cabinChalkbag)
             {
                 npcEvents.cabinChalkbag.SetActive(slotData.HasTool(Tools.Chalkbag));
             }
 
+            // load pipe
+
             if (npcEvents.cabinPipe)
             {
                 npcEvents.cabinPipe.SetActive(slotData.HasTool(Tools.Pipe));
+            }
+
+            // load barometer
+            if (npcEvents.cabinBarometer)
+            {
+                npcEvents.cabinBarometer.SetActive(slotData.HasTool(Tools.Barometer));
             }
         }
     }

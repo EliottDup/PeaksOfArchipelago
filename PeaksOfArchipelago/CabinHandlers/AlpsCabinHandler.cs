@@ -9,7 +9,7 @@ namespace PeaksOfArchipelago.CabinHandlers
         {
         }
 
-        public override void CollectItems(List<ItemInfo> itemInfos)
+        public override bool CollectItems(List<ItemInfo> itemInfos)
         {
             throw new NotImplementedException();
         }

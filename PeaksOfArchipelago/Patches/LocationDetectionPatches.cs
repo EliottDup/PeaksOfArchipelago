@@ -16,12 +16,17 @@ namespace PeaksOfArchipelago.Patches
         [HarmonyPatch("StampJournal")]
         public static void PeakLocationComplete(StamperPeakSummit __instance)
         {
+            PeaksOfArchipelago.Logger.LogInfo("stamping peak");
             if (__instance.isCustomLevel)
             {
                 return;
             }
 
-            Peaks peak = ItemTypes.PeakfromStamper(__instance);
+            Peaks peak = ItemTypes.PeakfromStamper(__instance.peakNames);
+            
+            PeaksOfArchipelago.Logger.LogInfo($"Stamping journal for peak {peak} (derived from {__instance.peakNames})");
+
+            Connection.Instance.CompletePeakLocation(peak);
 
             HashSet<Peaks> FSPeaks = new HashSet<Peaks>()
             {
@@ -44,9 +49,6 @@ namespace PeaksOfArchipelago.Patches
                 Peaks.EldrisWall,
                 Peaks.MountMhorgorm
             };
-
-
-            Connection.Instance.CompletePeakLocation(peak);
 
             if (FSPeaks.Contains(peak) && GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().ropesPlacedDuringMap == 0)
             {
@@ -141,7 +143,7 @@ namespace PeaksOfArchipelago.Patches
             {
                 return;
             }
-            Peaks peak = ItemTypes.PeakfromStamper(__instance.summitStamper);
+            Peaks peak = ItemTypes.PeakfromStamper(__instance.summitStamper.peakNames);
 
             if (__instance.timer < timeAttackDefaultData.times[(int)peak])
             {

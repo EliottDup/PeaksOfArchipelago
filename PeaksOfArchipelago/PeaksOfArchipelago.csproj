@@ -278,7 +278,7 @@
 		<Compile Include="PeaksOfArchipelago.cs" />
 		<Compile Include="Session\Connection.cs" />
 		<Compile Include="Session\Player.cs" />
-		<Compile Include="UI\ChatBox.cs" />
+		<Compile Include="MonoBehaviours\ChatBox.cs" />
 		<Compile Include="UI\LoginUI.cs" />
 		<Compile Include="UI\UIManager.cs" />
 	</ItemGroup>

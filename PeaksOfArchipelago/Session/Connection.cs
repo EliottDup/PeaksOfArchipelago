@@ -1,12 +1,15 @@
 ﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
+using Archipelago.MultiClient.Net.MessageLog.Parts;
 using Archipelago.MultiClient.Net.Models;
 using BepInEx.Logging;
 using PeaksOfArchipelago.CabinHandlers;
 using PeaksOfArchipelago.GameData;
 using PeaksOfArchipelago.UI;
+using UnityEngine;
 using static PeaksOfArchipelago.GameData.LocationIDs;
+using Color = UnityEngine.Color;
 
 namespace PeaksOfArchipelago.Session
 {
@@ -15,11 +18,13 @@ namespace PeaksOfArchipelago.Session
         public static Connection Instance { get; private set; }
 
         ArchipelagoSession session;
-        ManualLogSource logger;
+        readonly ManualLogSource logger;
         private Dictionary<string, object> slotOptions;
         private ISlotData slotData;
         private List<ItemInfo> uncollectedItems;
         private List<ItemInfo> instantCollectItems;
+
+        private Dictionary<long, ScoutedItemInfo> scoutedItems;
 
         private int itemCount = 0;
 
@@ -86,7 +91,27 @@ namespace PeaksOfArchipelago.Session
             // event listeners
             session.Items.ItemReceived += (ReceivedItemsHelper h) => OnItemReceived(h.AllItemsReceived.Last());
 
+            session.MessageLog.OnMessageReceived += (logMessage) =>
+            {
+                string msg = "";
+                foreach (MessagePart part in logMessage.Parts)
+                {
+                    Color col = new Color(part.Color.R, part.Color.G, part.Color.B);
+                    msg += $"<color=#{ColorUtility.ToHtmlStringRGB(col)}>{part.Text}</color>";
+                }
+                PeaksOfArchipelago.ui.SendChatMessage(msg);
+            };
+
+            _ = ScoutLocations();
+
             return true;
+        }
+
+        public async Task ScoutLocations()
+        {
+            logger.LogInfo("Scouting items");
+            scoutedItems = await session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, [.. session.Locations.AllLocations]);
+            logger.LogInfo("Items scouted");
         }
 
         private void LoadData()
@@ -109,6 +134,7 @@ namespace PeaksOfArchipelago.Session
                 logger.LogInfo("Collecting previously unlocked items...");
                 foreach (ItemInfo item in instantCollectItems)
                 {
+                    logger.LogInfo($"Unlocking Item: {item.ItemName}");
                     UnlockItem(item);
                 }
                 itemCount += instantCollectItems.Count;
@@ -120,13 +146,16 @@ namespace PeaksOfArchipelago.Session
             if (uncollectedItems.Count > 0)
             {
                 logger.LogInfo("Collecting new items...");
-                handler.CollectItems(uncollectedItems);
-                foreach (ItemInfo item in uncollectedItems)
-                {
-                    UnlockItem(item);
+                if (handler.CollectItems(uncollectedItems)) {
+                    foreach (ItemInfo item in uncollectedItems)
+                    {
+                        UnlockItem(item);
+                    }
+                    itemCount += uncollectedItems.Count;
+                    session.DataStorage["ItemCount"] = itemCount;
+                    handler.LoadProgress();
+                    uncollectedItems.Clear();
                 }
-                itemCount += uncollectedItems.Count;
-                session.DataStorage["ItemCount"] = itemCount;
             }
             handler.LoadProgress();
         }
@@ -134,6 +163,7 @@ namespace PeaksOfArchipelago.Session
         private void OnItemReceived(ItemInfo item)
         {
             uncollectedItems.Add(item);
+            logger.LogInfo($"Recieving Item: {item.ItemName}");
             // TODO: Notify player
         }
 
@@ -187,7 +217,12 @@ namespace PeaksOfArchipelago.Session
             {
                 return;
             }
-            PeaksOfArchipelago.ui.SendNotification("collected lolmao");
+            if (scoutedItems != null && scoutedItems.ContainsKey(locationID))
+            {
+            ScoutedItemInfo item = scoutedItems[locationID];
+            PeaksOfArchipelago.ui.SendNotification($"Found {item.Player.Name}'s {item.ItemName}");
+            }
+                
             // Notify player somehow
             session.Locations.CompleteLocationChecks(locationID);
         }

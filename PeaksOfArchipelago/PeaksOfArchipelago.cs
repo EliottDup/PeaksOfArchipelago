@@ -51,9 +51,7 @@ namespace PeaksOfArchipelago
             try
             {
                 Logger.LogInfo("Patching...");
-                this.harmony.PatchAll(typeof(Patches.AchievementBlockPatches));
-                this.harmony.PatchAll(typeof(Patches.NPCEventsPatches));
-                this.harmony.PatchAll(typeof(Patches.ArtefactLoaderCabinPatches));
+                this.harmony.PatchAll();
                 Logger.LogInfo("Patch complete!");
             }
             catch (Exception ex)

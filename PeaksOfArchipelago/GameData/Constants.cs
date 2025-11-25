@@ -59,9 +59,9 @@ namespace PeaksOfArchipelago.GameData
             return Types.Peak;
         }
         
-        public static Peaks PeakfromStamper(StamperPeakSummit stamper)
+        public static Peaks PeakfromStamper(StamperPeakSummit.PeakNames peakName)
         {
-            int p = (int)stamper.peakNames;
+            int p = (int)peakName - 1;
             if (p >= (int)StamperPeakSummit.PeakNames.IceWaterFallDemo)
             {
                 p--;

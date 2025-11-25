@@ -11,7 +11,7 @@ namespace PeaksOfArchipelago.CabinHandlers
     internal abstract class CabinHandler
     {
         public abstract void LoadProgress();
-        public abstract void CollectItems(List<ItemInfo> itemInfos);
+        public abstract bool CollectItems(List<ItemInfo> itemInfos);
         protected ManualLogSource logger;
 
         protected ISlotData slotData;
@@ -21,6 +21,7 @@ namespace PeaksOfArchipelago.CabinHandlers
             this.slotData = slotData;
             logger = PeaksOfArchipelago.Logger;
         }
+
         public static CabinHandler New(Cabins cabin, ISlotData slotData)
         {
             return cabin switch

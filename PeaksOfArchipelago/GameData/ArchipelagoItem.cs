@@ -154,13 +154,16 @@ namespace PeaksOfArchipelago.GameData
                     GameManager.control.artefactMap = true;
                     break;
                 case Tools.ProgressiveCrampons:
+                    GameManager.control.crampons = true;
                     if (slotData.cramponLevel == 0)
                     {
                         GameManager.control.crampons = true;
+                        slotData.cramponLevel = 1;
                     }
                     else if (slotData.cramponLevel == 1)
                     {
                         GameManager.control.cramponsUpgrade = true;
+                        slotData.cramponLevel = 2;
                     }
                     break;
                 case Tools.Monocular:
@@ -168,6 +171,9 @@ namespace PeaksOfArchipelago.GameData
                     break;
                 case Tools.Phonograph:
                     GameManager.control.phonograph = true;
+                    break;
+                case Tools.Pocketwatch:
+                    GameManager.control.pocketwatch = true;
                     break;
                 case Tools.Chalkbag:
                     GameManager.control.chalkBag = true;

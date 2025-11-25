@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PeaksOfArchipelago.UI
+namespace PeaksOfArchipelago.MonoBehaviours
 {
     internal class ChatBox : MonoBehaviour
     {
@@ -17,13 +17,12 @@ namespace PeaksOfArchipelago.UI
         public void Awake()
         {
             logger = PeaksOfArchipelago.Logger;
-            canvas = GameObject.FindObjectOfType<Canvas>();
+            canvas = FindObjectOfType<Canvas>();
         }
 
         private void Start()
         {
             CreateChatBox();
-            AddChatMessage("test Message 1");
         }
 
         void CreateChatBox()
