@@ -35,9 +35,9 @@ namespace PeaksOfArchipelago.Patches
     }
 
     [HarmonyPatch(typeof(PeakSelection))]
-    [HarmonyPatch(typeof(IntermediatePeakSelection))]
     [HarmonyPatch(typeof(AdvancedPeakSelection))]
-    [HarmonyPatch(typeof(PeakSelection))]
+    [HarmonyPatch(typeof(IntermediatePeakSelection))]
+    //[HarmonyPatch([typeof(PeakSelection), typeof(IntermediatePeakSelection), typeof(AdvancedPeakSelection)])]
     internal class PeakSelectionPatches
     {
         [HarmonyPrefix]
@@ -45,14 +45,16 @@ namespace PeaksOfArchipelago.Patches
         static bool DisableClick(object __instance)
         {
             Type type = __instance.GetType();
-            var journal = type.GetField("peakJournal", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
+            Books b = GetMatchingBook(type);
+
+            bool journalPublic = b != Books.Fundamentals;
+            var journal = type.GetField("peakJournal", (journalPublic ? BindingFlags.Public : BindingFlags.NonPublic)| BindingFlags.Instance).GetValue(__instance);
             // type: (Intermediate/Advanced/none)Journal
             PeaksOfArchipelago.Logger.LogInfo($"Journal Type: {journal.GetType().FullName}");
             
             int currentPage = (int)journal.GetType().GetField("currentPage", BindingFlags.Public | BindingFlags.Instance).GetValue(journal);
             bool leftPage = (bool)type.GetField("leftPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
 
-            Books b = GetMatchingBook(type);
 
             if ((leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(currentPage, b)) || 
                 (!leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(currentPage+1, b)))
@@ -64,10 +66,15 @@ namespace PeaksOfArchipelago.Patches
 
         [HarmonyPrefix]
         [HarmonyPatch("OnMouseSpriteOver")]
-        public static void ColorHighLight(object __instance) {
+        public static void ColorHighLight(object __instance)
+        {
             Type type = __instance.GetType();
-            var journal = type.GetField("peakJournal", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
-            
+
+
+            bool journalPublic = GetMatchingBook(type) != Books.Fundamentals;
+            var journal = type.GetField("peakJournal", (journalPublic ? BindingFlags.Public : BindingFlags.NonPublic) | BindingFlags.Instance).GetValue(__instance);
+
+            PeaksOfArchipelago.Logger.LogInfo(GetMatchingBook(type));
             int currentPage = (int)journal.GetType().GetField("currentPage", BindingFlags.Public | BindingFlags.Instance).GetValue(journal);
             bool leftPage = (bool)type.GetField("leftPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
 
@@ -99,8 +106,9 @@ namespace PeaksOfArchipelago.Patches
 
     // TODO: PeakJournal next
     [HarmonyPatch(typeof(PeakJournal))]
-    [HarmonyPatch(typeof(IntermediateJournal))]
     [HarmonyPatch(typeof(AdvancedJournal))]
+    [HarmonyPatch(typeof(IntermediateJournal))]
+    //[HarmonyPatch([typeof(PeakSelection), typeof(IntermediatePeakSelection), typeof(AdvancedPeakSelection)])]
     internal class PageColorationPatches
     {
         [HarmonyPostfix]
@@ -108,6 +116,7 @@ namespace PeaksOfArchipelago.Patches
         public static void PageTurnColoration(object __instance)
         {
             Type type = __instance.GetType();
+
             Animation anim = (Animation)type.GetField("journalPageAnim", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
             AnimationClip left_anim = (AnimationClip)type.GetField("journalPage_TurnLeft", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
             
