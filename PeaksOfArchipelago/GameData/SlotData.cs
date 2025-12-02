@@ -121,7 +121,7 @@ namespace PeaksOfArchipelago.GameData
             return HasPeak(BookPageToPeaks(page, book));
         }
 
-        private Peaks BookPageToPeaks(int page, Books book)
+        public Peaks BookPageToPeaks(int page, Books book)
         {
             page--;
             Peaks peak;

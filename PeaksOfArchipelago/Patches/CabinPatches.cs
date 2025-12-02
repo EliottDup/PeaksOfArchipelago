@@ -7,6 +7,7 @@ using PeaksOfArchipelago.Session;
 using PeaksOfArchipelago.GameData;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Archipelago.MultiClient.Net.Packets;
 
 namespace PeaksOfArchipelago.Patches
 {
@@ -34,31 +35,25 @@ namespace PeaksOfArchipelago.Patches
         }
     }
 
+    // Fundamentals blocking
+
     [HarmonyPatch(typeof(PeakSelection))]
-    [HarmonyPatch(typeof(AdvancedPeakSelection))]
-    [HarmonyPatch(typeof(IntermediatePeakSelection))]
-    //[HarmonyPatch([typeof(PeakSelection), typeof(IntermediatePeakSelection), typeof(AdvancedPeakSelection)])]
     internal class PeakSelectionPatches
     {
         [HarmonyPrefix]
         [HarmonyPatch("OnMouseSpriteDown")]
-        static bool DisableClick(object __instance)
+        static bool DisableClick(PeakSelection __instance)
         {
             Type type = __instance.GetType();
-            Books b = GetMatchingBook(type);
 
-            bool journalPublic = b != Books.Fundamentals;
-            var journal = type.GetField("peakJournal", (journalPublic ? BindingFlags.Public : BindingFlags.NonPublic)| BindingFlags.Instance).GetValue(__instance);
-            // type: (Intermediate/Advanced/none)Journal
-            PeaksOfArchipelago.Logger.LogInfo($"Journal Type: {journal.GetType().FullName}");
-            
-            int currentPage = (int)journal.GetType().GetField("currentPage", BindingFlags.Public | BindingFlags.Instance).GetValue(journal);
-            bool leftPage = (bool)type.GetField("leftPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
+            PeakJournal journal =  (PeakJournal)type.GetField("peakJournal", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
 
-
-            if ((leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(currentPage, b)) || 
-                (!leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(currentPage+1, b)))
+            if ((__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage, Books.Fundamentals)) || 
+                (!__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage + 1, Books.Fundamentals)))
             {
+                PeaksOfArchipelago.Logger.LogInfo($"LeftPage: {__instance.leftPage}");
+                PeaksOfArchipelago.Logger.LogInfo($"Page: {journal.currentPage}, Peak: {Connection.Instance.slotData.BookPageToPeaks(journal.currentPage, Books.Fundamentals)}");
+                PeaksOfArchipelago.Logger.LogInfo($"Page: {journal.currentPage + 1}, Peak: {Connection.Instance.slotData.BookPageToPeaks(journal.currentPage + 1, Books.Fundamentals)}");
                 return false;
             }
             return true;
@@ -66,68 +61,48 @@ namespace PeaksOfArchipelago.Patches
 
         [HarmonyPrefix]
         [HarmonyPatch("OnMouseSpriteOver")]
-        public static void ColorHighLight(object __instance)
+        public static void ColorHighLight(PeakSelection __instance)
         {
             Type type = __instance.GetType();
 
 
-            bool journalPublic = GetMatchingBook(type) != Books.Fundamentals;
-            var journal = type.GetField("peakJournal", (journalPublic ? BindingFlags.Public : BindingFlags.NonPublic) | BindingFlags.Instance).GetValue(__instance);
+            PeakJournal journal = (PeakJournal)type.GetField("peakJournal", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
 
-            PeaksOfArchipelago.Logger.LogInfo(GetMatchingBook(type));
-            int currentPage = (int)journal.GetType().GetField("currentPage", BindingFlags.Public | BindingFlags.Instance).GetValue(journal);
-            bool leftPage = (bool)type.GetField("leftPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
+            MeshRenderer leftRenderer = journal.leftSelectOutlineOBJ.GetComponent<MeshRenderer>();
+            MeshRenderer rightRenderer = journal.rightSelectOutlineOBJ.GetComponent<MeshRenderer>();
 
-            MeshRenderer leftRenderer = ((GameObject)type.GetField("rightSelectOutlineOBJ", 
-                BindingFlags.Public | BindingFlags.Instance).GetValue(__instance)).GetComponent<MeshRenderer>();
-            MeshRenderer rightRenderer = ((GameObject) type.GetField("leftSelectOutlineOBJ", 
-                BindingFlags.Public | BindingFlags.Instance).GetValue(__instance)).GetComponent<MeshRenderer>();
-
-            if (leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(currentPage, GetMatchingBook(type)))
+            if (__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage, Books.Fundamentals))
                 leftRenderer.material.color = new Color(2, 0, 0);
             else 
                 leftRenderer.material.color = new Color(1, 1, 1, 0.349f);
             
-            if (!leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(currentPage + 1, GetMatchingBook(type)))
+            if (!__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage + 1, Books.Fundamentals))
                 rightRenderer.material.color = new Color(2, 0, 0);
             else
                 rightRenderer.material.color = new Color(1, 1, 1, 0.349f);
         }
-
-        static Books GetMatchingBook(Type peakSelectionType)
-        {
-            if (peakSelectionType == typeof(PeakSelection))             return Books.Fundamentals;
-            if (peakSelectionType == typeof(IntermediatePeakSelection)) return Books.Intermediate;
-            if (peakSelectionType == typeof(AdvancedPeakSelection))     return Books.Advanced;
-            throw new ArgumentException("Unknown PeakSelection type");
-        }
     }
 
 
-    // TODO: PeakJournal next
     [HarmonyPatch(typeof(PeakJournal))]
-    [HarmonyPatch(typeof(AdvancedJournal))]
-    [HarmonyPatch(typeof(IntermediateJournal))]
-    //[HarmonyPatch([typeof(PeakSelection), typeof(IntermediatePeakSelection), typeof(AdvancedPeakSelection)])]
     internal class PageColorationPatches
     {
         [HarmonyPostfix]
         [HarmonyPatch("PageTurnSound")]
-        public static void PageTurnColoration(object __instance)
+        public static void PageTurnColoration(PeakJournal __instance)
         {
-            Type type = __instance.GetType();
-
-            Animation anim = (Animation)type.GetField("journalPageAnim", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
-            AnimationClip left_anim = (AnimationClip)type.GetField("journalPage_TurnLeft", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
+            Animation anim = __instance.journalPageAnim;
+            AnimationClip left_anim = __instance.journalPage_TurnLeft;
             
-            Material leftPage = (Material)type.GetField("leftPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
-            Material rightPage = (Material)type.GetField("rightPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
-            Material frontPage = (Material)type.GetField("frontPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
-            Material backPage = (Material)type.GetField("backPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
+            Material leftPage = __instance.leftPage;
+            Material rightPage = __instance.rightPage;
+            Material frontPage = __instance.frontPage;
+            Material backPage = __instance.backPage;
 
-            int currentPage = (int)type.GetField("currentPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
+            int currentPage = __instance.currentPage;
 
-            Books book = GetMatchingBook(type);
+            Books book = Books.Fundamentals;
+
 
             if (anim == left_anim)
             {
@@ -147,31 +122,233 @@ namespace PeaksOfArchipelago.Patches
 
         [HarmonyPostfix]
         [HarmonyPatch("UpdatePage")]
-        public static void PageOpeningColor(object __instance)
+        public static void PageOpeningColor(PeakJournal __instance)
         {
             Type type = __instance.GetType();
 
-            Material leftPage = (Material)type.GetField("leftPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
-            Material rightPage = (Material)type.GetField("rightPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
-            Material frontPage = (Material)type.GetField("frontPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
-            Material backPage = (Material)type.GetField("backPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
+            Material leftPage = __instance.leftPage;
+            Material rightPage = __instance.rightPage;
+            Material frontPage = __instance.frontPage;
+            Material backPage = __instance.backPage;
 
-            int currentPage = (int)type.GetField("currentPage", BindingFlags.Public | BindingFlags.Instance).GetValue(__instance);
+            int currentPage = __instance.currentPage;
 
-            Books book = GetMatchingBook(type);
+            Books book = Books.Fundamentals;
 
             backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 2, book);
             frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 1, book);
             rightPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 3, book);
             leftPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
         }
+    }
 
-        static Books GetMatchingBook(Type peakJournalType)
+    // Intermediate blocking
+
+    [HarmonyPatch(typeof(IntermediatePeakSelection))]
+    internal class IntermediatePeakSelectionPatches
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("OnMouseSpriteDown")]
+        static bool DisableClick(IntermediatePeakSelection __instance)
         {
-            if (peakJournalType == typeof(PeakJournal)) return Books.Fundamentals;
-            if (peakJournalType == typeof(IntermediateJournal)) return Books.Intermediate;
-            if (peakJournalType == typeof(AdvancedJournal)) return Books.Advanced;
-            throw new ArgumentException("Unknown PeakSelection type");
+            Type type = __instance.GetType();
+
+            IntermediateJournal journal = __instance.peakJournal;
+
+            Books book = Books.Intermediate;
+
+            if ((__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage, book)) ||
+                (!__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage + 1, book)))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("OnMouseSpriteOver")]
+        public static void ColorHighLight(IntermediatePeakSelection __instance)
+        {
+            Type type = __instance.GetType();
+
+            IntermediateJournal journal = __instance.peakJournal;
+
+            MeshRenderer leftRenderer = journal.leftSelectOutlineOBJ.GetComponent<MeshRenderer>();
+            MeshRenderer rightRenderer = journal.rightSelectOutlineOBJ.GetComponent<MeshRenderer>();
+
+            Books book = Books.Intermediate;
+
+            if (__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage, book))
+                leftRenderer.material.color = new Color(2, 0, 0);
+            else
+                leftRenderer.material.color = new Color(1, 1, 1, 0.349f);
+
+            if (!__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage + 1, book))
+                rightRenderer.material.color = new Color(2, 0, 0);
+            else
+                rightRenderer.material.color = new Color(1, 1, 1, 0.349f);
+        }
+    }
+
+
+    [HarmonyPatch(typeof(IntermediateJournal))]
+    internal class IntermediatePageColorationPatches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch("PageTurnSound")]
+        public static void PageTurnColoration(IntermediateJournal __instance)
+        {
+            Animation anim = __instance.journalPageAnim;
+            AnimationClip left_anim = __instance.journalPage_TurnLeft;
+
+            Material leftPage = __instance.leftPage;
+            Material rightPage = __instance.rightPage;
+            Material frontPage = __instance.frontPage;
+            Material backPage = __instance.backPage;
+
+            int currentPage = __instance.currentPage;
+
+            Books book = Books.Intermediate;
+
+
+            if (anim == left_anim)
+            {
+                backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
+                frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage - 1, book);
+                rightPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 1, book);
+                leftPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage - 2, book);
+            }
+            else
+            {
+                backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 2, book);
+                frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 1, book);
+                rightPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 3, book);
+                leftPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("UpdatePage")]
+        public static void PageOpeningColor(IntermediateJournal __instance)
+        {
+            Material leftPage = __instance.leftPage;
+            Material rightPage = __instance.rightPage;
+            Material frontPage = __instance.frontPage;
+            Material backPage = __instance.backPage;
+
+            int currentPage = __instance.currentPage;
+
+            Books book = Books.Intermediate;
+
+            backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 2, book);
+            frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 1, book);
+            rightPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 3, book);
+            leftPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
+        }
+    }
+
+    // Advanced blocking
+
+    [HarmonyPatch(typeof(AdvancedPeakSelection))]
+    internal class AdvancedPeakSelectionPatches
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("OnMouseSpriteDown")]
+        static bool DisableClick(AdvancedPeakSelection __instance)
+        {
+            Type type = __instance.GetType();
+
+            AdvancedJournal journal = __instance.peakJournal;
+
+            Books book = Books.Advanced;
+
+            if ((__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage, book)) ||
+                (!__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage + 1, book)))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("OnMouseSpriteOver")]
+        public static void ColorHighLight(AdvancedPeakSelection __instance)
+        {
+            Type type = __instance.GetType();
+
+            AdvancedJournal journal = __instance.peakJournal;
+
+            MeshRenderer leftRenderer = journal.leftSelectOutlineOBJ.GetComponent<MeshRenderer>();
+            MeshRenderer rightRenderer = journal.rightSelectOutlineOBJ.GetComponent<MeshRenderer>();
+
+            Books book = Books.Advanced;
+
+            if (__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage, book))
+                leftRenderer.material.color = new Color(2, 0, 0);
+            else
+                leftRenderer.material.color = new Color(1, 1, 1, 0.349f);
+
+            if (!__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage + 1, book))
+                rightRenderer.material.color = new Color(2, 0, 0);
+            else
+                rightRenderer.material.color = new Color(1, 1, 1, 0.349f);
+        }
+    }
+
+
+    [HarmonyPatch(typeof(AdvancedJournal))]
+    internal class AdvancedPageColorationPatches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch("PageTurnSound")]
+        public static void PageTurnColoration(AdvancedJournal __instance)
+        {
+            Animation anim = __instance.journalPageAnim;
+            AnimationClip left_anim = __instance.journalPage_TurnLeft;
+
+            Material leftPage = __instance.leftPage;
+            Material rightPage = __instance.rightPage;
+            Material frontPage = __instance.frontPage;
+            Material backPage = __instance.backPage;
+
+            int currentPage = __instance.currentPage;
+
+            Books book = Books.Advanced;
+
+
+            if (anim == left_anim)
+            {
+                backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
+                frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage - 1, book);
+                rightPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 1, book);
+                leftPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage - 2, book);
+            }
+            else
+            {
+                backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 2, book);
+                frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 1, book);
+                rightPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 3, book);
+                leftPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("UpdatePage")]
+        public static void PageOpeningColor(AdvancedJournal __instance)
+        {
+            Material leftPage = __instance.leftPage;
+            Material rightPage = __instance.rightPage;
+            Material frontPage = __instance.frontPage;
+            Material backPage = __instance.backPage;
+
+            int currentPage = __instance.currentPage;
+
+            Books book = Books.Advanced;
+
+            backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 2, book);
+            frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 1, book);
+            rightPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 3, book);
+            leftPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
         }
     }
 }
