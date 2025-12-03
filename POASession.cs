@@ -169,7 +169,7 @@ class POASession(PlayerData playerData)
             logger.LogInfo("Getting previously unlocked items");
             itemcount = session.DataStorage["ItemCount"];
             logger.LogInfo($"found {itemcount} already unlocked items");
-            List<SimpleItemInfo> oldReceivedItems = [.. session.Items.AllItemsReceived.Take(itemcount).Select(item =>
+            List<SimpleItemInfo> oldReceivedItems = [.. session.Items.AllItemsReceived.Where(item => item.ItemName != "Trap").Take(itemcount).Select(item =>
             new SimpleItemInfo() { playerName = item.Player.Name, id = item.ItemId, itemName = item.ItemName })];
             foreach (SimpleItemInfo oldReceivedItem in oldReceivedItems)
             {
