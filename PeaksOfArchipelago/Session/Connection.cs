@@ -121,8 +121,8 @@ namespace PeaksOfArchipelago.Session
             this.slotData = new SlotData(new SessionSettings(slotOptions));
 
             itemCount = (int)session.DataStorage["ItemCount"];
-            instantCollectItems = [.. session.Items.AllItemsReceived.Take(itemCount).Where(item => item.ItemName != "Trap")];
-            uncollectedItems = [.. session.Items.AllItemsReceived.Skip(itemCount).Where(item => item.ItemName != "Trap")];
+            instantCollectItems = [.. session.Items.AllItemsReceived.Where(item => item.ItemName != "Trap").Take(itemCount)];
+            uncollectedItems = [.. session.Items.AllItemsReceived.Where(item => item.ItemName != "Trap").Skip(itemCount)];
 
             logger.LogInfo($"Loaded {instantCollectItems.Count} old items and {uncollectedItems.Count} new items");
         }
@@ -136,6 +136,11 @@ namespace PeaksOfArchipelago.Session
                 {
                     logger.LogInfo($"Unlocking Item: {item.ItemName}");
                     UnlockItem(item);
+                }
+
+                if (instantCollectItems.Count != session.DataStorage["ItemCount"])
+                {
+                    logger.LogInfo($"Warning: Item count mismatch! Expected {session.DataStorage["ItemCount"]}, got {instantCollectItems.Count}");
                 }
                 itemCount += instantCollectItems.Count;
                 session.DataStorage["ItemCount"] = itemCount;

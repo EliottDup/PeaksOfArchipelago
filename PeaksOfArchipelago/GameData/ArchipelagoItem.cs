@@ -221,8 +221,9 @@ namespace PeaksOfArchipelago.GameData
             }
             else
             {
-                GameManager.control.ropesCollected++;
+                GameManager.control.ropesCollected += 2;
             }
+
             GameManager.control.Save();
         }
     }

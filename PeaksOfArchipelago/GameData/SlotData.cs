@@ -83,7 +83,7 @@ namespace PeaksOfArchipelago.GameData
             return unlockedArtefacts.Contains(artefact);
         }
 
-        public int GetRopeCount()
+        public int GetTotalRopeCount()
         {
             int ropeCount = 0;
             for (int i = (int)Ropes.WaltersCrag; i <= (int)Ropes.StHaelga; i++)
@@ -103,7 +103,14 @@ namespace PeaksOfArchipelago.GameData
                     ropeCount += 2;
                 }
             }
+
+            ropeCount += extraItemCounts[ExtraItems.ExtraRope];
             return ropeCount;
+        }
+
+        public int GetTotalCoffeeCount()
+        {
+            throw new NotImplementedException();
         }
 
         public bool HasTool(Tools tool)
@@ -119,6 +126,11 @@ namespace PeaksOfArchipelago.GameData
         public bool IsJournalPageUnlocked(int page, Books book)
         {
             return HasPeak(BookPageToPeaks(page, book));
+        }
+
+        public int GetExtraItemCount(ExtraItems item)
+        {
+            return extraItemCounts[item];
         }
 
         public Peaks BookPageToPeaks(int page, Books book)

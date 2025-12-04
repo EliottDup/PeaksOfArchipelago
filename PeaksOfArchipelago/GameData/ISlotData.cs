@@ -19,8 +19,10 @@ namespace PeaksOfArchipelago.GameData
 
         bool HasPeak(Peaks peak);
 
-        int GetRopeCount();
+        int GetTotalRopeCount();
+        int GetTotalCoffeeCount();
 
+        int GetExtraItemCount(ExtraItems item);
         void RecieveArtefact(Artefacts artefact);
         void RecieveBirdSeed(BirdSeeds birdSeed);
         void RecieveBook(Books book);

@@ -3,20 +3,17 @@ using PeaksOfArchipelago.GameData;
 
 namespace PeaksOfArchipelago.CabinHandlers
 {
-    internal class AlpsCabinHandler : CabinHandler
+    internal class AlpsCabinHandler(ISlotData slotData) : CabinHandler(slotData)
     {
-        public AlpsCabinHandler(ISlotData slotData) : base(slotData)
-        {
-        }
-
         public override bool CollectItems(List<ItemInfo> itemInfos)
         {
-            throw new NotImplementedException();
+            PeaksOfArchipelago.ui.SendNotification($"Alps not implemented, please return to the base cabin");
+            return false;
         }
 
         public override void LoadProgress()
         {
-            PeaksOfArchipelago.ui.SendNotification("Alps have not yet been implemented, please turn back :))");
+            PeaksOfArchipelago.ui.SendNotification($"Alps not implemented, please return to the base cabin");
         }
     }
 }
