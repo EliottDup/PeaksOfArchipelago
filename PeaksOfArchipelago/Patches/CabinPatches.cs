@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using HarmonyLib;
+﻿using HarmonyLib;
 using System.Reflection;
 using PeaksOfArchipelago.Session;
 using PeaksOfArchipelago.GameData;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Archipelago.MultiClient.Net.Packets;
 
 namespace PeaksOfArchipelago.Patches
 {
@@ -103,8 +98,7 @@ namespace PeaksOfArchipelago.Patches
 
             Books book = Books.Fundamentals;
 
-
-            if (anim == left_anim)
+            if (anim.clip == left_anim)
             {
                 backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
                 frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage - 1, book);
@@ -211,7 +205,7 @@ namespace PeaksOfArchipelago.Patches
             Books book = Books.Intermediate;
 
 
-            if (anim == left_anim)
+            if (anim.clip == left_anim)
             {
                 backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
                 frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage - 1, book);
@@ -316,7 +310,7 @@ namespace PeaksOfArchipelago.Patches
             Books book = Books.Advanced;
 
 
-            if (anim == left_anim)
+            if (anim.clip == left_anim)
             {
                 backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
                 frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage - 1, book);

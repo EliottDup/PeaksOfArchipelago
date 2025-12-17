@@ -108,6 +108,19 @@ namespace PeaksOfArchipelago.Patches
             }
             r.UpdateRopesCollected();
         }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("CheckRope")]
+        public static void StartPrefix()
+        {
+            GameManager.control.ropesCollected = 0;
+        }
+        
+        [HarmonyPostfix]
+        [HarmonyPatch("CheckRope")]
+        public static void StartPostfix() {
+            GameManager.control.ropesCollected = Connection.Instance.slotData.GetTotalRopeCount();
+        }
     }
 
     [HarmonyPatch(typeof(BirdSeedCollectable))]
@@ -120,6 +133,20 @@ namespace PeaksOfArchipelago.Patches
             BirdSeeds seed = (BirdSeeds)__instance.extraBirdSeedNumber;
             Connection.Instance.CompleteBirdSeedLocation(seed);
             GameManager.control.extraBirdSeedUses--;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("CheckBirdSeed")]
+        public static void StartPrefix()
+        {
+            GameManager.control.extraBirdSeedUses = 0;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("CheckBirdSeed")]
+        public static void StartPostfix()
+        {
+            GameManager.control.extraBirdSeedUses = Connection.Instance.slotData.GetTotalExtraBirdSeedCount();
         }
     }
 

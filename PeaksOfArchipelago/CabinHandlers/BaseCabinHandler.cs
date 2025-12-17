@@ -11,6 +11,7 @@ namespace PeaksOfArchipelago.CabinHandlers
     internal class BaseCabinHandler(ISlotData slotData) : CabinHandler(slotData)
     {
         bool hasSpawnedInAPLogo = false;
+        GameObject book1;
 
         public override bool CollectItems(List<ItemInfo> itemInfos)
         {
@@ -47,6 +48,11 @@ namespace PeaksOfArchipelago.CabinHandlers
 
             npcEvents.runningEvent = true;
             npcEvents.npcParcelDeliverySystem.StartCoroutine("FadeScreenAndStartUnpackEvent");
+
+            GameManager.control.ropesCollected -= 5;
+            GameManager.control.extraCoffeeUses -= 999999999;
+            GameManager.control.extraChalkUses -= 999999999;
+            GameManager.control.allArtefactsUnlocked = false;
             return true;
         }
 
@@ -74,11 +80,12 @@ namespace PeaksOfArchipelago.CabinHandlers
 
             // book loading
 
-            GameObject book1 = GameObject.Find("MAPJOURNAL");
 
             if (book1 == null)
             {
-                logger.LogWarning("Didnt find book object TwT");
+                book1 = GameObject.Find("MAPJOURNAL");
+                if (book1 == null)
+                    logger.LogWarning("Didnt find book object TwT");
             }
 
             NPCEvents npcEvents = GameObject.FindObjectOfType<NPCEvents>();
@@ -145,25 +152,34 @@ namespace PeaksOfArchipelago.CabinHandlers
             // Crampon loading...
             if (slotData.cramponLevel > 0)
             {
-                //logger.LogInfo($"crampon level: {slotData.cramponLevel}");
-                //logger.LogInfo($"PlayerPrefs: {PlayerPrefs.GetInt("UseBasicCrampons")}");
-                //logger.LogInfo($"GameManager.crampons: {(GameManager.control.crampons ? "true" : "false")}");
-                //logger.LogInfo($"GameManager.cramponsUpgrade: {(GameManager.control.cramponsUpgrade ? "true" : "false")}");
                 npcEvents.cabinCramponsCollider.SetActive(true);
-                if (slotData.cramponLevel > 1 && PlayerPrefs.GetInt("UseBasicCrampons") == 1)
+                logger.LogInfo($"crampon level: {slotData.cramponLevel}");
+                if (slotData.cramponLevel <= 2)
                 {
-                    logger.LogInfo("Showing 10-point crampons");
-                    npcEvents.cramponsEditionTxt.text = "10-";
-                    npcEvents.cabinCrampons_10Point.SetActive(true);
-                    npcEvents.cabinCrampons_6Point.SetActive(false);
+                    if (PlayerPrefs.GetInt("UseBasicCrampons") == 1)
+                    {
+                        logger.LogInfo("Showing 10-point crampons");
+                        npcEvents.cramponsEditionTxt.text = "10-";
+                        npcEvents.cabinCrampons_10Point.SetActive(true);
+                        npcEvents.cabinCrampons_6Point.SetActive(false);
+                    }
+                    else
+                    {
+                        logger.LogInfo("Showing 6-point crampons");
+                        npcEvents.cramponsEditionTxt.text = "6-";
+                        npcEvents.cabinCrampons_6Point.SetActive(true);
+                        npcEvents.cabinCrampons_10Point.SetActive(false);
+                    }
                 }
                 else
                 {
                     logger.LogInfo("Showing 6-point crampons");
+                    PlayerPrefs.SetInt("UseBasicCrampons", 1);
                     npcEvents.cramponsEditionTxt.text = "6-";
                     npcEvents.cabinCrampons_6Point.SetActive(true);
                     npcEvents.cabinCrampons_10Point.SetActive(false);
                 }
+
             }
             else
             {

@@ -254,7 +254,8 @@ namespace PeaksOfArchipelago.GameData
         Coffee,
         Lamp,
         leftHand,
-        RightHand
+        RightHand,
+        IceAxes
     }
     public enum Artefacts
     {

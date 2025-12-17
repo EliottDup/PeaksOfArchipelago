@@ -25,6 +25,7 @@ namespace PeaksOfArchipelago.MonoBehaviours
             Notification notificationScript = notification.AddComponent<Notification>();
             if (notificationScript)
             {
+                notification.SetActive(true);
                 notificationScript.Init(message, notifLocation.transform, transform.position + Vector3.up * 500f);
             }
         }

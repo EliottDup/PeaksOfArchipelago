@@ -4,6 +4,7 @@ using PeaksOfArchipelago.GameData;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace PeaksOfArchipelago.GameData
 {
@@ -159,9 +160,12 @@ namespace PeaksOfArchipelago.GameData
                     {
                         GameManager.control.crampons = true;
                         slotData.cramponLevel = 1;
+                        PeaksOfArchipelago.Logger.LogInfo("Crampons level set to 1");
                     }
                     else if (slotData.cramponLevel == 1)
                     {
+                        PeaksOfArchipelago.Logger.LogInfo("Crampons level set to 2");
+                        PlayerPrefs.SetInt("UseBasicCrampons", 0);
                         GameManager.control.cramponsUpgrade = true;
                         slotData.cramponLevel = 2;
                     }
@@ -192,6 +196,9 @@ namespace PeaksOfArchipelago.GameData
                     break;
                 case Tools.leftHand:
                     slotData.ReceiveTool(Tools.leftHand);
+                    break;
+                case Tools.IceAxes:
+                    GameManager.control.iceAxes = true;
                     break;
             }
             GameManager.control.Save();

@@ -37,5 +37,6 @@ namespace PeaksOfArchipelago.GameData
         bool IsJournalPageUnlocked(int v, Books b);
         Peaks BookPageToPeaks(int page, Books book);
         Color GetJournalPageColor(int v, Books b);
+        int GetTotalExtraBirdSeedCount();
     }
 }

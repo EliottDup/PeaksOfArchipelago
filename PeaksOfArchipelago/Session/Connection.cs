@@ -132,6 +132,10 @@ namespace PeaksOfArchipelago.Session
             if (instantCollectItems.Count > 0)
             {
                 logger.LogInfo("Collecting previously unlocked items...");
+                GameManager.control.ropesCollected = 0;
+                GameManager.control.extraChalkUses = 0;
+                GameManager.control.extraCoffeeUses = 0;
+                GameManager.control.extraBirdSeedUses = 0;
                 foreach (ItemInfo item in instantCollectItems)
                 {
                     logger.LogInfo($"Unlocking Item: {item.ItemName}");
@@ -140,7 +144,8 @@ namespace PeaksOfArchipelago.Session
 
                 if (instantCollectItems.Count != session.DataStorage["ItemCount"])
                 {
-                    logger.LogInfo($"Warning: Item count mismatch! Expected {session.DataStorage["ItemCount"]}, got {instantCollectItems.Count}");
+                    logger.LogInfo($"Warning: Item count mismatch! Expected {session.DataStorage["ItemCount"]}, " +
+                        $"got {instantCollectItems.Count}");
                 }
                 itemCount += instantCollectItems.Count;
                 session.DataStorage["ItemCount"] = itemCount;
@@ -162,6 +167,7 @@ namespace PeaksOfArchipelago.Session
                     uncollectedItems.Clear();
                 }
             }
+            GameManager.control.Save();
             handler.LoadProgress();
         }
 
@@ -222,13 +228,13 @@ namespace PeaksOfArchipelago.Session
             {
                 return;
             }
-            if (scoutedItems != null && scoutedItems.ContainsKey(locationID))
+            if (scoutedItems != null && scoutedItems.ContainsKey(locationID) 
+                && session.Locations.AllMissingLocations.Contains(locationID))
             {
-            ScoutedItemInfo item = scoutedItems[locationID];
-            PeaksOfArchipelago.ui.SendNotification($"Found {item.Player.Name}'s {item.ItemName}");
+                ScoutedItemInfo item = scoutedItems[locationID];
+                PeaksOfArchipelago.ui.SendNotification($"Found {item.Player.Name}'s {item.ItemName}");
             }
-                
-            // Notify player somehow
+
             session.Locations.CompleteLocationChecks(locationID);
         }
     }

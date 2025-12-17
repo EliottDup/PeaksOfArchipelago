@@ -17,11 +17,11 @@ namespace PeaksOfArchipelago.MonoBehaviours
         public void Awake()
         {
             logger = PeaksOfArchipelago.Logger;
-            canvas = FindObjectOfType<Canvas>();
         }
-
-        private void Start()
+        
+        public void Initialize(Canvas c)
         {
+            canvas = c;
             CreateChatBox();
         }
 

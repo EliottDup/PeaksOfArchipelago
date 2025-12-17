@@ -79,4 +79,25 @@ namespace PeaksOfArchipelago.Patches
             Connection.Instance.CompleteRopeLocation(rope);
         }
     }
+
+    [HarmonyPatch(typeof(RopeAnchor))]
+    internal class RopeAnchorPatch
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("Start")]
+        public static void Prefix(RopeAnchor __instance)
+        {
+            GameManager.control.ropesCollected = 0;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("Start")]
+        public static void Postfix(RopeAnchor __instance)
+        {
+            int ropeCount = Connection.Instance.slotData.GetTotalRopeCount();
+            __instance.anchorsInBackpack = ropeCount;
+            GameManager.control.ropesCollected = ropeCount;
+            __instance.UpdateRopesCollected();
+        }
+    }
 }

@@ -25,16 +25,31 @@ namespace PeaksOfArchipelago.UI
 
         private void MakeUI()
         {
-            canvas = GameObject.FindObjectOfType<Canvas>();
+            Canvas[] canvases = GameObject.FindObjectsOfType<Canvas>();
+            foreach (Canvas c in canvases)
+            {
+                if (c.isActiveAndEnabled)
+                {
+                    canvas = c;
+                    logger.LogInfo("Canvas found: " + c.name + "\nParents: " + c.transform.parent?.name);
+                    if ((c.transform.parent == null || c.transform.parent.name.ToLower() == "sceneobjects")
+                        && canvas.name.ToLower() == "canvas")
+                    {
+                        logger.LogInfo("root canvas found ^W^");
+                        break;
+                    }
+                }
+            }
             if (canvas == null)
             {
                 logger.LogError("Canvas not found!");
                 return;
             }
 
-            // Make ChatBox
+             //Make ChatBox
             chatBoxObject = new GameObject("UIManager_ScriptHolder");
             chat = chatBoxObject.AddComponent<ChatBox>();
+            chat.Initialize(canvas);
             notificationSystemObject = GameObject.Instantiate(PeaksOfAssets.Notificator, canvas.transform);
 
             // Make Notification System

@@ -61,10 +61,6 @@ namespace PeaksOfArchipelago.GameData
 
         public void ReceiveTool(Tools tool)
         {
-            if (tool == Tools.ProgressiveCrampons)
-            {
-                cramponLevel++;
-            }
             unlockedTools.Add(tool);
         }
 
@@ -106,6 +102,19 @@ namespace PeaksOfArchipelago.GameData
 
             ropeCount += extraItemCounts[ExtraItems.ExtraRope];
             return ropeCount;
+        }
+
+        public int GetTotalExtraBirdSeedCount()
+        {
+            int count = GetExtraItemCount(ExtraItems.ExtraSeed);
+            for (int i = 0; i <= (int)BirdSeeds.ExtraSeed5; i++)
+            {
+                if (unlockedBirdSeeds.Contains((BirdSeeds)i))
+                {
+                    count++;
+                }
+            }
+            return count;
         }
 
         public int GetTotalCoffeeCount()
