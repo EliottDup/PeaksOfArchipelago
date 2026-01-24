@@ -13,6 +13,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace PeaksOfArchipelago;
 
@@ -988,42 +989,43 @@ public class PeaksOfArchipelagoMod : ModClass
         }
     }
 
-    //------------------------- Harmony Transpilers -------------------------
-    //! THESE ARE THE THINGS THAT MIGHT BREAK WHEN UPDATING THE GAME!!
-
     [HarmonyPatch(typeof(RopeAnchor), "Start")]
-    public class StartTranspiler
+    public class RopeAnchorStartPatch
     {
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-        {
-            var codes = new List<CodeInstruction>(instructions);
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (i == 76 || i == 77 || i == 78)
-                {
-                    // logger.LogInfo("Disabled line " + i + " : " + codes[i].ToString());
-                    continue;
-                }
-                yield return codes[i];
+        static void Prefix(out int __state) {
+            __state = GameManager.control.ropesCollected;
+        }
+
+        static void Postfix(int __state) {
+            if (GameManager.control.ropesCollected < __state) {
+                GameManager.control.ropesCollected = __state;
             }
         }
     }
+
+    //------------------------- Harmony Transpilers -------------------------
+    //! THESE ARE THE THINGS THAT MIGHT BREAK WHEN UPDATING THE GAME!!
 
     [HarmonyPatch(typeof(RopeAnchor), "DetachThenAttachToNew", MethodType.Enumerator)]
     public class DetachThenAttachToNewTranspiler
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            var codes = new List<CodeInstruction>(instructions);
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (i == 120 || i == 121 || i == 122 || i == 123)
-                {
-                    // logger.LogInfo("Disabled line " + i + " : " + codes[i].ToString());
-                    continue;
-                }
-                yield return codes[i];
-            }
+
+            var matcher = new CodeMatcher(instructions);
+
+            // stop it from freaking out when there's 100+ anchors
+            matcher
+            .MatchForward(false,
+                new CodeMatch(OpCodes.Ldloc_1),
+                new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(RopeAnchor), nameof(RopeAnchor.anchorsInBackpack))),
+                new CodeMatch(OpCodes.Ldc_I4_S),
+                new CodeMatch(OpCodes.Bge)
+            )
+            .ThrowIfInvalid("failed to find <100 check in DetachThenAttachToNew")
+            .RemoveInstructions(4);
+
+            return matcher.Instructions();
         }
     }
 
@@ -1032,16 +1034,19 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            var codes = new List<CodeInstruction>(instructions);
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (i == 79 || i == 80 || i == 81 || i == 82)
-                {
-                    // logger.LogInfo("Disabled line " + i + " : " + codes[i].ToString());
-                    continue;
-                }
-                yield return codes[i];
-            }
+            var matcher = new CodeMatcher(instructions);
+
+            // stop it from freaking out when there's 100+ anchors
+            matcher
+            .MatchForward(false,
+                new CodeMatch(OpCodes.Ldloc_1),
+                new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(RopeAnchor), nameof(RopeAnchor.anchorsInBackpack))),
+                new CodeMatch(OpCodes.Ldc_I4_S),
+                new CodeMatch(OpCodes.Bge))
+            .ThrowIfInvalid("failed to find <100 check in PullOutAnchor")
+            .RemoveInstructions(4);
+
+            return matcher.Instructions();
         }
     }
 
@@ -1050,16 +1055,24 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            var codes = new List<CodeInstruction>(instructions);
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (i == 267 || i == 268 || i == 269 || i == 270)
-                {
-                    // logger.LogInfo("Disabled line " + i + " : " + codes[i].ToString());
-                    continue;   // this stops ropes on peaks from disappearing if you have 42+ ropes
-                }
-                yield return codes[i];
-            }
+            var matcher = new CodeMatcher(instructions);
+
+            // stop it from from removing ropes from peaks when 42+ have been collected
+            matcher
+            .End()
+            .MatchBack(false,
+                new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(GameManager), nameof(GameManager.ropesCollected))),
+                new CodeMatch(),
+                new CodeMatch(),
+                new CodeMatch(OpCodes.Ldarg_0),
+                new CodeMatch(OpCodes.Call, AccessTools.DeclaredPropertyGetter(typeof(Component), nameof(Component.gameObject))),
+                new CodeMatch(OpCodes.Ldc_I4_0),
+                new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(GameObject), nameof(GameObject.SetActive))))
+            .ThrowIfInvalid("failed to find collected rope amount check in CheckRope")
+            .Advance(3)
+            .RemoveInstructions(4);
+
+            return matcher.Instructions();
         }
     }
 
@@ -1068,16 +1081,24 @@ public class PeaksOfArchipelagoMod : ModClass
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            var codes = new List<CodeInstruction>(instructions);
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (i == 83 || i == 84 || i == 85 || i == 86)
-                {
-                    // logger.LogInfo("Disabled line " + i + " : " + codes[i].ToString());
-                    continue;   // this stops bird seeds on peaks from disappearing if you have 5+ seeds
-                }
-                yield return codes[i];
-            }
+            var matcher = new CodeMatcher(instructions);
+
+            // stop it from from removing bird seeds from peaks when 5+ have been collected
+            matcher
+            .End()
+            .MatchBack(false,
+                new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(GameManager), nameof(GameManager.extraBirdSeedUses))),
+                new CodeMatch(),
+                new CodeMatch(),
+                new CodeMatch(OpCodes.Ldarg_0),
+                new CodeMatch(OpCodes.Call, AccessTools.DeclaredPropertyGetter(typeof(Component), nameof(Component.gameObject))),
+                new CodeMatch(OpCodes.Ldc_I4_0),
+                new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(GameObject), nameof(GameObject.SetActive))))
+            .ThrowIfInvalid("failed to find collected bird seed amount check in CheckBirdSeed")
+            .Advance(3)
+            .RemoveInstructions(4);
+
+            return matcher.Instructions();
         }
     }
 }
