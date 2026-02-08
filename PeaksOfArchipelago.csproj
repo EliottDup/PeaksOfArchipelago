@@ -2,7 +2,7 @@
     <Import Project="Local.settings.props" Condition="Exists('Local.settings.props')" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <AssemblyName>PeaksOfArchipelago</AssemblyName>
     <Product>Peaks Of Archipelago</Product>
     <Version>1.7.1</Version>
