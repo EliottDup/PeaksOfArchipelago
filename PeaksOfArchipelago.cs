@@ -62,7 +62,7 @@ public class PeaksOfArchipelagoMod : ModClass
     [Editable] public string Port { get; set; } = "123456";
     [Editable] public string SlotName { get; set; } = "";
     [Editable] public string Password { get; set; } = "";
-    [Editable] public bool AutoConnect { get; set; } = false;
+    public bool AutoConnect { get; set; } = false;
     [Editable] public UnityEvent Connect { get; set; } = new UnityEvent();
 
     private bool justConnected = false;
@@ -92,7 +92,7 @@ public class PeaksOfArchipelagoMod : ModClass
         Connect.AddListener(OnConnect);
         if (AutoConnect)
         {
-            OnConnect();
+            // OnConnect();
         }
         logger.LogInfo("Enabled Peaks of Archipelago!");
     }
@@ -992,12 +992,15 @@ public class PeaksOfArchipelagoMod : ModClass
     [HarmonyPatch(typeof(RopeAnchor), "Start")]
     public class RopeAnchorStartPatch
     {
-        static void Prefix(out int __state) {
+        static void Prefix(out int __state)
+        {
             __state = GameManager.control.ropesCollected;
         }
 
-        static void Postfix(int __state) {
-            if (GameManager.control.ropesCollected < __state) {
+        static void Postfix(int __state)
+        {
+            if (GameManager.control.ropesCollected < __state)
+            {
                 GameManager.control.ropesCollected = __state;
             }
         }
