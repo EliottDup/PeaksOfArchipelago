@@ -79,6 +79,10 @@ class POASession(PlayerData playerData)
         {
             deathLinkTraps = Convert.ToInt32(tmp) == 1;
         }
+        else
+        {
+            logger.LogInfo("deathlink traps not found in slot data, defaulting to false");
+        }
 
 
         if (loginSuccessful.SlotData.TryGetValue("deathLink", out var enableDeathLink))
@@ -106,9 +110,19 @@ class POASession(PlayerData playerData)
                 }
             }
         }
+        else
+        {
+            logger.LogInfo("deathlink not found in slot data, defaulting to false");
+        }
+
         if (loginSuccessful.SlotData.TryGetValue("ropeUnlockMode", out var ropeUnlockMode))
         {
             instantRope = Convert.ToInt32(ropeUnlockMode) == 0;
+        }
+        else
+        {
+            logger.LogInfo("rope unlock mode not found in slot data, defaulting to normal");
+            instantRope = false;
         }
 
         if (loginSuccessful.SlotData.TryGetValue("gameMode", out var gameMode))
@@ -127,6 +141,14 @@ class POASession(PlayerData playerData)
                 {
                     playerData.items.books.SetCheck(book, true);
                 }
+            }
+        }
+        else
+        {
+            logger.LogInfo("game mode not found in slot data, defaulting to book unlock");
+            foreach (Peaks peak in Enum.GetValues(typeof(Peaks)))
+            {
+                playerData.items.peaks.SetCheck(peak, true);
             }
         }
 
