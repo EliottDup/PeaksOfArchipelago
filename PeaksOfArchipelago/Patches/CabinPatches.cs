@@ -30,6 +30,37 @@ namespace PeaksOfArchipelago.Patches
         }
     }
 
+    [HarmonyPatch(typeof(DisableCabin4Flag))]
+    internal class STGatewayPatches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch("CheckFlag")]
+        public static void STGatewayEnabler(DisableCabin4Flag __instance)
+        {
+            __instance.solemnTempestGateway.SetActive(Connection.Instance.slotData.HasPeak(Peaks.SolemnTempest));
+        }
+    }
+
+    [HarmonyPatch(typeof(Cabin4Map))]
+    internal class STGatewayEnabler
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("Update")]
+        public static void STEnablePrefix(out bool __state)
+        {
+            __state = GameManager.control.greatbulwark;
+            GameManager.control.greatbulwark = Connection.Instance.slotData.HasPeak(Peaks.SolemnTempest);
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("Update")]
+        public static void STEnablePostfix(bool __state)
+        {
+            GameManager.control.greatbulwark = __state;
+        }
+    }
+
+
     // Fundamentals blocking
 
     [HarmonyPatch(typeof(PeakSelection))]

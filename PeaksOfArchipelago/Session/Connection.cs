@@ -146,10 +146,11 @@ namespace PeaksOfArchipelago.Session
 
                 if (instantCollectItems.Count != session.DataStorage["ItemCount"])
                 {
-                    logger.LogInfo($"Warning: Item count mismatch! Expected {session.DataStorage["ItemCount"]}, " +
+                    int count = session.DataStorage["ItemCount"];
+                    logger.LogInfo($"Warning: Item count mismatch! Expected {count}, " +
                         $"got {instantCollectItems.Count}");
                 }
-                itemCount += instantCollectItems.Count;
+                //itemCount += instantCollectItems.Count;
                 session.DataStorage["ItemCount"] = itemCount;
                 instantCollectItems.Clear();
             }

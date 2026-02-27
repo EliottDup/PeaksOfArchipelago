@@ -14,7 +14,9 @@ namespace PeaksOfArchipelago.CabinHandlers
 
         public override void LoadProgress()
         {
-            GameManager.control.greatbulwark = slotData.HasPeak(Peaks.SolemnTempest);
+            logger.LogInfo("Loading progress for Expert Cabin");
+
+            //bulwark disabling
             Category4CabinLeave cabinLeave = GameObject.FindObjectOfType<Category4CabinLeave>();
             if (cabinLeave == null)
             {
