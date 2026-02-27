@@ -28,29 +28,7 @@ namespace PeaksOfArchipelago.Patches
 
             Connection.Instance.CompletePeakLocation(peak);
 
-            HashSet<Peaks> FSPeaks = new HashSet<Peaks>()
-            {
-                Peaks.WalkersPillar,
-                Peaks.Eldenhorn,
-                Peaks.GreatGaol,
-                Peaks.StHaelga,
-                Peaks.YmirsShadow,
-                Peaks.GreatBulwark,
-                Peaks.SolemnTempest,
-                Peaks.EinvaldFalls,
-                Peaks.AlmattrDam,
-                Peaks.Dunderhorn,
-                Peaks.MhorDruim,
-                Peaks.WelkinPass,
-                Peaks.SeigrCraeg,
-                Peaks.UllrsChasm,
-                Peaks.GreatSilf,
-                Peaks.ToweringVisir,
-                Peaks.EldrisWall,
-                Peaks.MountMhorgorm
-            };
-
-            if (FSPeaks.Contains(peak) && GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().ropesPlacedDuringMap == 0)
+            if (Mappings.HasFreeSolo(peak) && GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().ropesPlacedDuringMap == 0)
             {
                 Connection.Instance.CompleteFSPeakLocation(peak);
             }

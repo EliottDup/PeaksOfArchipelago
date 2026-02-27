@@ -261,6 +261,7 @@
 		<Compile Include="CabinHandlers\BaseCabinHandler.cs" />
 		<Compile Include="CabinHandlers\CabinHandler.cs" />
 		<Compile Include="CabinHandlers\ExpertCabinHandler.cs" />
+		<Compile Include="Extensions\DeepFind.cs" />
 		<Compile Include="GameData\ArchipelagoItem.cs" />
 		<Compile Include="GameData\Constants.cs" />
 		<Compile Include="GameData\ArchipelagoLocation.cs" />
@@ -272,6 +273,7 @@
 		<Compile Include="GameData\SlotData.cs" />
 		<Compile Include="MonoBehaviours\Notification.cs" />
 		<Compile Include="MonoBehaviours\Notificator.cs" />
+		<Compile Include="MonoBehaviours\ProgressDisplay.cs" />
 		<Compile Include="Patches\AchievementBlockPatches.cs" />
 		<Compile Include="Patches\CabinPatches.cs" />
 		<Compile Include="Patches\LocationDetectionPatches.cs" />

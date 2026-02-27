@@ -17,6 +17,10 @@ namespace PeaksOfArchipelago.Assets
         public static GameObject Notificator { get; private set; }
         public static GameObject Notification { get; private set; }
 
+        public static GameObject ProgressDisplay { get; private set; }
+        public static GameObject BookEntryPrefab { get; private set; }
+        public static GameObject PeakEntryPrefab { get; private set; }
+
         public static void LoadAssets()
         {
             if (loaded) return;
@@ -32,6 +36,10 @@ namespace PeaksOfArchipelago.Assets
 
             Notificator = assetBundle.LoadAsset<GameObject>("NotificationMaker");
             Notification = assetBundle.LoadAsset<GameObject>("Notification");
+
+            ProgressDisplay = assetBundle.LoadAsset<GameObject>("ProgressDisplay");
+            BookEntryPrefab = assetBundle.LoadAsset<GameObject>("BookPanel");
+            PeakEntryPrefab = assetBundle.LoadAsset<GameObject>("PeakEntry");
 
             PeaksOfArchipelago.Logger.LogInfo("Assets Loaded");
             loaded = true;

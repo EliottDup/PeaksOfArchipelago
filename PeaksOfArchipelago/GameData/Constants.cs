@@ -1,5 +1,7 @@
 ﻿
 
+using System.Text.RegularExpressions;
+
 namespace PeaksOfArchipelago.GameData
 {
     internal class Offsets
@@ -156,6 +158,217 @@ namespace PeaksOfArchipelago.GameData
         internal static long GetTAHoldsLocationID(Peaks peak)
         {
             return (long)peak + Offsets.TAHoldsIDOffset;
+        }
+    }
+
+    internal static class Mappings
+    {
+        private static readonly Dictionary<Books, String> bookNames = new Dictionary<Books, String>()
+        {
+            { Books.Fundamentals, "Fundamentals" },
+            { Books.Intermediate, "Intermediate" },
+            { Books.Advanced, "Advanced" },
+            { Books.Expert, "Expert" }
+        };
+
+        private static readonly Dictionary<Books, List<Peaks>> BookPeakMappings = new Dictionary<Books, List<Peaks>>()
+        {
+            { Books.Fundamentals, new List<Peaks>(){ 
+                Peaks.GreenhornsTop, 
+                Peaks.PaltryPeak,
+                Peaks.OldMill, 
+                Peaks.GrayGully,
+                Peaks.Lighthouse,
+                Peaks.OldManOfSjor,
+                Peaks.GiantsShelf,
+                Peaks.EvergreensEnd,
+                Peaks.TheTwins,
+                Peaks.OldGrovesSkelf,
+                Peaks.HangmansLeap,
+                Peaks.LandsEnd,
+                Peaks.OldLangr,
+                Peaks.AldrGrotto,
+                Peaks.ThreeBrothers,
+                Peaks.WaltersCrag,
+                Peaks.GreatCrevice,
+                Peaks.OldHagger,
+                Peaks.UgsomeStorr,
+                Peaks.WutheringCrest,
+            } },
+            { Books.Intermediate, new List<Peaks>(){ 
+                Peaks.PortersBoulders,
+                Peaks.JotunnsThumb,
+                Peaks.OldSkerry,
+                Peaks.HamarrStone,
+                Peaks.GiantsNose,
+                Peaks.WaltersBoulder,
+                Peaks.SunderedSons,
+                Peaks.OldWealdsBoulder,
+                Peaks.LeaningSpire,
+                Peaks.Cromlech,
+            } },
+            { Books.Advanced, new List<Peaks>(){
+                Peaks.WalkersPillar,
+                Peaks.GreatGaol,
+                Peaks.Eldenhorn,
+                Peaks.StHaelga,
+                Peaks.YmirsShadow,
+            } },
+            { Books.Expert, new List<Peaks>(){ 
+                Peaks.GreatBulwark,
+                Peaks.SolemnTempest
+            } }
+        };
+
+        private static readonly Dictionary<Peaks, List<long>> PeakIdMappings = new Dictionary<Peaks, List<long>>()
+        {
+            {Peaks.OldMill, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Hat1)
+            }},
+            {Peaks.GrayGully, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Photograph_1)
+            }},
+            {Peaks.OldManOfSjor, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Shoe), 
+                LocationIDs.GetRopeLocationID(Ropes.ExtraFirst)
+            }},
+            {Peaks.GiantsShelf, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Sleepingbag)
+            }},
+            {Peaks.EvergreensEnd, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Hat2),
+                LocationIDs.GetRopeLocationID(Ropes.Extra10)
+            }},
+            {Peaks.OldGrovesSkelf, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Helmet)
+            }},
+            {Peaks.LandsEnd, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Photograph_2),
+                LocationIDs.GetRopeLocationID(Ropes.Extra9)
+            }},
+            {Peaks.HangmansLeap, new List<long>(){
+                LocationIDs.GetRopeLocationID(Ropes.ExtraSecond)
+            }},
+            {Peaks.OldLangr, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Coffebox_1)
+            }},
+            {Peaks.AldrGrotto, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Backpack)
+            }},
+            {Peaks.ThreeBrothers, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Shovel),
+                LocationIDs.GetBirdSeedLocationID(BirdSeeds.ExtraSeed1)
+            }},
+            {Peaks.WaltersCrag, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.ClimberStatue0),
+                LocationIDs.GetRopeLocationID(Ropes.WaltersCrag),
+                LocationIDs.GetRopeLocationID(Ropes.Extra8)
+            }},
+            {Peaks.GreatCrevice, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Photograph_3),
+                LocationIDs.GetRopeLocationID(Ropes.Extra11)
+            }},
+            {Peaks.OldHagger, new List<long>(){
+                LocationIDs.GetRopeLocationID(Ropes.Extra12)
+            }},
+            {Peaks.UgsomeStorr, new List<long>(){
+                LocationIDs.GetRopeLocationID(Ropes.ExtraThird)
+            }},
+            {Peaks.WutheringCrest, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Coffebox_2),
+                LocationIDs.GetRopeLocationID(Ropes.Extra6)
+            }},
+            {Peaks.OldSkerry, new List<long>(){
+                LocationIDs.GetBirdSeedLocationID(BirdSeeds.ExtraSeed2)
+            }},
+            {Peaks.LeaningSpire, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.ClimberStatue1)
+            }},
+            {Peaks.WalkersPillar, new List<long>(){
+                LocationIDs.GetRopeLocationID(Ropes.WalkersPillar),
+                LocationIDs.GetArtefactLocationID(Artefacts.Chalkbox_1)
+            }},
+            {Peaks.Eldenhorn, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Chalkbox_2),
+                LocationIDs.GetRopeLocationID(Ropes.ExtraFourth),
+                LocationIDs.GetBirdSeedLocationID(BirdSeeds.ExtraSeed4)
+            }},
+            {Peaks.GreatGaol, new List<long>(){ 
+                LocationIDs.GetArtefactLocationID(Artefacts.PhotographFrame),
+                LocationIDs.GetRopeLocationID(Ropes.GreatGaol),
+                LocationIDs.GetRopeLocationID(Ropes.Extra7),
+                LocationIDs.GetBirdSeedLocationID(BirdSeeds.ExtraSeed3)
+            }},
+            {Peaks.StHaelga, new List<long>(){
+                LocationIDs.GetRopeLocationID(Ropes.StHaelga),
+                LocationIDs.GetArtefactLocationID(Artefacts.Photograph_4)
+            }},
+            {Peaks.YmirsShadow, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.ClimberStatue2),
+                LocationIDs.GetRopeLocationID(Ropes.Extra5),
+                LocationIDs.GetBirdSeedLocationID(BirdSeeds.ExtraSeed5)
+            }},
+            {Peaks.GreatBulwark, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.ClimberStatue3)
+            }},
+        };
+
+        private static readonly HashSet<Peaks> FSPeaks = new HashSet<Peaks>()
+            {
+                Peaks.WalkersPillar,
+                Peaks.Eldenhorn,
+                Peaks.GreatGaol,
+                Peaks.StHaelga,
+                Peaks.YmirsShadow,
+                Peaks.GreatBulwark,
+                Peaks.SolemnTempest,
+                Peaks.EinvaldFalls,
+                Peaks.AlmattrDam,
+                Peaks.Dunderhorn,
+                Peaks.MhorDruim,
+                Peaks.WelkinPass,
+                Peaks.SeigrCraeg,
+                Peaks.UllrsChasm,
+                Peaks.GreatSilf,
+                Peaks.ToweringVisir,
+                Peaks.EldrisWall,
+                Peaks.MountMhorgorm
+            };
+
+        private static readonly HashSet<Peaks> NoTAPeaks = new HashSet<Peaks>()
+        {
+            Peaks.GreatBulwark,
+            Peaks.SolemnTempest
+        };
+
+        public static string GetBookName(Books book)
+        {
+            return bookNames[book];
+        }
+
+        public static string GetPeakName(Peaks peak)
+        {
+            return Regex.Replace(peak.ToString(), "(\\B[A-Z])", " $1");
+        }
+
+        public static List<Peaks> GetBookPeaks(Books book)
+        {
+            return BookPeakMappings[book];
+        }
+
+        public static List<long> GetPeakLocations(Peaks peak)
+        {
+            return PeakIdMappings.ContainsKey(peak) ? PeakIdMappings[peak] : new List<long>();
+        }
+
+        public static bool HasFreeSolo(Peaks peak)
+        {
+            return FSPeaks.Contains(peak);
+        }
+
+        public static bool HasTimeAttack(Peaks peak)
+        {
+            return !NoTAPeaks.Contains(peak);
         }
     }
 

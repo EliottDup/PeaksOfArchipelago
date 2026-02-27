@@ -45,6 +45,8 @@ namespace PeaksOfArchipelago.GameData
         public GameMode gameMode = GameMode.BOOK_UNLOCK;
         public int booksEnabled = 0;
         public bool excludeST = false;
+        public bool includeFreeSolo = false;
+        public bool includeTimeAttack = false;
 
         public SessionSettings(bool deathLinkEnabled, RopeUnlockMode ropeUnlockMode, Goal goal, GameMode gameMode, int booksEnabled, bool excludeST)
         {
@@ -58,6 +60,7 @@ namespace PeaksOfArchipelago.GameData
 
         public SessionSettings(Dictionary<string, object> optionsDict)
         {
+            PeaksOfArchipelago.Logger.LogInfo("Loading session settings from options dict");
             foreach (string s in optionsDict.Keys)
             {
                 PeaksOfArchipelago.Logger.LogInfo($"Option key: {s}, value: {optionsDict[s].ToString()}");
@@ -68,18 +71,18 @@ namespace PeaksOfArchipelago.GameData
             goal = (Goal)LoadIntFromDict(optionsDict, "goal", Goal.ALL_PEAKS);
             gameMode = (GameMode)LoadIntFromDict(optionsDict, "gameMode", GameMode.BOOK_UNLOCK);
             excludeST = LoadIntFromDict(optionsDict, "disableSolemnTempest", true) == 1;
+            includeFreeSolo = LoadIntFromDict(optionsDict, "includeFreeSolo", false) == 1;
+            includeTimeAttack = LoadIntFromDict(optionsDict, "includeTimeAttack", false) == 1;
         }
 
         int LoadIntFromDict(Dictionary<string, object> dict, string v, object defaultValue)
         {
-            PeaksOfArchipelago.Logger.LogInfo($"Loading option {v}");
-            PeaksOfArchipelago.Logger.LogInfo($"from dict {dict.ToString()}");
             if (dict.TryGetValue(v, out var value))
             {
-                PeaksOfArchipelago.Logger.LogInfo($"Found option {v} with value {value}");
+                PeaksOfArchipelago.Logger.LogInfo($"{v}: {value}");
                 return Convert.ToInt32(value);
             }
-            PeaksOfArchipelago.Logger.LogInfo($"Option {v} not found, using default {defaultValue}");
+            PeaksOfArchipelago.Logger.LogWarning($"{v} not found, defaulting to {defaultValue}");
             return Convert.ToInt32(defaultValue);
         }
 

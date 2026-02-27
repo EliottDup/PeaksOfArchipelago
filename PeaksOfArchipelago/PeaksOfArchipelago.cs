@@ -71,14 +71,15 @@ namespace PeaksOfArchipelago
                 UIManager.CreateLoginUI(AttemptLogin);
             }
 
-            ui.OnSceneLoaded();
             Logger.LogInfo($"Loaded scene index: {scene.buildIndex}");
+
+            if (connection == null && scene.buildIndex != 0) throw new Exception("How tf did you enter the game without connecting??");
             // Scene buildIndex:
             // 0 = Main Menu
             // 1 = Cabin
             // 37 = Cabin4
             // 67 = Alpine Express/alps cabin
-            if (connection == null && scene.buildIndex != 0) throw new Exception("How tf did you enter the game without connecting??");
+            ui.OnSceneLoaded(connection);
             switch (scene.buildIndex)
             {
                 case 0:

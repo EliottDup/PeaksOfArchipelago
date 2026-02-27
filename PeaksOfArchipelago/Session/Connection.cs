@@ -23,6 +23,7 @@ namespace PeaksOfArchipelago.Session
         public ISlotData slotData;
         private List<ItemInfo> uncollectedItems;
         private List<ItemInfo> instantCollectItems;
+        internal SessionSettings settings;
 
         private Dictionary<long, ScoutedItemInfo> scoutedItems;
 
@@ -118,7 +119,8 @@ namespace PeaksOfArchipelago.Session
         {
             // init this.slotData
             // This does not actually apply the loaded data to the GameManager (because that would break save 1 for some reason I think)
-            this.slotData = new SlotData(new SessionSettings(slotOptions));
+            settings = new SessionSettings(slotOptions);
+            this.slotData = new SlotData(settings);
 
             itemCount = (int)session.DataStorage["ItemCount"];
             instantCollectItems = [.. session.Items.AllItemsReceived.Where(item => item.ItemName != "Trap").Take(itemCount)];
@@ -236,6 +238,11 @@ namespace PeaksOfArchipelago.Session
             }
 
             session.Locations.CompleteLocationChecks(locationID);
+        }
+
+        internal bool HasLocation(long v)
+        {
+            return session != null && !session.Locations.AllMissingLocations.Contains(v);
         }
     }
 }

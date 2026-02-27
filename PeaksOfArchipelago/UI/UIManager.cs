@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using PeaksOfArchipelago.Assets;
 using PeaksOfArchipelago.MonoBehaviours;
+using PeaksOfArchipelago.Session;
 using UnityEngine;
 using UnityEngine.UI;
 using Font = UnityEngine.Font;
@@ -12,11 +13,13 @@ namespace PeaksOfArchipelago.UI
         private static Font _gameFont;
 
         private Canvas canvas;
-        private GameObject chatBoxObject;
+        private GameObject scriptholder;
         private ManualLogSource logger;
         private ChatBox chat;
         private GameObject notificationSystemObject;
         private Notificator notificationSystem;
+
+        private ProgressDisplay progressDisplay;
 
         public UIManager()
         {
@@ -47,8 +50,8 @@ namespace PeaksOfArchipelago.UI
             }
 
              //Make ChatBox
-            chatBoxObject = new GameObject("UIManager_ScriptHolder");
-            chat = chatBoxObject.AddComponent<ChatBox>();
+            scriptholder = new GameObject("UIManager_ScriptHolder");
+            chat = scriptholder.AddComponent<ChatBox>();
             chat.Initialize(canvas);
             notificationSystemObject = GameObject.Instantiate(PeaksOfAssets.Notificator, canvas.transform);
 
@@ -71,6 +74,16 @@ namespace PeaksOfArchipelago.UI
         public void OnSceneLoaded()
         {
             MakeUI();
+        }
+
+        internal void OnSceneLoaded(Connection connection)
+        {
+            MakeUI();
+            if (connection != null)
+            {
+                progressDisplay = scriptholder.AddComponent<ProgressDisplay>();
+                progressDisplay.Initialize(canvas, connection);
+            }
         }
 
         public void OnSceneUnloaded()
