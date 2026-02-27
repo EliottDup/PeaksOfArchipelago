@@ -48,11 +48,7 @@ namespace PeaksOfArchipelago.CabinHandlers
 
             npcEvents.runningEvent = true;
             npcEvents.npcParcelDeliverySystem.StartCoroutine("FadeScreenAndStartUnpackEvent");
-
-            GameManager.control.ropesCollected -= 5;
-            GameManager.control.extraCoffeeUses -= 999999999;
-            GameManager.control.extraChalkUses -= 999999999;
-            GameManager.control.allArtefactsUnlocked = false;
+            // trust that the patches will correctly reverse any effects brought by this :P
             return true;
         }
 

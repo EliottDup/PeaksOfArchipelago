@@ -2,6 +2,7 @@
 using System.Reflection;
 using PeaksOfArchipelago.Session;
 using PeaksOfArchipelago.GameData;
+using System.Collections;
 using UnityEngine;
 
 namespace PeaksOfArchipelago.Patches
@@ -15,6 +16,28 @@ namespace PeaksOfArchipelago.Patches
         {
             PeaksOfArchipelago.Logger.LogInfo("Disabled Cabin CheckProgress!");
             return false;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("ItemEvents")]
+        public static void UndoAllArtefactsEffects(ref IEnumerator __result, NPCEvents __instance)
+        {
+            __result = Wrapper(__result, __instance);
+        }
+
+        private static IEnumerator Wrapper(IEnumerator original, NPCEvents __instance) {
+            while (original.MoveNext())
+            {
+                yield return original.Current;
+            }
+            if (__instance.eventName != "AllArtefacts")
+            {
+                GameManager.control.ropesCollected -= 5;
+                GameManager.control.extraCoffeeUses -= 999999999;
+                GameManager.control.extraChalkUses -= 999999999;
+                GameManager.control.allArtefactsUnlocked = false;
+            }
+            yield return null;
         }
     }
 
