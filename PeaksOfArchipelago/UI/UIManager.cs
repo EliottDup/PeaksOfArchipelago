@@ -29,20 +29,33 @@ namespace PeaksOfArchipelago.UI
         private void MakeUI()
         {
             Canvas[] canvases = GameObject.FindObjectsOfType<Canvas>();
+            Canvas kidNamedCanvas = null;
+            bool rootFound = false;
             foreach (Canvas c in canvases)
             {
                 if (c.isActiveAndEnabled)
                 {
                     canvas = c;
                     logger.LogInfo("Canvas found: " + c.name + "\nParents: " + c.transform.parent?.name);
+                    if (c.name.ToLower() == "canvas")
+                    {
+                        kidNamedCanvas = c;
+                    }
                     if ((c.transform.parent == null || c.transform.parent.name.ToLower() == "sceneobjects")
                         && canvas.name.ToLower() == "canvas")
                     {
                         logger.LogInfo("root canvas found ^W^");
+                        rootFound = true;
                         break;
                     }
                 }
             }
+
+            if (!rootFound)
+            {
+                canvas = kidNamedCanvas;
+            }
+
             if (canvas == null)
             {
                 logger.LogError("Canvas not found!");
