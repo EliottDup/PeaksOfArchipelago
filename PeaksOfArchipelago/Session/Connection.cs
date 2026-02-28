@@ -1,4 +1,5 @@
 ﻿using Archipelago.MultiClient.Net;
+using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.MessageLog.Parts;
@@ -7,6 +8,7 @@ using BepInEx.Logging;
 using PeaksOfArchipelago.CabinHandlers;
 using PeaksOfArchipelago.GameData;
 using PeaksOfArchipelago.UI;
+using System.Reflection;
 using UnityEngine;
 using static PeaksOfArchipelago.GameData.LocationIDs;
 using Color = UnityEngine.Color;
@@ -24,6 +26,9 @@ namespace PeaksOfArchipelago.Session
         private List<ItemInfo> uncollectedItems;
         private List<ItemInfo> instantCollectItems;
         internal SessionSettings settings;
+
+        DeathLinkService deathLinkService;
+        private bool playerKilled;
 
         private Dictionary<long, ScoutedItemInfo> scoutedItems;
 
@@ -88,6 +93,17 @@ namespace PeaksOfArchipelago.Session
             session.DataStorage["ItemCount"].Initialize(0);
 
             LoadData();
+            if (settings.deathLinkEnabled)
+            {
+                deathLinkService = session.CreateDeathLinkService();
+                deathLinkService.EnableDeathLink();
+
+                deathLinkService.OnDeathLinkReceived += (deathLinkObject) =>
+                {
+                    logger.LogInfo(deathLinkObject.Source + deathLinkObject.Cause);
+                    KillPlayer();
+                };
+            }
 
             // event listeners
             session.Items.ItemReceived += (ReceivedItemsHelper h) => OnItemReceived(h.AllItemsReceived.Last());
@@ -108,11 +124,44 @@ namespace PeaksOfArchipelago.Session
             return true;
         }
 
+        private void KillPlayer()
+        {
+            FallingEvent[] events = GameObject.FindObjectsOfType<FallingEvent>();
+            foreach (FallingEvent fallingEvent in events)
+            {
+                MethodInfo method = typeof(FallingEvent).GetMethod("FellToDeath", BindingFlags.NonPublic | BindingFlags.Instance);
+                if (method == null)
+                {
+                    return;
+                }
+                logger.LogInfo("killing player");
+                playerKilled = true;
+                method.Invoke(fallingEvent, null);
+            }
+            Climbing[] climbingScripts = GameObject.FindObjectsOfType<Climbing>();
+            foreach (Climbing climbing in climbingScripts)
+            {
+                climbing.ReleaseLHand(true);
+                climbing.ReleaseRHand(true);
+            }
+        }
+
         public async Task ScoutLocations()
         {
             logger.LogInfo("Scouting items");
             scoutedItems = await session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, [.. session.Locations.AllLocations]);
             logger.LogInfo("Items scouted");
+        }
+
+        internal void HandleDeath()
+        {
+            if (playerKilled)
+            {
+                playerKilled = false;
+                return;
+            }
+            logger.LogInfo("sending Deathlink");
+            deathLinkService?.SendDeathLink(new DeathLink(session.Players.GetPlayerAliasAndName(session.ConnectionInfo.Slot), "Fell off."))
         }
 
         private void LoadData()

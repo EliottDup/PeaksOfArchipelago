@@ -100,4 +100,16 @@ namespace PeaksOfArchipelago.Patches
             __instance.UpdateRopesCollected();
         }
     }
+    
+    [HarmonyPatch(typeof(FallingEvent))]
+    internal class DeathFallPatch
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch("FellToDeath")]
+        public static void Kill()
+        {
+            Connection.Instance?.HandleDeath();
+        }
+    }
+    
 }
