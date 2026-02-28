@@ -28,8 +28,25 @@ namespace PeaksOfArchipelago.UI
 
         private void MakeUI()
         {
+            
+            this.canvas = GetBestCanvas();
+
+             //Make ChatBox
+            scriptholder = new GameObject("UIManager_ScriptHolder");
+            chat = scriptholder.AddComponent<ChatBox>();
+            chat.Initialize(canvas);
+            notificationSystemObject = GameObject.Instantiate(PeaksOfAssets.Notificator, canvas.transform);
+
+            // Make Notification System
+            notificationSystem = notificationSystemObject.AddComponent<Notificator>();
+            notificationSystem.notificationPrefab = PeaksOfAssets.Notification;
+        }
+
+        private Canvas GetBestCanvas()
+        {
             Canvas[] canvases = GameObject.FindObjectsOfType<Canvas>();
             Canvas kidNamedCanvas = null;
+            Canvas canvas = null;
             bool rootFound = false;
             foreach (Canvas c in canvases)
             {
@@ -42,7 +59,7 @@ namespace PeaksOfArchipelago.UI
                         kidNamedCanvas = c;
                     }
                     if ((c.transform.parent == null || c.transform.parent.name.ToLower() == "sceneobjects")
-                        && canvas.name.ToLower() == "canvas")
+                        && c.name.ToLower() == "canvas")
                     {
                         logger.LogInfo("root canvas found ^W^");
                         rootFound = true;
@@ -59,18 +76,9 @@ namespace PeaksOfArchipelago.UI
             if (canvas == null)
             {
                 logger.LogError("Canvas not found!");
-                return;
+                throw new Exception("Error: could not find any canvas :P");
             }
-
-             //Make ChatBox
-            scriptholder = new GameObject("UIManager_ScriptHolder");
-            chat = scriptholder.AddComponent<ChatBox>();
-            chat.Initialize(canvas);
-            notificationSystemObject = GameObject.Instantiate(PeaksOfAssets.Notificator, canvas.transform);
-
-            // Make Notification System
-            notificationSystem = notificationSystemObject.AddComponent<Notificator>();
-            notificationSystem.notificationPrefab = PeaksOfAssets.Notification;
+            return canvas;
         }
 
         public void SendChatMessage(string message) {
