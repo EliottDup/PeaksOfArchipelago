@@ -94,13 +94,15 @@ namespace PeaksOfArchipelago.CabinHandlers
             book1.SetActive(slotData.HasBook(Books.Fundamentals));
             npcEvents.cabin_Category2.SetActive(slotData.HasBook(Books.Intermediate));
             npcEvents.cabin_Category3.SetActive(slotData.HasBook(Books.Advanced));
+            npcEvents.teaclothteacupObj.SetActive(!slotData.HasBook(Books.Advanced));
             npcEvents.cabinIceaxes.SetActive(slotData.HasBook(Books.Expert));
 
             // artefact loading
             ArtefactLoaderCabin alc = GameObject.FindObjectOfType<ArtefactLoaderCabin>();
 
-            Dictionary<Artefacts, GameObject> artefactsToGameObjects = new() // Can't really blame Andos for doing it this way, but I hate it :D
-            {   // It could have been done with a Hashmap or something (he even has a whole enum with all the artefacts)
+            Dictionary<Artefacts, GameObject> artefactsToGameObjects = new()
+            {   // Can't really blame Andos for doing it this way, but I hate it :D
+                // It could have been done with a Hashmap or something (he even has a whole enum with all the artefacts)
                 // but noooo, we have 20123 individual fields in GameManager.
                 // INSTEAD OF 3 HASHMAPS
                 {Artefacts.Hat1, alc.clean_hat1},
