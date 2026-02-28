@@ -123,9 +123,9 @@ namespace PeaksOfArchipelago.MonoBehaviours
             peaks[peak].FindDeep("COMPLETIONCHECK")?.gameObject.SetActive(peaked);
             peaks[peak].FindDeep("FREESOLOCHECK")?.gameObject.SetActive(fsComplete);
 
-            CanvasGroup cgTime = peaks[peak].FindDeep("TIMECHECK").GetComponent<CanvasGroup>();
-            CanvasGroup cgHolds = peaks[peak].FindDeep("HOLDSCHECK").GetComponent<CanvasGroup>();
-            CanvasGroup cgRopes = peaks[peak].FindDeep("ROPESCHECK").GetComponent<CanvasGroup>();
+            CanvasGroup cgTime = peaks[peak].FindDeep("TIMECHECK").gameObject.GetComponent<CanvasGroup>();
+            CanvasGroup cgHolds = peaks[peak].FindDeep("HOLDSCHECK").gameObject.GetComponent<CanvasGroup>();
+            CanvasGroup cgRopes = peaks[peak].FindDeep("ROPESCHECK").gameObject.GetComponent<CanvasGroup>();
 
             cgTime.alpha = timeComplete ? 1.0f : 0.0f;
             cgHolds.alpha = holdsComplete ? 1.0f : 0.0f;
@@ -215,7 +215,7 @@ namespace PeaksOfArchipelago.MonoBehaviours
                 fsCol.gameObject.SetActive(settings.includeFreeSolo);
                 if (settings.includeFreeSolo)
                 {
-                    CanvasGroup cg = fsCol.GetComponent<CanvasGroup>() ?? fsCol.gameObject.AddComponent<CanvasGroup>();
+                    CanvasGroup cg = fsCol.gameObject.GetComponent<CanvasGroup>() ?? fsCol.gameObject.AddComponent<CanvasGroup>();
                     
                     cg.alpha = Mappings.HasFreeSolo(peak) ? 1.0f : 0.0f;
                 }
@@ -231,7 +231,7 @@ namespace PeaksOfArchipelago.MonoBehaviours
                 taCol.gameObject.SetActive(settings.includeTimeAttack);
                 if (settings.includeTimeAttack)
                 {
-                    CanvasGroup cg = taCol.GetComponent<CanvasGroup>() ?? fsCol.gameObject.AddComponent<CanvasGroup>();
+                    CanvasGroup cg = taCol.gameObject.GetComponent<CanvasGroup>() ?? taCol.gameObject.AddComponent<CanvasGroup>();
                     cg.alpha = Mappings.HasTimeAttack(peak) ? 1.0f : 0.0f;
                 }
             }

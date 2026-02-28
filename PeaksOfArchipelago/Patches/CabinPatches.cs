@@ -30,7 +30,7 @@ namespace PeaksOfArchipelago.Patches
             {
                 yield return original.Current;
             }
-            if (__instance.eventName != "AllArtefacts")
+            if (__instance.eventName == "AllArtefacts")
             {
                 GameManager.control.ropesCollected -= 5;
                 GameManager.control.extraCoffeeUses -= 999999999;
