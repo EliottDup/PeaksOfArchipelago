@@ -1,6 +1,7 @@
 ﻿using Archipelago.MultiClient.Net.Models;
 using BepInEx.Logging;
 using PeaksOfArchipelago.GameData;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,6 +13,8 @@ namespace PeaksOfArchipelago.CabinHandlers
     {
         public abstract void LoadProgress();
         public abstract bool CollectItems(List<ItemInfo> itemInfos);
+        public abstract bool HandleCompletion();
+
         protected ManualLogSource logger;
 
         protected ISlotData slotData;

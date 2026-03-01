@@ -52,6 +52,19 @@ namespace PeaksOfArchipelago.CabinHandlers
             return true;
         }
 
+        public override bool HandleCompletion()
+        {
+            // NPCEvents: GameEndingBase
+            NPCEvents npcEvents = GameObject.FindObjectOfType<NPCEvents>();
+            if (npcEvents == null)
+            {
+                logger.LogError("Couldn't find NPCEvents to start win check");
+                return false;
+            }
+            npcEvents.StartCoroutine("GameEndingBase");
+            return true;
+        }
+
         public override void LoadProgress()
         {
             // If not alps, disable ticket & suitcase

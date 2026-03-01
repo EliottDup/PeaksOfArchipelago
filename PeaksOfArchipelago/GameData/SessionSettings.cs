@@ -5,8 +5,6 @@ using System.Text;
 
 namespace PeaksOfArchipelago.GameData
 {
-
-
     internal class SessionSettings
     {
         public enum RopeUnlockMode

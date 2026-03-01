@@ -105,7 +105,6 @@ namespace PeaksOfArchipelago
                     Logger.LogInfo("In Cabin");
                     OnEnterCabin?.Invoke(this, GameData.Cabins.CabinAlps);
                     break;
-
                 default:
                     playerState = PlayerState.InPeak;
                     break;

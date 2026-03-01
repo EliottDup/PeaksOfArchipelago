@@ -11,6 +11,7 @@ using PeaksOfArchipelago.UI;
 using System.Reflection;
 using UnityEngine;
 using static PeaksOfArchipelago.GameData.LocationIDs;
+using static PeaksOfArchipelago.GameData.ItemTypes;
 using Color = UnityEngine.Color;
 
 namespace PeaksOfArchipelago.Session
@@ -30,6 +31,7 @@ namespace PeaksOfArchipelago.Session
         DeathLinkService deathLinkService;
         private bool playerKilled;
 
+        private bool hasWon;
         private Dictionary<long, ScoutedItemInfo> scoutedItems;
 
         private int itemCount = 0;
@@ -123,6 +125,46 @@ namespace PeaksOfArchipelago.Session
 
             return true;
         }
+        
+        public bool CheckCompletion()
+        {
+            IReadOnlyCollection<long> missingIDs = session.Locations.AllMissingLocations;
+            bool checkPeaks = settings.goal == SessionSettings.Goal.ALL_PEAKS
+                || settings.goal == SessionSettings.Goal.ALL_ARTEFACTS_AND_PEAKS;
+            bool checkArtefacts = settings.goal == SessionSettings.Goal.ALL_ARTEFACTS
+                || settings.goal == SessionSettings.Goal.ALL_ARTEFACTS_AND_PEAKS;
+            bool checkTA = settings.goal == SessionSettings.Goal.ALL_TIME_ATTACK;
+            if (settings.goal == SessionSettings.Goal.ALL)
+            {
+                if (missingIDs.Count == 0)
+                {
+                    //win
+                    return true;
+                }
+                return false;
+            }
+            else {
+                foreach (long id in missingIDs)
+                {
+                    ItemTypes.Types type = GetItemType(id);
+                    if ((type == ItemTypes.Types.Peak) && checkPeaks ||
+                        (type == ItemTypes.Types.Artefact) && checkArtefacts||
+                        ((type == ItemTypes.Types.TATime ||
+                          type == ItemTypes.Types.TAHolds ||
+                          type == ItemTypes.Types.TARope) && checkTA)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
+        public void CompleteWinCheck()
+        {
+            session.SetClientState(ArchipelagoClientState.ClientGoal);
+            session.SetGoalAchieved();
+            hasWon = true;
+        }
 
         private void KillPlayer()
         {
@@ -161,7 +203,7 @@ namespace PeaksOfArchipelago.Session
                 return;
             }
             logger.LogInfo("sending Deathlink");
-            deathLinkService?.SendDeathLink(new DeathLink(session.Players.GetPlayerAliasAndName(session.ConnectionInfo.Slot), "Fell off."))
+            deathLinkService?.SendDeathLink(new DeathLink(session.Players.GetPlayerAliasAndName(session.ConnectionInfo.Slot), "Fell off."));
         }
 
         private void LoadData()
@@ -205,6 +247,14 @@ namespace PeaksOfArchipelago.Session
             }
             // TODO: Collect Items
             CabinHandler handler = CabinHandler.New(cabin, slotData);
+            if (!hasWon && CheckCompletion())
+            {
+                if (handler.HandleCompletion())
+                {
+                    CompleteWinCheck();
+                    return;
+                }
+            }
             if (uncollectedItems.Count > 0)
             {
                 logger.LogInfo("Collecting new items...");

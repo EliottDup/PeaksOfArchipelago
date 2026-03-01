@@ -12,6 +12,12 @@ namespace PeaksOfArchipelago.CabinHandlers
             return false;
         }
 
+        public override bool HandleCompletion()
+        {
+            PeaksOfArchipelago.ui.SendNotification("You have completed your goal, return to your cabin to free your items.");
+            return false;
+        }
+
         public override void LoadProgress()
         {
             logger.LogInfo("Loading progress for Expert Cabin");
