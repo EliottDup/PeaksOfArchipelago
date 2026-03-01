@@ -36,6 +36,7 @@ namespace PeaksOfArchipelago.Patches
                 GameManager.control.extraCoffeeUses -= 999999999;
                 GameManager.control.extraChalkUses -= 999999999;
                 GameManager.control.allArtefactsUnlocked = false;
+                __instance.cabinallArtefacts.SetActive(false);
             }
             yield return null;
         }
