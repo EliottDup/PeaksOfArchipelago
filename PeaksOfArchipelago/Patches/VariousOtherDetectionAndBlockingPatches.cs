@@ -40,7 +40,7 @@ namespace PeaksOfArchipelago.Patches
     }
 
     [HarmonyPatch(typeof(NPCSystem))]
-    internal class GivePlayerMonocularPatch
+    internal class NPCGivenItemsPatch
     {
         [HarmonyPatch("GivePlayerMonocular")]
         [HarmonyPostfix]
@@ -80,27 +80,47 @@ namespace PeaksOfArchipelago.Patches
         }
     }
 
+    [HarmonyPatch(typeof(NPC_Climber))]
+    internal class ClimberGivenItemsPatch
+    {
+        [HarmonyPatch("GivePlayerRope")]
+        [HarmonyPostfix]
+        public static void CollectRope(NPC_Climber __instance)
+        {
+            Ropes rope = (Ropes)(-1);
+            if (__instance.isWaltersCrag) rope = Ropes.WaltersCrag;
+            else if (__instance.isWalkersPillar) rope = Ropes.WalkersPillar;
+            else
+            {
+                throw new Exception("Unknown rope NPC");
+            }
+            GameManager.control.ropesCollected--;
+            GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().anchorsInBackpack--;
+
+            Connection.Instance.CompleteRopeLocation(rope);
+        }
+    }
+
     [HarmonyPatch(typeof(RopeAnchor))]
     internal class RopeAnchorPatch
     {
         [HarmonyPrefix]
         [HarmonyPatch("Start")]
-        public static void Prefix(RopeAnchor __instance)
+        public static void Prefix(RopeAnchor __instance, out int __state)
         {
-            GameManager.control.ropesCollected = 0;
+            __state = GameManager.control.ropesCollected;
         }
 
         [HarmonyPostfix]
         [HarmonyPatch("Start")]
-        public static void Postfix(RopeAnchor __instance)
+        public static void Postfix(RopeAnchor __instance, int __state)
         {
-            int ropeCount = Connection.Instance.slotData.GetTotalRopeCount();
-            __instance.anchorsInBackpack = ropeCount;
-            GameManager.control.ropesCollected = ropeCount;
+            __instance.anchorsInBackpack = __state;
+            GameManager.control.ropesCollected = __state;
             __instance.UpdateRopesCollected();
         }
     }
-    
+
     [HarmonyPatch(typeof(FallingEvent))]
     internal class DeathFallPatch
     {

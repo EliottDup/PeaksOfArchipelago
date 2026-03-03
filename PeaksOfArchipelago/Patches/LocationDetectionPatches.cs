@@ -89,15 +89,15 @@ namespace PeaksOfArchipelago.Patches
 
         [HarmonyPrefix]
         [HarmonyPatch("CheckRope")]
-        public static void StartPrefix()
+        public static void StartPrefix(out int __state)
         {
-            GameManager.control.ropesCollected = 0;
+            __state = GameManager.control.ropesCollected;
         }
         
         [HarmonyPostfix]
         [HarmonyPatch("CheckRope")]
-        public static void StartPostfix() {
-            GameManager.control.ropesCollected = Connection.Instance.slotData.GetTotalRopeCount();
+        public static void StartPostfix(int __state) {
+            GameManager.control.ropesCollected = __state;
         }
     }
 
