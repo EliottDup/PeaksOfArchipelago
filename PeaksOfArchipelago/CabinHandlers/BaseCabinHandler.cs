@@ -108,7 +108,6 @@ namespace PeaksOfArchipelago.CabinHandlers
             npcEvents.cabin_Category2.SetActive(slotData.HasBook(Books.Intermediate));
             npcEvents.cabin_Category3.SetActive(slotData.HasBook(Books.Advanced));
             npcEvents.teaclothteacupObj.SetActive(!slotData.HasBook(Books.Advanced));
-            npcEvents.cabinIceaxes.SetActive(slotData.HasBook(Books.Expert));
 
             // artefact loading
             ArtefactLoaderCabin alc = GameObject.FindObjectOfType<ArtefactLoaderCabin>();
@@ -150,6 +149,14 @@ namespace PeaksOfArchipelago.CabinHandlers
             if (npcEvents.cabinRope)
             {
                 npcEvents.cabinRope.SetActive(slotData.HasTool(Tools.Rope));
+            }
+            if (npcEvents.cabinPhonograph)
+            {
+                npcEvents.cabinPhonograph.SetActive(slotData.HasTool(Tools.Phonograph));
+            }
+            if (npcEvents.cabinIceaxes)
+            {
+                npcEvents.cabinIceaxes.SetActive(slotData.HasTool(Tools.IceAxes));
             }
 
             // load pocketwatch

@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<AssemblyName>com.c0der23.PeaksOfArchipelago</AssemblyName>
 		<Product>Peaks Of Archipelago</Product>
-		<Version>0.0.1</Version>
+		<Version>2.0.0</Version>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
@@ -20,6 +20,7 @@
 			https://nuget.bepinex.dev/v3/index.json;
 			https://nuget.samboy.dev/v3/index.json
 		</RestoreAdditionalProjectSources>
+		<Configurations>Dev;Release</Configurations>
 	</PropertyGroup>
 
 	<Import Project="Paths.props" Condition="Exists('Paths.props')" />
@@ -265,10 +266,7 @@
 		<Compile Include="GameData\ArchipelagoItem.cs" />
 		<Compile Include="GameData\Constants.cs" />
 		<Compile Include="GameData\ArchipelagoLocation.cs" />
-		<Compile Include="GameData\IPeakCollectable.cs" />
 		<Compile Include="GameData\ISlotData.cs" />
-		<Compile Include="GameData\Peak.cs" />
-		<Compile Include="GameData\PeakCollectable.cs" />
 		<Compile Include="GameData\SessionSettings.cs" />
 		<Compile Include="GameData\SlotData.cs" />
 		<Compile Include="MonoBehaviours\Notification.cs" />
@@ -299,34 +297,55 @@
 	  <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" />
 	</ItemGroup>
 	
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-
+	<Target Name="CommonPostBuild" AfterTargets="PostBuildEvent">
 		<PropertyGroup>
 			<DestDir>$(ProjectDir)..\Build\Dev\$(AssemblyName)\</DestDir>
 		</PropertyGroup>
-		
+
 		<PropertyGroup>
 			<AssetsDir>$(DestDir)Assets\</AssetsDir>
+			<ReleaseDir>$(ProjectDir)..\Release\</ReleaseDir>
+			<TemplateDir>$(ProjectDir)..\ReleaseTemplate\</TemplateDir>
 		</PropertyGroup>
 
 		<MakeDir Directories="$(DestDir)" />
 		<MakeDir Directories="$(AssetsDir)" />
-		
+
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DestDir)" />
-		
+
 		<Copy SourceFiles="$(TargetDir)Archipelago.MultiClient.Net.dll" DestinationFolder="$(DestDir)" SkipUnchangedFiles="true" />
 		<Copy SourceFiles="$(TargetDir)Newtonsoft.Json.dll" DestinationFolder="$(DestDir)" SkipUnchangedFiles="true" />
 
 		<Copy SourceFiles="$(ProjectDir)..\Assets\AssetBundles\peaksofbundle" DestinationFolder="$(AssetsDir)" SkipUnchangedFiles="true" />
 
-		<PropertyGroup>
-			<PluginDir>$(GameDir)BepInEx\plugins\$(AssemblyName)\</PluginDir>
-		</PropertyGroup>
 
 		<ItemGroup>
 			<AllBuiltFiles Include="$(DestDir)**\*"></AllBuiltFiles>
+			<AllTemplateFiles Include="$(TemplateDir)\*"></AllTemplateFiles>
 		</ItemGroup>
 		
-		<Copy SourceFiles="@(AllBuiltFiles)" DestinationFiles="@(AllBuiltFiles-> '$(PluginDir)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+		<PropertyGroup>
+			<PluginDir>$(PluginsDir)$(AssemblyName)\</PluginDir>
+		</PropertyGroup>
+		
+		
+		<Copy Condition="'$(Configuration)' == 'Dev'" SourceFiles="@(AllBuiltFiles)" DestinationFiles="@(AllBuiltFiles-> '$(PluginDir)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+		<Exec Condition="'$(Configuration)' == 'Dev'" Command="start steam://rungameid/2236070" />
+	</Target>
+
+	<Target Name="ReleasePostBuid" AfterTargets="CommonPostBuild" Condition="'$(Configuration)' == 'Release'">
+
+		<PropertyGroup>
+			<ReleaseDir>$(ProjectDir)..\Release\</ReleaseDir>
+			<CopiedManifestFile>$(ReleaseDir)manifest.json</CopiedManifestFile>
+		</PropertyGroup>
+		
+		<Copy SourceFiles="@(AllTemplateFiles)" DestinationFiles="@(AllTemplateFiles-> '$(ReleaseDir)%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(AllBuiltFiles)" DestinationFiles="@(AllBuiltFiles-> '$(ReleaseDir)$(AssemblyName)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+		
+		<!--Replace %VERSION% in manifest.json with the version-->
+		<WriteLinesToFile File="$(CopiedManifestFile)" Lines="$([System.IO.File]::ReadAllText($(CopiedManifestFile)).Replace('%VERSION%','$(Version)'))" Overwrite="true" />
+
+		<Exec Command="explorer &quot;$(ProjectDir)..\Release&quot;" IgnoreExitCode="true" />
 	</Target>
 </Project>

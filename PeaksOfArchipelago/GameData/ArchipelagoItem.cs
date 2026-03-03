@@ -53,6 +53,7 @@ namespace PeaksOfArchipelago.GameData
 
         public override void Unlock(ISlotData slotData)
         {
+            slotData.ExtraItemReceived(item);
             switch (item)
             {
                 case ExtraItems.ExtraRope:
@@ -188,21 +189,13 @@ namespace PeaksOfArchipelago.GameData
                 case Tools.Coffee:
                     GameManager.control.coffee = true;
                     break;
-                case Tools.Lamp:
-                    slotData.ReceiveTool(Tools.Lamp);
-                    break;
-                case Tools.RightHand:
-                    slotData.ReceiveTool(Tools.RightHand);
-                    break;
-                case Tools.leftHand:
-                    slotData.ReceiveTool(Tools.leftHand);
-                    break;
                 case Tools.IceAxes:
                     GameManager.control.iceAxes = true;
                     break;
+                default:
+                    break; // for items that don't have an immediate effect on GameManager, like hands, or Lamp
             }
             GameManager.control.Save();
-            slotData.ReceiveTool(tool);
         }
     }
 

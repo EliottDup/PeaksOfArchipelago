@@ -19,6 +19,7 @@ namespace PeaksOfArchipelago.CabinHandlers
 
         public override void LoadProgress()
         {
+            // rember to do phonograph, crampons and sum more as well
             PeaksOfArchipelago.ui.SendNotification($"Alps not implemented, please return to the base cabin");
         }
     }
