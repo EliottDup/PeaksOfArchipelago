@@ -1,0 +1,8 @@
+<Project>
+	<PropertyGroup>
+		<GameDir>Path\To\common\Peaks of Yore\</GameDir>
+		<Libs>Path\To\Libs\</Libs>
+		<!--Libraries needs to contain at least Newtonsoft and Archipelago.MultiClient.net-->
+		<PluginsDir>$(GameDir)BepInEx\plugins\</PluginsDir>
+	</PropertyGroup>
+</Project>
