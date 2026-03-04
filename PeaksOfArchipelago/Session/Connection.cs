@@ -24,6 +24,7 @@ namespace PeaksOfArchipelago.Session
         readonly ManualLogSource logger;
         private Dictionary<string, object> slotOptions;
         public ISlotData slotData;
+
         private List<ItemInfo> uncollectedItems;
         private List<ItemInfo> instantCollectItems;
         internal SessionSettings settings;
@@ -93,6 +94,7 @@ namespace PeaksOfArchipelago.Session
             session.SetClientState(ArchipelagoClientState.ClientConnected);
             slotOptions = ((LoginSuccessful)result).SlotData;
             session.DataStorage["ItemCount"].Initialize(0);
+            session.DataStorage["SaveSlot"].Initialize(-1);
 
             LoadData();
             if (settings.deathLinkEnabled)
@@ -125,7 +127,7 @@ namespace PeaksOfArchipelago.Session
 
             return true;
         }
-        
+
         public bool CheckCompletion()
         {
             IReadOnlyCollection<long> missingIDs = session.Locations.AllMissingLocations;
@@ -143,15 +145,17 @@ namespace PeaksOfArchipelago.Session
                 }
                 return false;
             }
-            else {
+            else
+            {
                 foreach (long id in missingIDs)
                 {
                     ItemTypes.Types type = GetItemType(id);
                     if ((type == ItemTypes.Types.Peak) && checkPeaks ||
-                        (type == ItemTypes.Types.Artefact) && checkArtefacts||
+                        (type == ItemTypes.Types.Artefact) && checkArtefacts ||
                         ((type == ItemTypes.Types.TATime ||
                           type == ItemTypes.Types.TAHolds ||
-                          type == ItemTypes.Types.TARope) && checkTA)) {
+                          type == ItemTypes.Types.TARope) && checkTA))
+                    {
                         return false;
                     }
                 }
@@ -258,7 +262,8 @@ namespace PeaksOfArchipelago.Session
             if (uncollectedItems.Count > 0)
             {
                 logger.LogInfo("Collecting new items...");
-                if (handler.CollectItems(uncollectedItems)) {
+                if (handler.CollectItems(uncollectedItems))
+                {
                     foreach (ItemInfo item in uncollectedItems)
                     {
                         UnlockItem(item);
@@ -330,7 +335,7 @@ namespace PeaksOfArchipelago.Session
             {
                 return;
             }
-            if (scoutedItems != null && scoutedItems.ContainsKey(locationID) 
+            if (scoutedItems != null && scoutedItems.ContainsKey(locationID)
                 && session.Locations.AllMissingLocations.Contains(locationID))
             {
                 ScoutedItemInfo item = scoutedItems[locationID];
@@ -343,6 +348,24 @@ namespace PeaksOfArchipelago.Session
         internal bool HasLocation(long v)
         {
             return session != null && !session.Locations.AllMissingLocations.Contains(v);
+        }
+
+        internal int GetSaveSlot()
+        {
+            if (session == null)
+            {
+                return -1;
+            }
+            return (int)session.DataStorage["SaveSlot"];
+        }
+
+        internal void SetSaveSlot(int slot)
+        {
+            if (session == null)
+            {
+                return;
+            }
+            session.DataStorage["SaveSlot"] = slot;
         }
     }
 }
