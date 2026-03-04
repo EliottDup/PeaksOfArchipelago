@@ -22,6 +22,11 @@ namespace PeaksOfArchipelago.CabinHandlers
         {
             logger.LogInfo("Loading progress for Expert Cabin");
 
+            if (!slotData.HasTool(Tools.IceAxes))
+            {
+                PeaksOfArchipelago.ui.SendNotification("You have not unlocked the Ice Axes, you will not be able to progress here");
+            }
+
             //bulwark disabling
             Category4CabinLeave cabinLeave = GameObject.FindObjectOfType<Category4CabinLeave>();
             if (cabinLeave == null)
