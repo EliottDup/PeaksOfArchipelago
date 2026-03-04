@@ -334,14 +334,20 @@
 	</Target>
 
 	<Target Name="ReleasePostBuid" AfterTargets="CommonPostBuild" Condition="'$(Configuration)' == 'Release'">
-
+		
 		<PropertyGroup>
 			<ReleaseDir>$(ProjectDir)..\Release\</ReleaseDir>
+			<ReleasePluginDir>$(ProjectDir)..\Release\plugins\</ReleasePluginDir>
 			<CopiedManifestFile>$(ReleaseDir)manifest.json</CopiedManifestFile>
 		</PropertyGroup>
 		
+		<RemoveDir Directories="$(ReleaseDir)" />
+		
+		<MakeDir Directories="$(ReleaseDir)" />
+		<MakeDir Directories="$(ReleasePluginDir)" />
+		
 		<Copy SourceFiles="@(AllTemplateFiles)" DestinationFiles="@(AllTemplateFiles-> '$(ReleaseDir)%(RecursiveDir)%(Filename)%(Extension)')" />
-		<Copy SourceFiles="@(AllBuiltFiles)" DestinationFiles="@(AllBuiltFiles-> '$(ReleaseDir)$(AssemblyName)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(AllBuiltFiles)" DestinationFiles="@(AllBuiltFiles-> '$(ReleasePluginDir)$(AssemblyName)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 		
 		<!--Replace %VERSION% in manifest.json with the version-->
 		<WriteLinesToFile File="$(CopiedManifestFile)" Lines="$([System.IO.File]::ReadAllText($(CopiedManifestFile)).Replace('%VERSION%','$(Version)'))" Overwrite="true" />
