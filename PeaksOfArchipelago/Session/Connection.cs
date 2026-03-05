@@ -7,7 +7,6 @@ using Archipelago.MultiClient.Net.Models;
 using BepInEx.Logging;
 using PeaksOfArchipelago.CabinHandlers;
 using PeaksOfArchipelago.GameData;
-using PeaksOfArchipelago.UI;
 using System.Reflection;
 using UnityEngine;
 using static PeaksOfArchipelago.GameData.LocationIDs;
@@ -124,6 +123,8 @@ namespace PeaksOfArchipelago.Session
             };
 
             _ = ScoutLocations();
+
+            PeaksOfArchipelago.Instance.OnConnectionSuccesful(settings);
 
             return true;
         }

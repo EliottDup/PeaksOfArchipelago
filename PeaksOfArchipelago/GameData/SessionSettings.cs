@@ -45,6 +45,7 @@ namespace PeaksOfArchipelago.GameData
         public bool excludeST = false;
         public bool includeFreeSolo = false;
         public bool includeTimeAttack = false;
+        public bool enableDLC = false;
 
         public SessionSettings(bool deathLinkEnabled, RopeUnlockMode ropeUnlockMode, Goal goal, GameMode gameMode, int booksEnabled, bool excludeST)
         {
@@ -71,6 +72,7 @@ namespace PeaksOfArchipelago.GameData
             excludeST = LoadIntFromDict(optionsDict, "disableSolemnTempest", true) == 1;
             includeFreeSolo = LoadIntFromDict(optionsDict, "includeFreeSolo", false) == 1;
             includeTimeAttack = LoadIntFromDict(optionsDict, "includeTimeAttack", false) == 1;
+            enableDLC = LoadIntFromDict(optionsDict, "enableDlc", false) == 1;
         }
 
         int LoadIntFromDict(Dictionary<string, object> dict, string v, object defaultValue)
@@ -83,14 +85,5 @@ namespace PeaksOfArchipelago.GameData
             PeaksOfArchipelago.Logger.LogWarning($"{v} not found, defaulting to {defaultValue}");
             return Convert.ToInt32(defaultValue);
         }
-
-        public bool IsBookEnabled(Book book)
-        {
-            return true;
-            return (booksEnabled & (int)book) != 0;
-        }
-
-        
-
     }
 }

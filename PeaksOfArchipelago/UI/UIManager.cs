@@ -20,6 +20,8 @@ namespace PeaksOfArchipelago.UI
         private Notificator notificationSystem;
 
         private ProgressDisplay progressDisplay;
+        private GameObject noDLCAlert;
+        private bool showDLCAlert = false;
 
         public UIManager()
         {
@@ -28,10 +30,10 @@ namespace PeaksOfArchipelago.UI
 
         private void MakeUI()
         {
-            
+
             this.canvas = GetBestCanvas();
 
-             //Make ChatBox
+            //Make ChatBox
             scriptholder = new GameObject("UIManager_ScriptHolder");
             chat = scriptholder.AddComponent<ChatBox>();
             chat.Initialize(canvas);
@@ -40,6 +42,9 @@ namespace PeaksOfArchipelago.UI
             // Make Notification System
             notificationSystem = notificationSystemObject.AddComponent<Notificator>();
             notificationSystem.notificationPrefab = PeaksOfAssets.Notification;
+
+            noDLCAlert = GameObject.Instantiate(PeaksOfAssets.DLCWarning, canvas.transform);
+            noDLCAlert.SetActive(showDLCAlert);
         }
 
         private Canvas GetBestCanvas()
@@ -69,7 +74,7 @@ namespace PeaksOfArchipelago.UI
 
             if (!rootFound)
             {
-                
+
                 logger.LogInfo("Didn't find rootcanvas, using some other canvas");
                 canvas = kidNamedCanvas;
             }
@@ -82,7 +87,8 @@ namespace PeaksOfArchipelago.UI
             return canvas;
         }
 
-        public void SendChatMessage(string message) {
+        public void SendChatMessage(string message)
+        {
             if (chat == null) return;
             chat.AddChatMessage(message);
         }
@@ -136,11 +142,17 @@ namespace PeaksOfArchipelago.UI
             }
             return _gameFont;
         }
-        
+
         public static void CreateLoginUI(Func<string, string, string, Task<bool>> attemptLogin)
         {
             LoginUI m = new();
             m.CreateLoginUI(attemptLogin);
+        }
+
+        public void SetDLCWarning(bool show)
+        {
+            showDLCAlert = show;
+            noDLCAlert.SetActive(showDLCAlert);
         }
     }
 }

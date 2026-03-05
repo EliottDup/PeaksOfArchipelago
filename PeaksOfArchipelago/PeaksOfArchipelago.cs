@@ -29,6 +29,8 @@ namespace PeaksOfArchipelago
         public ConfigEntry<string> ServerIP;
         public ConfigEntry<string> Password;
 
+        public bool hasDLCInstalled = false;
+
         public enum PlayerState
         {
             InMainMenu,
@@ -105,6 +107,21 @@ namespace PeaksOfArchipelago
                     playerState = PlayerState.InPeak;
                     break;
             }
+        }
+
+        internal void OnConnectionSuccesful(SessionSettings settings)
+        {
+            CheckGameVersion versionChecker = GameObject.FindObjectOfType<CheckGameVersion>();
+            if (versionChecker == null)
+            {
+                Logger.LogError("Couldn't find version checker object in scene!");
+            }
+            else if (versionChecker.CheckGOGDLCInstall() || versionChecker.CheckDLCInstall())
+            {
+                hasDLCInstalled = true;
+                Logger.LogInfo("DLC detected!");
+            }
+            ui.SetDLCWarning(!hasDLCInstalled && settings.enableDLC);
         }
 
         public void SaveUserCredentials(string username, string uri, string password)

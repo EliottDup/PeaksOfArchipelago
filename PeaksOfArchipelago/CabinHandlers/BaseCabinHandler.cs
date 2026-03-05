@@ -67,8 +67,8 @@ namespace PeaksOfArchipelago.CabinHandlers
 
         public override void LoadProgress()
         {
-            // If not alps, disable ticket & suitcase
-            if (true /*Not Alps*/)
+            // If not alps ticket, disable ticket & suitcase
+            if (!slotData.HasTool(Tools.AlpsTicket))
             {
                 // Disable Alps Bed
                 // Enable Normal Bed
@@ -213,7 +213,6 @@ namespace PeaksOfArchipelago.CabinHandlers
             }
 
             // load pipe
-
             if (npcEvents.cabinPipe)
             {
                 npcEvents.cabinPipe.SetActive(slotData.HasTool(Tools.Pipe));
