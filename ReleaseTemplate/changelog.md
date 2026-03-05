@@ -1,9 +1,10 @@
-## [Unreleased]
+## [2.0.2] - 2026-03-05
 
 ### Added
 
 - Save file blocking:
   - An apworld run will now remember what save slot it was on, and will not allow you to open any other slot, empty slots may be opened
+- Entering the Northern Range Cabin without owning the Ice Axes will notify the player.
   
 ### Fixed
 
