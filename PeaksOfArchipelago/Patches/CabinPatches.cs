@@ -102,9 +102,9 @@ namespace PeaksOfArchipelago.Patches
             if ((__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage, Books.Fundamentals)) || 
                 (!__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage + 1, Books.Fundamentals)))
             {
-                PeaksOfArchipelago.Logger.LogInfo($"LeftPage: {__instance.leftPage}");
-                PeaksOfArchipelago.Logger.LogInfo($"Page: {journal.currentPage}, Peak: {Connection.Instance.slotData.BookPageToPeaks(journal.currentPage, Books.Fundamentals)}");
-                PeaksOfArchipelago.Logger.LogInfo($"Page: {journal.currentPage + 1}, Peak: {Connection.Instance.slotData.BookPageToPeaks(journal.currentPage + 1, Books.Fundamentals)}");
+                //PeaksOfArchipelago.Logger.LogInfo($"LeftPage: {__instance.leftPage}");
+                //PeaksOfArchipelago.Logger.LogInfo($"Page: {journal.currentPage}, Peak: {Connection.Instance.slotData.BookPageToPeaks(journal.currentPage, Books.Fundamentals)}");
+                //PeaksOfArchipelago.Logger.LogInfo($"Page: {journal.currentPage + 1}, Peak: {Connection.Instance.slotData.BookPageToPeaks(journal.currentPage + 1, Books.Fundamentals)}");
                 return false;
             }
             return true;

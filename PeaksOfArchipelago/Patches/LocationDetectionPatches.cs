@@ -16,7 +16,6 @@ namespace PeaksOfArchipelago.Patches
         [HarmonyPatch("StampJournal")]
         public static void PeakLocationComplete(StamperPeakSummit __instance)
         {
-            PeaksOfArchipelago.Logger.LogInfo("stamping peak");
             if (__instance.isCustomLevel)
             {
                 return;

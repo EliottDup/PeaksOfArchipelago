@@ -88,23 +88,19 @@ namespace PeaksOfArchipelago
 
                 case 1:
                     playerState = PlayerState.InCabin;
-                    Logger.LogInfo("In Cabin");
                     OnEnterCabin?.Invoke(this, GameData.Cabins.Cabin);
                     break;
 
                 case 37:
                     playerState = PlayerState.InCabin;
-
-                    Logger.LogInfo("In Cabin");
                     OnEnterCabin?.Invoke(this, GameData.Cabins.CabinExpert);
                     break;
 
                 case 67:
                     playerState = PlayerState.InCabin;
-
-                    Logger.LogInfo("In Cabin");
                     OnEnterCabin?.Invoke(this, GameData.Cabins.CabinAlps);
                     break;
+
                 default:
                     playerState = PlayerState.InPeak;
                     break;

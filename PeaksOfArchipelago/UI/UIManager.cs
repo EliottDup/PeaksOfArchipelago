@@ -61,7 +61,6 @@ namespace PeaksOfArchipelago.UI
                     if ((c.transform.parent == null || c.transform.parent.name.ToLower() == "sceneobjects")
                         && c.name.ToLower() == "canvas")
                     {
-                        logger.LogInfo("root canvas found ^W^");
                         rootFound = true;
                         break;
                     }
@@ -70,13 +69,15 @@ namespace PeaksOfArchipelago.UI
 
             if (!rootFound)
             {
+                
+                logger.LogInfo("Didn't find rootcanvas, using some other canvas");
                 canvas = kidNamedCanvas;
             }
 
             if (canvas == null)
             {
-                logger.LogError("Canvas not found!");
-                throw new Exception("Error: could not find any canvas :P");
+                logger.LogError("No Canvases Found");
+                throw new Exception("Error: could not find any Canvas");
             }
             return canvas;
         }

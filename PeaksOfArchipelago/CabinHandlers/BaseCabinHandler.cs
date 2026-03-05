@@ -82,26 +82,24 @@ namespace PeaksOfArchipelago.CabinHandlers
                 }
                 else
                 {
-                    logger.LogInfo("Alps bed not found!");
+                    logger.LogWarning("Alps Gateway not found!");
                 }
             }
-            PeaksOfArchipelago.Logger.LogInfo("Entered Base Cabin");
 
             // book loading
-
-
             if (book1 == null)
             {
                 book1 = GameObject.Find("MAPJOURNAL");
                 if (book1 == null)
-                    logger.LogWarning("Didnt find book object TwT");
+                    logger.LogWarning("Warning: Could Not Find Fundamentals book");
             }
 
             NPCEvents npcEvents = GameObject.FindObjectOfType<NPCEvents>();
 
             if (npcEvents == null)
             {
-                logger.LogInfo("npc events is null :c");
+                logger.LogWarning("npc events is null, aborting");
+                return;
             }
 
             Transform ticketObject = npcEvents.cabinIceaxes.transform.Find("Category4_Ticket_Cabin");
@@ -179,14 +177,12 @@ namespace PeaksOfArchipelago.CabinHandlers
                 {
                     if (PlayerPrefs.GetInt("UseBasicCrampons") == 1)
                     {
-                        logger.LogInfo("Showing 10-point crampons");
                         npcEvents.cramponsEditionTxt.text = "10-";
                         npcEvents.cabinCrampons_10Point.SetActive(true);
                         npcEvents.cabinCrampons_6Point.SetActive(false);
                     }
                     else
                     {
-                        logger.LogInfo("Showing 6-point crampons");
                         npcEvents.cramponsEditionTxt.text = "6-";
                         npcEvents.cabinCrampons_6Point.SetActive(true);
                         npcEvents.cabinCrampons_10Point.SetActive(false);
@@ -194,7 +190,6 @@ namespace PeaksOfArchipelago.CabinHandlers
                 }
                 else
                 {
-                    logger.LogInfo("Showing 6-point crampons");
                     PlayerPrefs.SetInt("UseBasicCrampons", 1);
                     npcEvents.cramponsEditionTxt.text = "6-";
                     npcEvents.cabinCrampons_6Point.SetActive(true);
