@@ -43,6 +43,19 @@ namespace PeaksOfArchipelago.Patches
         }
     }
 
+    [HarmonyPatch(typeof(AlpsEvents))]
+    internal class AlpsEventsPatches
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("CheckProgress")]
+        public static bool CabinEventDisabler()
+        {
+            PeaksOfArchipelago.Logger.LogInfo("Disabled Alps Cabin CheckProgress!");
+            return false;
+        }
+    }
+
+
     [HarmonyPatch(typeof(ArtefactLoaderCabin))]
     internal class ArtefactLoaderCabinPatches
     {
@@ -85,6 +98,55 @@ namespace PeaksOfArchipelago.Patches
         }
     }
 
+    ////TEMP
+    //[HarmonyPatch(typeof(GameObject))]
+    //internal class ObjectPatches
+    //{
+    //    [HarmonyPrefix]
+    //    [HarmonyPatch(nameof(GameObject.SetActive))]
+    //    public static bool SetActivePrefix(GameObject __instance, bool value)
+    //    {
+    //        if (__instance.name == "CabinStuff" && !value)
+    //        {
+    //            PeaksOfArchipelago.Logger.LogInfo(Environment.StackTrace);
+    //            PeaksOfArchipelago.Logger.LogInfo("Prevented Cabin4Map destruction!");
+    //            return false;
+    //        }
+    //        return true;
+    //    }
+    //}
+
+    [HarmonyPatch(typeof(TimeAttack_CheckScoreboard))]
+    internal class TimeAttackCheckScoreboardPatches
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("CheckOwned")]
+        public static bool CheckOwnedPrefix(TimeAttack_CheckScoreboard __instance)
+        {
+            if (__instance.isAlps)
+            {
+                if (!GameManager.control.pocketwatch)
+                {
+                    __instance.transform.parent.gameObject.SetActive(false);
+                }
+                return false;
+            }
+            return true;
+        }
+    }
+
+    // Intro blocking
+    [HarmonyPatch(typeof(EnterRoomSegmentScene))]
+    internal class BaseIntroBlocker
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("StartScene")]
+        public static void IntroBlocker()
+        {
+            GameManager.control.hasPlayedGameIntro = true;
+            GameManager.control.hasPlayedAlpsIntro = true;
+        }
+    }
 
     // Fundamentals blocking
 

@@ -4,6 +4,7 @@ using PeaksOfArchipelago.Session;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PeaksOfArchipelago.Patches
 {
@@ -98,6 +99,21 @@ namespace PeaksOfArchipelago.Patches
             GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().anchorsInBackpack--;
 
             Connection.Instance.CompleteRopeLocation(rope);
+        }
+    }
+
+    [HarmonyPatch(typeof(Text))] // surely patching Text won't cause any issues, right?
+    internal class  TextPatch
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(Text.text), MethodType.Setter)]
+        public static bool TextPrefix(ref string value)
+        {
+            if (value == "- Essentials Completion Medal -" || value == "Awarded by the Alpine Climbing Association for summiting every peak in the \"Essentials\" category.")
+            {
+                return false;
+            }
+            return true;
         }
     }
 
