@@ -21,6 +21,7 @@ namespace PeaksOfArchipelago
         public static PlayerState playerState { get; private set; } = PlayerState.InMainMenu;
 
         public event EventHandler<GameData.Cabins> OnEnterCabin;
+        public event EventHandler OnExitCabin;
 
         private Harmony harmony;
         private Connection connection;
@@ -86,6 +87,7 @@ namespace PeaksOfArchipelago
             {
                 case 0:
                     playerState = PlayerState.InMainMenu;
+                    OnExitCabin?.Invoke(this, EventArgs.Empty);
                     break;
 
                 case 1:
@@ -105,6 +107,7 @@ namespace PeaksOfArchipelago
 
                 default:
                     playerState = PlayerState.InPeak;
+                    OnExitCabin?.Invoke(this, EventArgs.Empty);
                     break;
             }
         }

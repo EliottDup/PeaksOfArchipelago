@@ -53,16 +53,11 @@ namespace PeaksOfArchipelago.CabinHandlers
 
         public override bool HandleCompletion()
         {
-            PeaksOfArchipelago.ui.SendNotification($"Alps not implemented, please return to the base cabin");
             return false;
         }
 
         public override void LoadProgress()
         {
-            // rember to do phonograph, crampons and sum more as well
-
-            PeaksOfArchipelago.ui.SendNotification($"Alps not fully implemented, please return to the base cabin");
-
             // Books loading
             AlpsJournal alpsJournal = GameObject.FindObjectOfType<AlpsJournal>();
             if (!alpsJournal)
@@ -174,9 +169,9 @@ namespace PeaksOfArchipelago.CabinHandlers
 
             alc.alpsflowerpot_edelweiss.SetActive(false);
 
-            for (int i = 0; i < gentianas.Count; i++)
+            for (int i = 0; i < edelweiss.Count; i++)
             {
-                if (slotData.HasArtefact(gentianas[i]))
+                if (slotData.HasArtefact(edelweiss[i]))
                 {
                     alc.alpsflowerpot_edelweiss.SetActive(true);
                     alc.alpsflower_edelweiss[i].SetActive(true);
@@ -209,7 +204,6 @@ namespace PeaksOfArchipelago.CabinHandlers
             alc.alpcabin_seeds.SetActive(GameManager.control.extraBirdSeedUses > 0);
             
             alc.alpcabin_barometer.transform.parent.gameObject.SetActive(true);
-            logger.LogInfo(alc.alpcabin_barometer.transform.parent.name);
 
             if (!slotData.HasTool(Tools.Pipe))
             {

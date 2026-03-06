@@ -19,6 +19,8 @@ namespace PeaksOfArchipelago.Session
     {
         public static Connection Instance { get; private set; }
 
+        private CabinHandler cabinHandler;
+
         ArchipelagoSession session;
         readonly ManualLogSource logger;
         private Dictionary<string, object> slotOptions;
@@ -41,6 +43,7 @@ namespace PeaksOfArchipelago.Session
         {
             logger = PeaksOfArchipelago.Logger;
             PeaksOfArchipelago.Instance.OnEnterCabin += OnEnterCabin;
+            PeaksOfArchipelago.Instance.OnExitCabin += OnExitCabin;
             Instance = this;
         }
 
@@ -251,10 +254,10 @@ namespace PeaksOfArchipelago.Session
                 instantCollectItems.Clear();
             }
             // TODO: Collect Items
-            CabinHandler handler = CabinHandler.New(cabin, slotData);
+            cabinHandler = CabinHandler.New(cabin, slotData);
             if (!hasWon && CheckCompletion())
             {
-                if (handler.HandleCompletion())
+                if (cabinHandler.HandleCompletion())
                 {
                     CompleteWinCheck();
                     return;
@@ -263,7 +266,7 @@ namespace PeaksOfArchipelago.Session
             if (uncollectedItems.Count > 0)
             {
                 logger.LogInfo("Collecting new items...");
-                if (handler.CollectItems(uncollectedItems))
+                if (cabinHandler.CollectItems(uncollectedItems))
                 {
                     foreach (ItemInfo item in uncollectedItems)
                     {
@@ -271,17 +274,38 @@ namespace PeaksOfArchipelago.Session
                     }
                     itemCount += uncollectedItems.Count;
                     session.DataStorage["ItemCount"] = itemCount;
-                    handler.LoadProgress();
                     uncollectedItems.Clear();
                 }
             }
             GameManager.control.Save();
-            handler.LoadProgress();
+            cabinHandler.LoadProgress();
+        }
+
+        public void OnExitCabin(object sender, EventArgs args)
+        {
+            cabinHandler = null;
+        }
+
+        public void ReloadCabin()
+        {
+            if (cabinHandler != null)
+            {
+                cabinHandler.LoadProgress();
+            }
         }
 
         private void OnItemReceived(ItemInfo item)
         {
+            if (cabinHandler != null && cabinHandler.CollectItems([item]))
+            {
+                UnlockItem(item);
+
+                itemCount += 1;
+                session.DataStorage["ItemCount"] = itemCount;
+                return;
+            }
             uncollectedItems.Add(item);
+
             logger.LogInfo($"Recieving Item: {item.ItemName}");
             // TODO: Notify player
         }
