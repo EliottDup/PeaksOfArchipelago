@@ -1,9 +1,4 @@
-﻿using BepInEx.Logging;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PeaksOfArchipelago.GameData
+﻿namespace PeaksOfArchipelago.GameData
 {
     internal class SessionSettings
     {
@@ -37,6 +32,8 @@ namespace PeaksOfArchipelago.GameData
             EXPERT = 8,
         }
 
+        public const int SETTINGSVER = 1;
+
         public bool deathLinkEnabled = false;
         public RopeUnlockMode ropeUnlockMode = RopeUnlockMode.NORMAL;
         public Goal goal = Goal.ALL_PEAKS;
@@ -45,6 +42,7 @@ namespace PeaksOfArchipelago.GameData
         public bool excludeST = false;
         public bool includeFreeSolo = false;
         public bool includeTimeAttack = false;
+        public int version = 0;
 
         public SessionSettings(bool deathLinkEnabled, RopeUnlockMode ropeUnlockMode, Goal goal, GameMode gameMode, int booksEnabled, bool excludeST)
         {
@@ -71,6 +69,17 @@ namespace PeaksOfArchipelago.GameData
             excludeST = LoadIntFromDict(optionsDict, "disableSolemnTempest", true) == 1;
             includeFreeSolo = LoadIntFromDict(optionsDict, "includeFreeSolo", false) == 1;
             includeTimeAttack = LoadIntFromDict(optionsDict, "includeTimeAttack", false) == 1;
+            version = LoadIntFromDict(optionsDict, "settingsVer", 0);
+            if (version < SETTINGSVER)
+            {
+                PeaksOfArchipelago.Logger.LogWarning($"AP World out of date! Issues may happen.");
+                PeaksOfArchipelago.Logger.LogWarning($"Mod settings Version     : v{SETTINGSVER}");
+                PeaksOfArchipelago.Logger.LogWarning($"AP World settings Version: v{version}");
+            }
+            if (version > SETTINGSVER)
+            {
+                PeaksOfArchipelago.Logger.LogWarning($"Mod out of date! Issues may happen. Expected v{SETTINGSVER}, got v{version}");
+            }
         }
 
         int LoadIntFromDict(Dictionary<string, object> dict, string v, object defaultValue)
