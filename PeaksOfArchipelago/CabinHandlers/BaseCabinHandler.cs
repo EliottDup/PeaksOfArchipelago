@@ -105,7 +105,7 @@ namespace PeaksOfArchipelago.CabinHandlers
             Transform ticketObject = npcEvents.cabinIceaxes.transform.Find("Category4_Ticket_Cabin");
             Transform iceAxesObject = npcEvents.cabinIceaxes.transform.Find("iceaxes_hanging");
 
-            npcEvents.iceaxesInfo.SetActive(true);
+            npcEvents.iceaxesInfo.SetActive(false);
 
             book1.SetActive(slotData.HasBook(Books.Fundamentals));
             npcEvents.cabin_Category2.SetActive(slotData.HasBook(Books.Intermediate));
