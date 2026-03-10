@@ -85,6 +85,18 @@ namespace PeaksOfArchipelago.Patches
         }
     }
 
+    // Intro blocking
+    [HarmonyPatch(typeof(EnterRoomSegmentScene))]
+    internal class BaseIntroBlocker
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("StartScene")]
+        public static void IntroBlocker()
+        {
+            GameManager.control.hasPlayedGameIntro = true;
+            GameManager.control.hasPlayedAlpsIntro = true;
+        }
+    }
 
     // Fundamentals blocking
 
