@@ -1,3 +1,15 @@
+## [2.0.3] - [undated]
+
+### Added
+
+- added You Fall You Die mode back
+- added very simple APWorld version checker that will warn the player if the apworld or mod are outdated and potentially incompatible
+
+### Fixed
+
+- fixed a bug where the game intro would play, while it shouldn't
+- fixed a bug where Ice Axe info would be overlayed every time the player recieved an item
+
 ## [2.0.2] - 2026-03-05
 
 ### Added
