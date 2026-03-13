@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<AssemblyName>com.c0der23.PeaksOfArchipelago</AssemblyName>
 		<Product>Peaks Of Archipelago</Product>
-		<Version>2.0.2</Version>
+		<Version>2.0.3</Version>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
