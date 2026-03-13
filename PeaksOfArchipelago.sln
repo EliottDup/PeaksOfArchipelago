@@ -12,6 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReleaseTemplate", "ReleaseT
 		ReleaseTemplate\manifest.json = ReleaseTemplate\manifest.json
 		ReleaseTemplate\README.md = ReleaseTemplate\README.md
 	EndProjectSection
+	ProjectSection(FolderGlobals) = preProject
+		C_5_4Users_4Eliott_4source_4repos_4PeaksOfArchipelago_4ReleaseTemplate_4manifest_1json__JsonSchema = 
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
