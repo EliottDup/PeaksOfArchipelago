@@ -15,7 +15,8 @@
             ALL_ARTEFACTS = 1,
             ALL_ARTEFACTS_AND_PEAKS = 2,
             ALL_TIME_ATTACK = 3,
-            ALL = 4
+            ALL = 4,
+            PEAK = 5,
         }
 
         public enum GameMode
@@ -32,7 +33,7 @@
             EXPERT = 8,
         }
 
-        public const int SETTINGSVER = 0;
+        public const int SETTINGSVER = 1;
 
         public bool deathLinkEnabled = false;
         public RopeUnlockMode ropeUnlockMode = RopeUnlockMode.NORMAL;
@@ -42,6 +43,7 @@
         public bool excludeST = false;
         public bool includeFreeSolo = false;
         public bool includeTimeAttack = false;
+        public Peaks targetPeak;
         public int version = 0;
 
         public SessionSettings(bool deathLinkEnabled, RopeUnlockMode ropeUnlockMode, Goal goal, GameMode gameMode, int booksEnabled, bool excludeST)
@@ -69,6 +71,7 @@
             excludeST = LoadIntFromDict(optionsDict, "disableSolemnTempest", true) == 1;
             includeFreeSolo = LoadIntFromDict(optionsDict, "includeFreeSolo", false) == 1;
             includeTimeAttack = LoadIntFromDict(optionsDict, "includeTimeAttack", false) == 1;
+            targetPeak = (Peaks)LoadIntFromDict(optionsDict, "peakGoal", 36);
             version = LoadIntFromDict(optionsDict, "settingsVer", 0);
             if (version < SETTINGSVER)
             {

@@ -154,6 +154,9 @@ namespace PeaksOfArchipelago.Session
                 }
                 return false;
             }
+            else if (settings.goal == SessionSettings.Goal.PEAK){
+                return missingIDs.Contains(LocationIDs.GetPeakLocationID(settings.targetPeak));
+            }
             else
             {
                 foreach (long id in missingIDs)
