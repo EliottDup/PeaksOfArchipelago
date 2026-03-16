@@ -269,6 +269,7 @@
 		<Compile Include="GameData\ISlotData.cs" />
 		<Compile Include="GameData\SessionSettings.cs" />
 		<Compile Include="GameData\SlotData.cs" />
+		<Compile Include="MonoBehaviours\BookLayoutGroup.cs" />
 		<Compile Include="MonoBehaviours\Notification.cs" />
 		<Compile Include="MonoBehaviours\Notificator.cs" />
 		<Compile Include="MonoBehaviours\ProgressDisplay.cs" />

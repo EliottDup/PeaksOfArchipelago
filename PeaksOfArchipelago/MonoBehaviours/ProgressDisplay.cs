@@ -68,10 +68,17 @@ namespace PeaksOfArchipelago.MonoBehaviours
             this.canvas = canvas;
             this.connection = connection;
             this.Logger = PeaksOfArchipelago.Logger;
-
+            
             progressDisplayRoot = Instantiate(PeaksOfAssets.ProgressDisplay, canvas.transform).transform;
             progressDisplayRoot.SetAsLastSibling(); // set as last as it should be visible over everything else (even the escape menu apparently whoops)
             progressDisplayRoot.gameObject.SetActive(false);
+
+            Vector2 size = ((RectTransform)canvas.transform).sizeDelta;
+            PeaksOfArchipelago.Logger.LogInfo(size);
+            BookLayoutGroup layout = progressDisplayRoot.gameObject.AddComponent<BookLayoutGroup>();
+            layout.constraint = BookLayoutGroup.Constraint.FixedColumnCount;
+            layout.constraintCount = 4;
+            layout.cellSize = new Vector2(size.x / 4, size.y);
 
             // Somehow get the slotdata here ??
             this.settings = connection.settings;
