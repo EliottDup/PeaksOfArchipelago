@@ -81,27 +81,7 @@ namespace PeaksOfArchipelago.GameData
 
         public int GetTotalRopeCount()
         {
-            int ropeCount = 0;
-            for (int i = (int)Ropes.WaltersCrag; i <= (int)Ropes.StHaelga; i++)
-            {
-                Ropes rope = (Ropes)i;
-                if (unlockedRopes.Contains(rope))
-                {
-                    ropeCount++;
-                }
-            }
-            
-            for (int i = (int)Ropes.ExtraFirst; i <= (int)Ropes.Extra12; i++)
-            {
-                Ropes rope = (Ropes)i;
-                if (unlockedRopes.Contains(rope))
-                {
-                    ropeCount += 2;
-                }
-            }
-
-            ropeCount += extraItemCounts[ExtraItems.ExtraRope];
-            return ropeCount;
+            return GetExtraItemCount(ExtraItems.ExtraRope) * 2;
         }
 
         public int GetTotalExtraBirdSeedCount()
