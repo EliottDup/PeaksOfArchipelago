@@ -29,6 +29,7 @@ namespace PeaksOfArchipelago
         public ConfigEntry<string> ServerIP;
         public ConfigEntry<string> Password;
 
+        public ConfigEntry<bool> hasSeenProgressScreenTutorial;
         public enum PlayerState
         {
             InMainMenu,
@@ -41,6 +42,8 @@ namespace PeaksOfArchipelago
             Username = Config.Bind("Session", "Username", "", "The last username used to connect to an Archipelago session.");
             ServerIP = Config.Bind("Session", "ServerIP", "", "The last server IP used to connect to an Archipelago session.");
             Password = Config.Bind("Session", "Password", "", "The last password used to connect to an Archipelago session.");
+
+            hasSeenProgressScreenTutorial = Config.Bind("HasSeenProgressScreenTutorial", "Misc", false, "Whether the player has seen the progress screen tutorial or not.");
 
             Instance = this;
 
