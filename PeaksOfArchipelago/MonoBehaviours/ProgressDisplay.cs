@@ -81,7 +81,7 @@ namespace PeaksOfArchipelago.MonoBehaviours
             layout.cellSize = new Vector2(size.x / 4, size.y);
 
             if (!PeaksOfArchipelago.Instance.hasSeenProgressScreenTutorial.Value) {
-                StartCoroutine(nameof(StartCoroutine));
+                StartCoroutine(nameof(ShowTutorial));
             }
 
             // Somehow get the slotdata here ??
