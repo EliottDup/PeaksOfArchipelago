@@ -107,11 +107,12 @@ namespace PeaksOfArchipelago.CabinHandlers
 
             npcEvents.iceaxesInfo.SetActive(false);
 
-            book1.SetActive(slotData.HasBook(Books.Fundamentals));
-            npcEvents.cabin_Category2.SetActive(slotData.HasBook(Books.Intermediate));
-            npcEvents.cabin_Category3.SetActive(slotData.HasBook(Books.Advanced));
-            npcEvents.teaclothteacupObj.SetActive(!slotData.HasBook(Books.Advanced));
-            ticketObject.gameObject.SetActive(slotData.HasBook(Books.Expert));
+            book1.SetActive(slotData.ShowBook(Books.Fundamentals));
+            npcEvents.cabin_Category2.SetActive(slotData.ShowBook(Books.Intermediate));
+            bool adv = slotData.ShowBook(Books.Advanced);
+            npcEvents.cabin_Category3.SetActive(adv);
+            npcEvents.teaclothteacupObj.SetActive(!adv);
+            ticketObject.gameObject.SetActive(slotData.ShowBook(Books.Expert));
 
             // artefact loading
             ArtefactLoaderCabin alc = GameObject.FindObjectOfType<ArtefactLoaderCabin>();

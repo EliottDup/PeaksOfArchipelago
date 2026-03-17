@@ -74,6 +74,22 @@ namespace PeaksOfArchipelago.GameData
             return unlockedBooks.Contains(book) || gameMode == SessionSettings.GameMode.PEAK_UNLOCK;
         }
 
+        public bool ShowBook(Books book)
+        {
+            if (gameMode == SessionSettings.GameMode.PEAK_UNLOCK) {
+                foreach (Peaks p in Mappings.GetBookPeaks(book))
+                {
+                    if (HasPeak(p)) return true;
+                }
+                return false;
+            }
+            else
+            {
+                return HasBook(book);
+            }
+        }
+            
+
         public bool HasArtefact(Artefacts artefact)
         {
             return unlockedArtefacts.Contains(artefact);

@@ -99,9 +99,9 @@ namespace PeaksOfArchipelago.MonoBehaviours
 
         private void LoadBookData(Books book, ISlotData data)
         {
-            bool unlocked = data.HasBook(book);
-            books[book].gameObject.SetActive(unlocked);
-            if (!unlocked) return;
+            bool showing = data.ShowBook(book);
+            books[book].gameObject.SetActive(showing);
+            if (!showing) return;
             Transform nameObject = books[book].FindDeep("BOOKNAME");
             if (nameObject == null)
             {
