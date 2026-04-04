@@ -1,3 +1,27 @@
+## [2.1.0] - wip
+
+## Added
+
+- Tutorial for opening the progress screen.
+- New completion target!
+  - Peak Goal will allow you to set a specific peak as goal.
+- Starting peak!
+  - Only affects the game in Peak unlock mode, allows you to choose what peak to start with.
+
+## Changed
+
+- Changed the compatible APworld version (older versions will not be rejected)
+- Extra ropes now give 2 extra ropes instead of 1.
+  - Correspondingly, extra rope item count halved in the APworld 
+- Layout of progress screen to prepare for futur addition of Alpine Books
+- When playing with Peak Unlock mode, the progress screen will no longer show books with no unlocked peaks
+
+## Fixed
+
+- "Go to next peak" should no longer appear if the next peak is not unlocked.
+- Bug where crampons and other items could be given to the player for completing a peak in YFYD mode.
+- Issue where simply existing in the expert cabin would fill up the log with NullReferenceExceptions
+
 ## [2.0.3] - 2026-03-13
 
 ### Added
