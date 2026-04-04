@@ -60,7 +60,8 @@ namespace PeaksOfArchipelago.Session
 
             session.Socket.ErrorReceived += (Exception e, string message) =>
             {
-                logger.LogInfo("Socket error incoming lmao");
+                logger.LogInfo("Socket error");
+                logger.LogError($"message: {message}");
                 logger.LogError(e);
             };
 
