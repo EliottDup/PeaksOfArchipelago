@@ -370,6 +370,18 @@ namespace PeaksOfArchipelago.GameData
         {
             return !NoTAPeaks.Contains(peak);
         }
+
+        public static Books GetPeakBook(Peaks peak)
+        {
+            foreach (Books b in Enum.GetValues(typeof(Books)))
+            {
+                if (BookPeakMappings[b].Contains(peak))
+                {
+                    return b;
+                }
+            }
+            throw new Exception("Peak not found");
+        }
     }
 
     public enum Peaks {

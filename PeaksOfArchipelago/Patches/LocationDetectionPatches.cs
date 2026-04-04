@@ -31,6 +31,11 @@ namespace PeaksOfArchipelago.Patches
             {
                 Connection.Instance.CompleteFSPeakLocation(peak);
             }
+            bool isBookUnlock = Connection.Instance.settings.gameMode == SessionSettings.GameMode.BOOK_UNLOCK;
+            Peaks nextPeak = peak + 1;
+            bool isLastInBook = Mappings.GetPeakBook(peak) != Mappings.GetPeakBook(nextPeak);
+            bool hasNextPeak = Connection.Instance.HasLocation(LocationIDs.GetPeakLocationID(nextPeak));
+            __instance.gotonextpeak_ui.gameObject.SetActive(!isLastInBook && (isBookUnlock || hasNextPeak));
         }
 
         public struct State
