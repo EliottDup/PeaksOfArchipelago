@@ -265,7 +265,6 @@
 		<Compile Include="Extensions\DeepFind.cs" />
 		<Compile Include="GameData\ArchipelagoItem.cs" />
 		<Compile Include="GameData\Constants.cs" />
-		<Compile Include="GameData\ArchipelagoLocation.cs" />
 		<Compile Include="GameData\ISlotData.cs" />
 		<Compile Include="GameData\SessionSettings.cs" />
 		<Compile Include="GameData\SlotData.cs" />
