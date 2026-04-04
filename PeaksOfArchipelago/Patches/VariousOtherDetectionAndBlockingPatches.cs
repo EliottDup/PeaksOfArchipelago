@@ -131,5 +131,4 @@ namespace PeaksOfArchipelago.Patches
             Connection.Instance?.HandleDeath();
         }
     }
-    
 }
