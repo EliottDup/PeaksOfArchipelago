@@ -78,10 +78,14 @@
                 PeaksOfArchipelago.Logger.LogWarning($"AP World out of date! Issues may happen.");
                 PeaksOfArchipelago.Logger.LogWarning($"Mod settings Version     : v{SETTINGSVER}");
                 PeaksOfArchipelago.Logger.LogWarning($"AP World settings Version: v{version}");
+                PeaksOfArchipelago.ui.SendNotification($"AP World out of date: Expected v{SETTINGSVER}, got v{version}");
+                PeaksOfArchipelago.ui.SendNotification($"Expect the Unexpected");
             }
             if (version > SETTINGSVER)
             {
                 PeaksOfArchipelago.Logger.LogWarning($"Mod out of date! Issues may happen. Expected v{SETTINGSVER}, got v{version}");
+                PeaksOfArchipelago.ui.SendNotification($"Mod out of date: Expected v{SETTINGSVER}, got v{version}");
+                PeaksOfArchipelago.ui.SendNotification($"Expect the Unexpected");
             }
         }
 
