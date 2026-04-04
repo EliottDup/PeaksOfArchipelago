@@ -4,6 +4,7 @@ using PeaksOfArchipelago.Session;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace PeaksOfArchipelago.Patches
 {
@@ -98,6 +99,18 @@ namespace PeaksOfArchipelago.Patches
             GameObject.FindGameObjectWithTag("Player").GetComponent<RopeAnchor>().anchorsInBackpack--;
 
             Connection.Instance.CompleteRopeLocation(rope);
+        }
+    }
+
+    [HarmonyPatch(typeof(TimeAttack))]
+    internal class TimeAttackNullReferenceExceptionPatch
+    {
+        [HarmonyPatch("Update")]
+        [HarmonyPrefix]
+        public static bool UpdatePatch()
+        {
+            if (SceneManager.GetActiveScene().buildIndex == 37) return false;
+            return true;
         }
     }
 

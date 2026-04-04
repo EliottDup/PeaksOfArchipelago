@@ -74,7 +74,7 @@ namespace PeaksOfArchipelago
                 UIManager.CreateLoginUI(AttemptLogin);
             }
 
-            Logger.LogInfo($"Loaded scene index: {scene.buildIndex}");
+            Logger.LogInfo($"Loaded scene index: {scene.buildIndex}, named: {scene.name}");
 
             if (connection == null && scene.buildIndex != 0) throw new Exception("How tf did you enter the game without connecting??");
             // Scene buildIndex:
