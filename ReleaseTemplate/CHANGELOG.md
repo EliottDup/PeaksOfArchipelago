@@ -1,4 +1,10 @@
-## [2.1.0] - wip
+## [2.1.1] - 2026-04-04
+
+## Added
+
+- On-screen warnings when APWorld or mod are outdated
+
+## [2.1.0] - 2026-04-04
 
 ## Added
 
