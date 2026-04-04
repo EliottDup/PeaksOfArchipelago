@@ -33,7 +33,7 @@
             EXPERT = 8,
         }
 
-        public const int SETTINGSVER = 1;
+        public const int SETTINGSVER = 2;
 
         public bool deathLinkEnabled = false;
         public RopeUnlockMode ropeUnlockMode = RopeUnlockMode.NORMAL;
