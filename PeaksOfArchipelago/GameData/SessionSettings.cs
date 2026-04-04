@@ -15,7 +15,8 @@
             ALL_ARTEFACTS = 1,
             ALL_ARTEFACTS_AND_PEAKS = 2,
             ALL_TIME_ATTACK = 3,
-            ALL = 4
+            ALL = 4,
+            PEAK = 5,
         }
 
         public enum GameMode
@@ -42,6 +43,7 @@
         public bool excludeST = false;
         public bool includeFreeSolo = false;
         public bool includeTimeAttack = false;
+        public Peaks targetPeak;
         public bool enableDLC = false;
         public int version = 0;
 
@@ -70,6 +72,7 @@
             excludeST = LoadIntFromDict(optionsDict, "disableSolemnTempest", true) == 1;
             includeFreeSolo = LoadIntFromDict(optionsDict, "includeFreeSolo", false) == 1;
             includeTimeAttack = LoadIntFromDict(optionsDict, "includeTimeAttack", false) == 1;
+            targetPeak = (Peaks)LoadIntFromDict(optionsDict, "peakGoal", 36);
             enableDLC = LoadIntFromDict(optionsDict, "enableDlc", false) == 1;
             version = LoadIntFromDict(optionsDict, "settingsVer", 0);
             if (version < SETTINGSVER)
@@ -77,10 +80,14 @@
                 PeaksOfArchipelago.Logger.LogWarning($"AP World out of date! Issues may happen.");
                 PeaksOfArchipelago.Logger.LogWarning($"Mod settings Version     : v{SETTINGSVER}");
                 PeaksOfArchipelago.Logger.LogWarning($"AP World settings Version: v{version}");
+                PeaksOfArchipelago.ui.SendNotification($"AP World out of date: Expected v{SETTINGSVER}, got v{version}");
+                PeaksOfArchipelago.ui.SendNotification($"Expect the Unexpected");
             }
             if (version > SETTINGSVER)
             {
                 PeaksOfArchipelago.Logger.LogWarning($"Mod out of date! Issues may happen. Expected v{SETTINGSVER}, got v{version}");
+                PeaksOfArchipelago.ui.SendNotification($"Mod out of date: Expected v{SETTINGSVER}, got v{version}");
+                PeaksOfArchipelago.ui.SendNotification($"Expect the Unexpected");
             }
         }
 

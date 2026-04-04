@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Text;
 using PeaksOfArchipelago.Assets;
 using PeaksOfArchipelago.GameData;
 using PeaksOfArchipelago.Session;
 using BepInEx.Logging;
 using PeaksOfArchipelago.Extensions;
-using static RootMotion.FinalIK.VRIKCalibrator;
+using System.Collections;
 
 
 namespace PeaksOfArchipelago.MonoBehaviours
@@ -24,6 +21,8 @@ namespace PeaksOfArchipelago.MonoBehaviours
         ManualLogSource Logger;
 
         SessionSettings settings;
+        
+        bool showingTutorial = false;
 
         private bool visible = false;
 
@@ -40,6 +39,7 @@ namespace PeaksOfArchipelago.MonoBehaviours
             {
                 if (Input.GetKeyDown(KeyCode.P))
                 {
+                    showingTutorial = false;
                     Enable();
                 }
 
@@ -68,10 +68,21 @@ namespace PeaksOfArchipelago.MonoBehaviours
             this.canvas = canvas;
             this.connection = connection;
             this.Logger = PeaksOfArchipelago.Logger;
-
+            
             progressDisplayRoot = Instantiate(PeaksOfAssets.ProgressDisplay, canvas.transform).transform;
             progressDisplayRoot.SetAsLastSibling(); // set as last as it should be visible over everything else (even the escape menu apparently whoops)
             progressDisplayRoot.gameObject.SetActive(false);
+
+            Vector2 size = ((RectTransform)canvas.transform).sizeDelta;
+            PeaksOfArchipelago.Logger.LogInfo(size);
+            BookLayoutGroup layout = progressDisplayRoot.gameObject.AddComponent<BookLayoutGroup>();
+            layout.constraint = BookLayoutGroup.Constraint.FixedColumnCount;
+            layout.constraintCount = 4;
+            layout.cellSize = new Vector2(size.x / 4, size.y);
+
+            if (!PeaksOfArchipelago.Instance.hasSeenProgressScreenTutorial.Value) {
+                StartCoroutine(nameof(ShowTutorial));
+            }
 
             // Somehow get the slotdata here ??
             this.settings = connection.settings;
@@ -88,9 +99,9 @@ namespace PeaksOfArchipelago.MonoBehaviours
 
         private void LoadBookData(Books book, ISlotData data)
         {
-            bool unlocked = data.HasBook(book);
-            books[book].gameObject.SetActive(unlocked);
-            if (!unlocked) return;
+            bool showing = data.ShowBook(book);
+            books[book].gameObject.SetActive(showing);
+            if (!showing) return;
             Transform nameObject = books[book].FindDeep("BOOKNAME");
             if (nameObject == null)
             {
@@ -240,6 +251,38 @@ namespace PeaksOfArchipelago.MonoBehaviours
             {
                 Logger.LogWarning("Couldn't find Time Attack column in book entry prefab");
             }
+        }
+
+        private IEnumerator ShowTutorial()
+        {
+            GameObject tutorialObject = Instantiate(PeaksOfAssets.ProgressScreenTutorial, canvas.transform);
+            CanvasGroup cg = tutorialObject.GetComponent<CanvasGroup>();
+            cg.alpha = 0f;
+            float t = 0f;
+            float d = 2.0f;
+            while (t < d)
+            {
+                t += Time.deltaTime;
+                cg.alpha = t / d;
+                yield return null;
+            }
+            showingTutorial = true;
+            while (showingTutorial)
+            {
+                yield return null;
+            }
+
+            PeaksOfArchipelago.Instance.hasSeenProgressScreenTutorial.Value = true;
+            PeaksOfArchipelago.Instance.Config.Save();
+
+            while (t > 0f)
+            {
+                t -= Time.deltaTime;
+                cg.alpha = t / d;
+                yield return null;
+            }
+            Destroy(tutorialObject);
+            yield return null;
         }
     }
 }

@@ -31,6 +31,66 @@ namespace PeaksOfArchipelago.Patches
             {
                 Connection.Instance.CompleteFSPeakLocation(peak);
             }
+            bool isBookUnlock = Connection.Instance.settings.gameMode == SessionSettings.GameMode.BOOK_UNLOCK;
+            Peaks nextPeak = peak + 1;
+            bool isLastInBook = Mappings.GetPeakBook(peak) != Mappings.GetPeakBook(nextPeak);
+            bool hasNextPeak = Connection.Instance.HasLocation(LocationIDs.GetPeakLocationID(nextPeak));
+            __instance.gotonextpeak_ui.gameObject.SetActive(!isLastInBook && (isBookUnlock || hasNextPeak));
+        }
+
+        public struct State
+        {
+            public bool crampons;
+            public bool cramponUpgrade;
+            public bool rope;
+            public int ropesCollected;
+            public bool ropeUpgrade;
+            public bool pipe;
+            public bool chalkbag;
+            public bool coffee;
+            public bool instantiated;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("SavePeakProgress")]
+        public static void PrePeakProgressSave(out State __state)
+        {
+            __state = new State
+            {
+                crampons = GameManager.control.crampons,
+                cramponUpgrade = GameManager.control.cramponsUpgrade,
+                rope = GameManager.control.rope,
+                ropesCollected = GameManager.control.ropesCollected,
+                ropeUpgrade = GameManager.control.ropesUpgrade,
+                pipe = GameManager.control.smokingpipe,
+                chalkbag = GameManager.control.chalkBag,
+                coffee = GameManager.control.coffee,
+                instantiated = true
+            };
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("SavePeakProgress")]
+        public static void PostPeakProgessSave(State __state)
+        {
+            // Incredible warning suppression moment
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable Harmony003 // Harmony non-ref patch parameters modified
+            if (!__state.instantiated)
+            {
+                PeaksOfArchipelago.Logger.LogWarning("state not instantiated somehow");
+                return;
+            }
+            GameManager.control.crampons = __state.crampons;
+            GameManager.control.cramponsUpgrade = __state.cramponUpgrade;
+            GameManager.control.rope = __state.rope;
+            GameManager.control.ropesCollected = __state.ropesCollected;
+            GameManager.control.ropesUpgrade = __state.ropeUpgrade;
+            GameManager.control.smokingpipe = __state.pipe;
+            GameManager.control.chalkBag = __state.chalkbag;
+            GameManager.control.coffee = __state.coffee;
+#pragma warning restore Harmony003 // Harmony non-ref patch parameters modified
+#pragma warning restore IDE0079 // Remove unnecessary suppression
         }
     }
 

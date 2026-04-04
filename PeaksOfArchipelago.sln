@@ -5,6 +5,17 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PeaksOfArchipelago", "PeaksOfArchipelago\PeaksOfArchipelago.csproj", "{081AB4AE-5D09-4AB2-912A-02589737E45B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReleaseTemplate", "ReleaseTemplate", "{92052884-11BF-4965-8EF3-EBE5BC82C794}"
+	ProjectSection(SolutionItems) = preProject
+		ReleaseTemplate\CHANGELOG.md = ReleaseTemplate\CHANGELOG.md
+		ReleaseTemplate\icon.png = ReleaseTemplate\icon.png
+		ReleaseTemplate\manifest.json = ReleaseTemplate\manifest.json
+		ReleaseTemplate\README.md = ReleaseTemplate\README.md
+	EndProjectSection
+	ProjectSection(FolderGlobals) = preProject
+		C_5_4Users_4Eliott_4source_4repos_4PeaksOfArchipelago_4ReleaseTemplate_4manifest_1json__JsonSchema = 
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Dev|Any CPU = Dev|Any CPU

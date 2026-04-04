@@ -58,6 +58,7 @@ namespace PeaksOfArchipelago.GameData
             {
                 case ExtraItems.ExtraRope:
                     GameManager.control.ropesCollected++;
+                    GameManager.control.ropesCollected++;
                     break;
                 case ExtraItems.ExtraChalk:
                     GameManager.control.extraChalkUses++;

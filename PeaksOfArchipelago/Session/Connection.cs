@@ -15,6 +15,14 @@ using Color = UnityEngine.Color;
 
 namespace PeaksOfArchipelago.Session
 {
+
+    internal enum SlotType
+    {
+        None = 0,
+        Normal = 1,
+        YFYD = 2
+    }
+
     internal class Connection
     {
         public static Connection Instance { get; private set; }
@@ -54,7 +62,8 @@ namespace PeaksOfArchipelago.Session
 
             session.Socket.ErrorReceived += (Exception e, string message) =>
             {
-                logger.LogInfo("Socket error incoming lmao");
+                logger.LogInfo("Socket error");
+                logger.LogError($"message: {message}");
                 logger.LogError(e);
             };
 
@@ -97,6 +106,7 @@ namespace PeaksOfArchipelago.Session
             slotOptions = ((LoginSuccessful)result).SlotData;
             session.DataStorage["ItemCount"].Initialize(0);
             session.DataStorage["SaveSlot"].Initialize(-1);
+            session.DataStorage["SlotType"].Initialize((int)SlotType.None);
 
             LoadData();
             if (settings.deathLinkEnabled)
@@ -148,6 +158,9 @@ namespace PeaksOfArchipelago.Session
                     return true;
                 }
                 return false;
+            }
+            else if (settings.goal == SessionSettings.Goal.PEAK){
+                return !missingIDs.Contains(LocationIDs.GetPeakLocationID(settings.targetPeak));
             }
             else
             {
@@ -391,6 +404,24 @@ namespace PeaksOfArchipelago.Session
                 return;
             }
             session.DataStorage["SaveSlot"] = slot;
+        }
+
+        internal SlotType GetSlotType()
+        {
+            if (session == null)
+            {
+                return SlotType.None;
+            }
+            return (SlotType)(int)session.DataStorage["SlotType"];
+        }
+
+        internal void SetSlotType(SlotType type)
+        {
+            if (session == null)
+            {
+                return;
+            }
+            session.DataStorage["SlotType"] = (int)type;
         }
     }
 }

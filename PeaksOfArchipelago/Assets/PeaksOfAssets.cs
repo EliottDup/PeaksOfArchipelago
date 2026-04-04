@@ -20,6 +20,7 @@ namespace PeaksOfArchipelago.Assets
         public static GameObject ProgressDisplay { get; private set; }
         public static GameObject BookEntryPrefab { get; private set; }
         public static GameObject PeakEntryPrefab { get; private set; }
+        public static GameObject ProgressScreenTutorial { get; private set; }
         public static GameObject DLCWarning { get; private set; }
 
         public static void LoadAssets()
@@ -41,6 +42,7 @@ namespace PeaksOfArchipelago.Assets
             ProgressDisplay = assetBundle.LoadAsset<GameObject>("ProgressDisplay");
             BookEntryPrefab = assetBundle.LoadAsset<GameObject>("BookPanel");
             PeakEntryPrefab = assetBundle.LoadAsset<GameObject>("PeakEntry");
+            ProgressScreenTutorial = assetBundle.LoadAsset<GameObject>("ProgressScreenTutorial");
 
             DLCWarning = assetBundle.LoadAsset<GameObject>("NoDLCAlert");
 

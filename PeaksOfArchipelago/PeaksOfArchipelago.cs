@@ -32,6 +32,7 @@ namespace PeaksOfArchipelago
 
         public bool hasDLCInstalled = false;
 
+        public ConfigEntry<bool> hasSeenProgressScreenTutorial;
         public enum PlayerState
         {
             InMainMenu,
@@ -45,11 +46,13 @@ namespace PeaksOfArchipelago
             ServerIP = Config.Bind("Session", "ServerIP", "", "The last server IP used to connect to an Archipelago session.");
             Password = Config.Bind("Session", "Password", "", "The last password used to connect to an Archipelago session.");
 
+            hasSeenProgressScreenTutorial = Config.Bind("HasSeenProgressScreenTutorial", "Misc", false, "Whether the player has seen the progress screen tutorial or not.");
+
             Instance = this;
 
             Logger = base.Logger;
             Assets.PeaksOfAssets.LoadAssets();
-
+            
             this.harmony = new(MyPluginInfo.PLUGIN_GUID + "_Patcher");
             try
             {
@@ -69,38 +72,42 @@ namespace PeaksOfArchipelago
 
         public void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
+            if (loadSceneMode == LoadSceneMode.Additive)
+            {
+                Logger.LogInfo("Scene loaded in additive mode, might want to disable this");
+            }
             if ( connection == null && scene.buildIndex == 0)
             {
                 UIManager.CreateLoginUI(AttemptLogin);
             }
 
-            Logger.LogInfo($"Loaded scene index: {scene.buildIndex}");
+            Logger.LogInfo($"Loaded scene index: {scene.buildIndex}, named: {scene.name}");
 
             if (connection == null && scene.buildIndex != 0) throw new Exception("How tf did you enter the game without connecting??");
+            ui.OnSceneLoaded(connection);
             // Scene buildIndex:
             // 0 = Main Menu
             // 1 = Cabin
             // 37 = Cabin4
             // 67 = Alpine Express/alps cabin
-            ui.OnSceneLoaded(connection);
             switch (scene.buildIndex)
             {
-                case 0:
+                case 0: //name: "TitleSceen"
                     playerState = PlayerState.InMainMenu;
                     OnExitCabin?.Invoke(this, EventArgs.Empty);
                     break;
 
-                case 1:
+                case 1: // name: "Cabin"
                     playerState = PlayerState.InCabin;
                     OnEnterCabin?.Invoke(this, GameData.Cabins.Cabin);
                     break;
 
-                case 37:
+                case 37: // name: "Category4_1_Cabin"
                     playerState = PlayerState.InCabin;
                     OnEnterCabin?.Invoke(this, GameData.Cabins.CabinExpert);
                     break;
 
-                case 67:
+                case 67: // name: "Alps_Main"
                     playerState = PlayerState.InCabin;
                     OnEnterCabin?.Invoke(this, GameData.Cabins.CabinAlps);
                     break;

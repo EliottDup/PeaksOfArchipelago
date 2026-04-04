@@ -4,6 +4,7 @@ using PeaksOfArchipelago.Session;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace PeaksOfArchipelago.Patches
@@ -102,6 +103,18 @@ namespace PeaksOfArchipelago.Patches
         }
     }
 
+    [HarmonyPatch(typeof(TimeAttack))]
+    internal class TimeAttackNullReferenceExceptionPatch
+    {
+        [HarmonyPatch("Update")]
+        [HarmonyPrefix]
+        public static bool UpdatePatch()
+        {
+            if (SceneManager.GetActiveScene().buildIndex == 37) return false;
+            return true;
+        }
+    }
+
     [HarmonyPatch(typeof(Text))] // surely patching Text won't cause any issues, right?
     internal class  TextPatch
     {
@@ -147,5 +160,4 @@ namespace PeaksOfArchipelago.Patches
             Connection.Instance?.HandleDeath();
         }
     }
-    
 }

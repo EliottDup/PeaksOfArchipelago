@@ -12,6 +12,7 @@ namespace PeaksOfArchipelago.GameData
         int cramponLevel { get; set; }
 
         bool HasBook(Books book);
+        bool ShowBook(Books book);
 
         bool HasArtefact(Artefacts artefact);
 
