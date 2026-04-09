@@ -13,12 +13,21 @@ namespace PeaksOfArchipelago.MonoBehaviours
         private Canvas canvas;
         private GameObject chatBoxRoot;
         private Transform messageHolder;
+        private Queue<string> messageQueue = new Queue<string>();
 
         public void Awake()
         {
             logger = PeaksOfArchipelago.Logger;
         }
-        
+
+        public void Update()
+        {
+            while (messageQueue.Count > 0)
+            {
+                Create(messageQueue.Dequeue());
+            }
+        }
+
         public void Initialize(Canvas c)
         {
             canvas = c;
@@ -36,13 +45,18 @@ namespace PeaksOfArchipelago.MonoBehaviours
             messageHolder = chatBoxRoot.transform.GetChild(0);
         }
 
-        public void AddChatMessage(string message)
+        public void Create(string message)
         {
             if (messageHolder == null) return;
             logger.LogInfo("AddChatMessage: " + message);
             GameObject messageObject = Instantiate(Assets.PeaksOfAssets.ChatMessagePrefab, messageHolder);
             Text t = messageObject.GetComponentInChildren<Text>();
             t.text = message;
+        }
+
+        public void AddChatMessage(string message)
+        {
+            messageQueue.Enqueue(message);
         }
     }
 }
