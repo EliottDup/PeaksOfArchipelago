@@ -21,12 +21,14 @@ namespace PeaksOfArchipelago.UI
 
         private ProgressDisplay progressDisplay;
 
+        private GameObject trapDisplay;
+
         public UIManager()
         {
             logger = PeaksOfArchipelago.Logger;
         }
 
-        private void MakeUI()
+        private void MakeUI(TrapHandler trapHandler)
         {
             
             this.canvas = GetBestCanvas();
@@ -40,6 +42,10 @@ namespace PeaksOfArchipelago.UI
             // Make Notification System
             notificationSystem = notificationSystemObject.AddComponent<Notificator>();
             notificationSystem.notificationPrefab = PeaksOfAssets.Notification;
+
+            // init traphandler
+            trapDisplay = GameObject.Instantiate(PeaksOfAssets.TrapDisplay, canvas.transform);
+            trapHandler.Initialize(trapDisplay);
         }
 
         private Canvas GetBestCanvas()
