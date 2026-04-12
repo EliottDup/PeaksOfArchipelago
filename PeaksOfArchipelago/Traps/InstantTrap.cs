@@ -5,10 +5,10 @@ namespace PeaksOfArchipelago.Traps
 {
     internal class InstantTrap : Trap
     {
-        private readonly Func<IEnumerator> _action;
+        private readonly Action _action;
         private readonly Func<bool> _condition;
 
-        public InstantTrap(string message, Func<IEnumerator> action, Func<bool> condition = null)
+        public InstantTrap(string message, Action action, Func<bool> condition = null)
         {
             Message = message;
             _action = action;
@@ -20,9 +20,9 @@ namespace PeaksOfArchipelago.Traps
             return _condition == null || _condition();
         }
 
-        public override IEnumerator Execute(TrapHandler handler)
+        public override void Execute(TrapHandler handler)
         {
-            yield return _action();
+            _action?.Invoke();
         }
     }
 }

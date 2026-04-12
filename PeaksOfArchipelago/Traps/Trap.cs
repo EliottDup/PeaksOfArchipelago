@@ -13,6 +13,6 @@ namespace PeaksOfArchipelago.Traps
             return true;
         }
 
-        public abstract IEnumerator Execute(TrapHandler handler);
+        public abstract void Execute(TrapHandler handler);
     }
 }

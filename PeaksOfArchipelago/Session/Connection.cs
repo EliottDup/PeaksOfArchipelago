@@ -13,6 +13,7 @@ using UnityEngine;
 using static PeaksOfArchipelago.GameData.LocationIDs;
 using static PeaksOfArchipelago.GameData.ItemTypes;
 using Color = UnityEngine.Color;
+using PeaksOfArchipelago.MonoBehaviours;
 
 namespace PeaksOfArchipelago.Session
 {
@@ -293,9 +294,28 @@ namespace PeaksOfArchipelago.Session
 
         private void OnItemReceived(ItemInfo item)
         {
-            uncollectedItems.Add(item);
-            logger.LogInfo($"Recieving Item: {item.ItemName}");
-            // TODO: Notify player
+            if (item.ItemName == "Trap")
+            {
+                if (PeaksOfArchipelago.playerState == PeaksOfArchipelago.PlayerState.InPeak)
+                {
+                    if (TrapHandler.Instance == null)
+                    {
+                        logger.LogError("Error: Tried activating trap but handler is null??");
+                        return;
+                    }
+                    logger.LogInfo("Activating trap");
+                    TrapHandler.Instance?.StartRandomTrap();
+                }
+                else
+                {
+                    logger.LogInfo($"Trap received but player is not in peak!");
+                }
+            }
+            else
+            {
+                uncollectedItems.Add(item);
+                logger.LogInfo($"Recieving Item: {item.ItemName}");
+            }
         }
 
         private void UnlockItem(ItemInfo item)

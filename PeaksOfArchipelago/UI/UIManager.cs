@@ -21,16 +21,15 @@ namespace PeaksOfArchipelago.UI
 
         private ProgressDisplay progressDisplay;
 
-        private GameObject trapDisplay;
+        public GameObject trapDisplay;
 
         public UIManager()
         {
             logger = PeaksOfArchipelago.Logger;
         }
 
-        private void MakeUI(TrapHandler trapHandler)
+        private void MakeUI()
         {
-            
             this.canvas = GetBestCanvas();
 
              //Make ChatBox
@@ -45,7 +44,6 @@ namespace PeaksOfArchipelago.UI
 
             // init traphandler
             trapDisplay = GameObject.Instantiate(PeaksOfAssets.TrapDisplay, canvas.transform);
-            trapHandler.Initialize(trapDisplay);
         }
 
         private Canvas GetBestCanvas()
@@ -107,6 +105,7 @@ namespace PeaksOfArchipelago.UI
         internal void OnSceneLoaded(Connection connection)
         {
             MakeUI();
+            scriptholder.AddComponent<TrapHandler>();
             if (connection != null)
             {
                 progressDisplay = scriptholder.AddComponent<ProgressDisplay>();
