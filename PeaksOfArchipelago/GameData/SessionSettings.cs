@@ -44,6 +44,7 @@
         public bool includeFreeSolo = false;
         public bool includeTimeAttack = false;
         public Peaks targetPeak;
+        public bool artefactItems;
         public int version = 0;
 
         public SessionSettings(bool deathLinkEnabled, RopeUnlockMode ropeUnlockMode, Goal goal, GameMode gameMode, int booksEnabled, bool excludeST)
@@ -72,6 +73,7 @@
             includeFreeSolo = LoadIntFromDict(optionsDict, "includeFreeSolo", false) == 1;
             includeTimeAttack = LoadIntFromDict(optionsDict, "includeTimeAttack", false) == 1;
             targetPeak = (Peaks)LoadIntFromDict(optionsDict, "peakGoal", 36);
+            artefactItems = LoadIntFromDict(optionsDict, "artefactItems", true) == 1;
             version = LoadIntFromDict(optionsDict, "settingsVer", 0);
             if (version < SETTINGSVER)
             {

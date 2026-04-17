@@ -3,7 +3,7 @@ using PeaksOfArchipelago.GameData;
 
 namespace PeaksOfArchipelago.CabinHandlers
 {
-    internal class AlpsCabinHandler(ISlotData slotData) : CabinHandler(slotData)
+    internal class AlpsCabinHandler(ISlotData slotData, SessionSettings settings) : CabinHandler(slotData, settings)
     {
         public override bool CollectItems(List<ItemInfo> itemInfos)
         {
@@ -21,6 +21,11 @@ namespace PeaksOfArchipelago.CabinHandlers
         {
             // rember to do phonograph, crampons and sum more as well
             PeaksOfArchipelago.ui.SendNotification($"Alps not implemented, please return to the base cabin");
+        }
+
+        internal override void LoadArtefacts()
+        {
+            throw new NotImplementedException();
         }
     }
 }

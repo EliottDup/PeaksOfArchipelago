@@ -50,6 +50,7 @@ namespace PeaksOfArchipelago.Patches
         [HarmonyPatch("LoadArtefacts")]
         public static bool ArtefactLoaderCabinDisabler()
         {
+            Connection.Instance?.loadArtefacts();
             PeaksOfArchipelago.Logger.LogInfo("Disabled artefact loading!");
             return false;
         }

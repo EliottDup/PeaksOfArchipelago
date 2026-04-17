@@ -43,6 +43,8 @@ namespace PeaksOfArchipelago.Session
 
         private bool hasWon;
         private Dictionary<long, ScoutedItemInfo> scoutedItems;
+            
+        private CabinHandler currentCabinHandler;
 
         private int itemCount = 0;
 
@@ -264,7 +266,8 @@ namespace PeaksOfArchipelago.Session
                 instantCollectItems.Clear();
             }
             // TODO: Collect Items
-            CabinHandler handler = CabinHandler.New(cabin, slotData);
+            CabinHandler handler = CabinHandler.New(cabin, slotData, settings);
+            currentCabinHandler = handler;
             if (!hasWon && CheckCompletion())
             {
                 if (handler.HandleCompletion())
@@ -281,6 +284,11 @@ namespace PeaksOfArchipelago.Session
                     foreach (ItemInfo item in uncollectedItems)
                     {
                         UnlockItem(item);
+
+                        if (GetItemType(item.ItemId) == ItemTypes.Types.Artefact)
+                        {
+                            SetArtefactDirty(ItemIDs.GetArtefactFromID(item.ItemId));
+                        }
                     }
                     itemCount += uncollectedItems.Count;
                     session.DataStorage["ItemCount"] = itemCount;
@@ -417,6 +425,79 @@ namespace PeaksOfArchipelago.Session
                 return;
             }
             session.DataStorage["SlotType"] = (int)type;
+        }
+
+        internal void loadArtefacts()
+        {
+            currentCabinHandler?.LoadArtefacts();
+        }
+
+        private void SetArtefactDirty(Artefacts artefact)
+        {
+            // bit of a pain but so be it
+            switch (artefact)
+            {
+                case Artefacts.Hat1:
+                    GameManager.control.artefact_Hat1_IsDirty = true;
+                    break;
+                case Artefacts.Hat2:
+                    GameManager.control.artefact_Hat2_IsDirty = true;
+                    break;
+                case Artefacts.Helmet:
+                    GameManager.control.artefact_Helmet_IsDirty = true;
+                    break;
+                case Artefacts.Shoe:
+                    GameManager.control.artefact_Shoe_IsDirty = true;
+                    break;
+                case Artefacts.Shovel:
+                    GameManager.control.artefact_Shovel_IsDirty = true;
+                    break;
+                case Artefacts.Sleepingbag:
+                    GameManager.control.artefact_Sleepingbag_IsDirty = true;
+                    break;
+                case Artefacts.Backpack:
+                    GameManager.control.artefact_Backpack_IsDirty = true;
+                    break;
+                case Artefacts.Coffebox_1:
+                    GameManager.control.artefact_Coffeebox1_IsDirty = true;
+                    break;
+                case Artefacts.Coffebox_2:
+                    GameManager.control.artefact_Coffeebox2_IsDirty = true;
+                    break;
+                case Artefacts.Chalkbox_1:
+                    GameManager.control.artefact_Chalkbox1_IsDirty = true;
+                    break;
+                case Artefacts.Chalkbox_2:
+                    GameManager.control.artefact_Chalkbox2_IsDirty = true;
+                    break;
+                case Artefacts.ClimberStatue1:
+                    GameManager.control.artefact_Statue1_IsDirty = true;
+                    break;
+                case Artefacts.ClimberStatue2:
+                    GameManager.control.artefact_Statue2_IsDirty = true;
+                    break;
+                case Artefacts.ClimberStatue3:
+                    GameManager.control.artefact_Statue3_IsDirty = true;
+                    break;
+                case Artefacts.Photograph_1:
+                    GameManager.control.artefact_Photograph1_IsDirty = true;
+                    break;
+                case Artefacts.Photograph_2:
+                    GameManager.control.artefact_Photograph2_IsDirty = true;
+                    break;
+                case Artefacts.Photograph_3:
+                    GameManager.control.artefact_Photograph3_IsDirty = true;
+                    break;
+                case Artefacts.Photograph_4:
+                    GameManager.control.artefact_Photograph4_IsDirty = true;
+                    break;
+                case Artefacts.PhotographFrame:
+                    GameManager.control.artefact_PhotographFrame_IsDirty = true;
+                    break;
+                case Artefacts.ClimberStatue0:
+                    GameManager.control.artefact_Statue0_IsDirty = true;
+                    break;
+            }
         }
     }
 }
