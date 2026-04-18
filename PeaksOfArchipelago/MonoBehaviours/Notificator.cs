@@ -15,7 +15,7 @@ namespace PeaksOfArchipelago.MonoBehaviours
             notificationParent = transform.GetChild(0);
         }
 
-        public void CreateNotification(string message)
+        public void CreateNotification(string message, float duration = 2f)
         {
             GameObject notifLocation = new GameObject("NotifLoc", typeof(RectTransform));
             notifLocation.transform.SetParent(notificationParent);
@@ -26,7 +26,7 @@ namespace PeaksOfArchipelago.MonoBehaviours
             if (notificationScript)
             {
                 notification.SetActive(true);
-                notificationScript.Init(message, notifLocation.transform, transform.position + Vector3.up * 500f);
+                notificationScript.Init(message, notifLocation.transform, transform.position + Vector3.up * 500f, duration);
             }
         }
     }

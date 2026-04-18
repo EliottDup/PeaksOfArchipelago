@@ -5,6 +5,7 @@ using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace PeaksOfArchipelago.CabinHandlers
@@ -19,11 +20,28 @@ namespace PeaksOfArchipelago.CabinHandlers
 
         protected ISlotData slotData;
 
+        protected struct ArtefactInfo
+        {
+            public ArtefactInfo(Artefacts artefact, GameObject cleanObject, GameObject dirtyObject, bool isDirty, bool hasArtefact)
+            {
+                this.artefact = artefact;
+                this.cleanObject = cleanObject;
+                this.dirtyObject = dirtyObject;
+                this.isDirty = isDirty;
+                this.hasArtefact = hasArtefact;
+            }
+
+            public Artefacts artefact;
+            public GameObject cleanObject;
+            public GameObject dirtyObject;
+            public bool isDirty;
+            public bool hasArtefact;
+        }
+
         public CabinHandler(ISlotData slotData)
         {
             this.slotData = slotData;
             logger = PeaksOfArchipelago.Logger;
-            this.settings = settings;
         }
 
         public static CabinHandler New(Cabins cabin, ISlotData slotData)

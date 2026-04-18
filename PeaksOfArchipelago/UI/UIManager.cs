@@ -97,10 +97,10 @@ namespace PeaksOfArchipelago.UI
             chat.AddChatMessage(message);
         }
 
-        public void SendNotification(string message)
+        public void SendNotification(string message, float duration = 2f)
         {
             if (notificationSystem == null) return;
-            notificationSystem.CreateNotification(message);
+            notificationSystem.CreateNotification(message, duration);
         }
 
         public void OnSceneLoaded()

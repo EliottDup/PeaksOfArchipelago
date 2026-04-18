@@ -160,6 +160,63 @@ namespace PeaksOfArchipelago.Patches
         }
     }
 
+    [HarmonyPatch(typeof(Mermaid))]
+    internal class MermaidPatches
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("LoadMermaidStuff")]
+        public static bool LoadPublicStuffPrefix(Mermaid __instance)
+        {
+            int num = Int32.Parse(__instance.gameObject.name.Split('_')[1]);
+            if (num <= 0)
+            {
+                throw new Exception($"Error: incorrectly determined index of mermaid {__instance.gameObject.name}");
+            }
+            if (__instance.isEagle)
+            {
+                Mermaids m = (Mermaids)(num + Mermaids.Goat5);
+                __instance.gameObject.SetActive(!Connection.Instance.HasLocation(LocationIDs.GetMermaidLocationID(m)) && !GameManager.control.alps_statue_sundown_InUse);
+            }
+            else if (__instance.isGoat)
+            {
+                Mermaids m = (Mermaids)(num + Mermaids.Mermaid7);
+                __instance.eagleParentObj.SetActive(!Connection.Instance.HasLocation(LocationIDs.GetMermaidLocationID(m)) && GameManager.control.alps_statue_sundown_InUse);
+            }
+            else
+            {
+                Mermaids m = (Mermaids)num;
+                __instance.gameObject.SetActive(!Connection.Instance.HasLocation(LocationIDs.GetMermaidLocationID(m)));
+            }
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(MonocularSightDetection))]
+    internal class MonocularSightDetectionPatches
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("FadeOutMermaid")]
+        public static void UnlockMermaid(int mermaidID)
+        {
+            Mermaids m = (Mermaids)(-1);
+            if (mermaidID <= 7)
+            {
+                m = (Mermaids)(mermaidID - 1);
+            }
+            else if (mermaidID <= 12)
+            {
+                //eagle
+                m = (Mermaids)(mermaidID + 4);
+            }
+            else
+            {
+                m = (Mermaids)(mermaidID - 6);
+            }
+            Connection.Instance.CompleteMermaidLocation(m);
+        }
+
+    }
+
     [HarmonyPatch(typeof(BirdSeedCollectable))]
     internal class BirdSeedCollectablePatches
     {

@@ -37,6 +37,7 @@ namespace PeaksOfArchipelago.GameData
         public void RecieveArtefact(Artefacts artefact)
         {
             unlockedArtefacts.Add(artefact);
+            PeaksOfArchipelago.Logger.LogWarning("How did we get here again?");
         }
 
         public void RecieveBirdSeed(BirdSeeds birdSeed)
@@ -88,12 +89,6 @@ namespace PeaksOfArchipelago.GameData
             {
                 return HasBook(book);
             }
-        }
-            
-
-        public bool HasArtefact(Artefacts artefact)
-        {
-            return unlockedArtefacts.Contains(artefact);
         }
 
         public int GetTotalRopeCount()
@@ -176,6 +171,11 @@ namespace PeaksOfArchipelago.GameData
         public Color GetJournalPageColor(int v, Books b)
         {
             return IsJournalPageUnlocked(v, b) ? Color.white : Color.red;
+        }
+
+        public void receiveIdol(Idols idol)
+        {
+            unlockedIdols.Add(idol);
         }
     }
 }

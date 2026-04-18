@@ -130,6 +130,22 @@ namespace PeaksOfArchipelago.Patches
         }
     }
 
+    [HarmonyPatch(typeof(PlayerPrefs))] // This makes it so that eagles and goats are viewable even if they have all been viewed b4
+    internal class PlayerPrefsPatch
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(PlayerPrefs.HasKey))]
+        public static bool HasKeyPrefix(string key, ref bool result)
+        {
+            if (key.Equals("Pin_AA_4") || key.Equals("Pin_AA_5"))
+            {
+                result = false;
+                return false;
+            }
+            return true;
+        }
+    }
+
     [HarmonyPatch(typeof(RopeAnchor))]
     internal class RopeAnchorPatch
     {

@@ -13,7 +13,7 @@ namespace PeaksOfArchipelago.MonoBehaviours
         private Vector3 startPosition;
         private CanvasGroup canvasGroup;
 
-        public void Init(string message, Transform target, Vector3 startPos)
+        public void Init(string message, Transform target, Vector3 startPos, float duration = 2f)
         {
             canvasGroup = GetComponent<CanvasGroup>();
             Text t = GetComponentInChildren<Text>();
@@ -23,7 +23,7 @@ namespace PeaksOfArchipelago.MonoBehaviours
             }
             targetTransform = target;
             startPosition = startPos;
-            StartCoroutine(FadeTimer(2f, 0.5f));
+            StartCoroutine(FadeTimer(duration, 0.5f));
         }
 
         private IEnumerator FadeTimer(float duration, float fadeDuration)

@@ -65,22 +65,6 @@ namespace PeaksOfArchipelago.CabinHandlers
             return true;
         }
 
-        private struct Artefact
-        {
-            public Artefact(GameObject cleanObject, GameObject dirtyObject, bool isDirty, bool hasArtefact)
-            {
-                this.cleanObject = cleanObject;
-                this.dirtyObject = dirtyObject;
-                this.isDirty = isDirty;
-                this.hasArtefact = hasArtefact;
-            }
-
-            public GameObject cleanObject;
-            public GameObject dirtyObject;
-            public bool isDirty;
-            public bool hasArtefact;
-        }
-
         public override void LoadProgress()
         {
             logger.LogInfo("Loading Base Cabin Progress...");
@@ -232,39 +216,34 @@ namespace PeaksOfArchipelago.CabinHandlers
             // ISSUE TODO: AAAA IsDirty is not set correctly by the game
             ArtefactLoaderCabin alc = GameObject.FindObjectOfType<ArtefactLoaderCabin>();
 
-            Dictionary<Artefacts, Artefact> artefactsToGameObjects = new()
-                {   // Can't really blame Andos for doing it this way, but I hate it :D
-                    // It could have been done with a Hashmap or something (he even has a whole enum with all the artefacts)
-                    // but noooo, we have 20123 individual fields in GameManager.
-                    // INSTEAD OF 3 HASHMAPS
-                    {Artefacts.Hat1, new Artefact(alc.clean_hat1, alc.dirty_hat1, GameManager.control.artefact_Hat1_IsDirty, GameManager.control.hasArtefact_Hat1)},
-                    {Artefacts.Hat2, new Artefact(alc.clean_hat2, alc.dirty_hat2, GameManager.control.artefact_Hat2_IsDirty, GameManager.control.hasArtefact_Hat2)},
-                    {Artefacts.Helmet, new Artefact(alc.clean_helmet, alc.dirty_helmet, GameManager.control.artefact_Helmet_IsDirty, GameManager.control.hasArtefact_Helmet)},
-                    {Artefacts.Shoe, new Artefact(alc.clean_shoe, alc.dirty_shoe, GameManager.control.artefact_Shoe_IsDirty, GameManager.control.hasArtefact_Shoe)},
-                    {Artefacts.Shovel, new Artefact(alc.clean_shovel, alc.dirty_shovel, GameManager.control.artefact_Shovel_IsDirty, GameManager.control.hasArtefact_Shovel)},
-                    {Artefacts.Sleepingbag, new Artefact(alc.clean_sleepingbag, alc.dirty_sleepingbag, GameManager.control.artefact_Sleepingbag_IsDirty, GameManager.control.hasArtefact_Sleepingbag)},
-                    {Artefacts.Backpack, new Artefact(alc.clean_backpack, alc.dirty_backpack, GameManager.control.artefact_Backpack_IsDirty, GameManager.control.hasArtefact_Backpack)},
-                    {Artefacts.Coffebox_1, new Artefact(alc.clean_coffeebox1, alc.dirty_coffeebox1, GameManager.control.artefact_Coffeebox1_IsDirty, GameManager.control.hasArtefact_Coffeebox1)},
-                    {Artefacts.Coffebox_2, new Artefact(alc.clean_coffeebox2, alc.dirty_coffeebox2, GameManager.control.artefact_Coffeebox2_IsDirty, GameManager.control.hasArtefact_Coffeebox2)},
-                    {Artefacts.Chalkbox_1, new Artefact(alc.clean_chalkbox1, alc.dirty_chalkbox1, GameManager.control.artefact_Chalkbox1_IsDirty, GameManager.control.hasArtefact_Chalkbox1)},
-                    {Artefacts.Chalkbox_2, new Artefact(alc.clean_chalkbox2, alc.dirty_chalkbox2, GameManager.control.artefact_Chalkbox2_IsDirty, GameManager.control.hasArtefact_Chalkbox2)},
-                    {Artefacts.ClimberStatue1, new Artefact(alc.clean_statue1, alc.dirty_statue1, GameManager.control.artefact_Statue1_IsDirty, GameManager.control.hasArtefact_Statue1)},
-                    {Artefacts.ClimberStatue2, new Artefact(alc.clean_statue2, alc.dirty_statue2, GameManager.control.artefact_Statue2_IsDirty, GameManager.control.hasArtefact_Statue2)},
-                    {Artefacts.ClimberStatue3, new Artefact(alc.clean_statue3, alc.dirty_statue3, GameManager.control.artefact_Statue3_IsDirty, GameManager.control.hasArtefact_Statue3)},
-                    {Artefacts.Photograph_1, new Artefact(alc.clean_photograph1, alc.dirty_photograph1, GameManager.control.artefact_Photograph1_IsDirty, GameManager.control.hasArtefact_Photograph1)},
-                    {Artefacts.Photograph_2, new Artefact(alc.clean_photograph2, alc.dirty_photograph2, GameManager.control.artefact_Photograph2_IsDirty, GameManager.control.hasArtefact_Photograph2)},
-                    {Artefacts.Photograph_3, new Artefact(alc.clean_photograph3, alc.dirty_photograph3, GameManager.control.artefact_Photograph3_IsDirty, GameManager.control.hasArtefact_Photograph3)},
-                    {Artefacts.Photograph_4, new Artefact(alc.clean_photograph4, alc.dirty_photograph4, GameManager.control.artefact_Photograph4_IsDirty, GameManager.control.hasArtefact_Photograph4)},
-                    {Artefacts.PhotographFrame, new Artefact(alc.clean_photographframe, alc.dirty_photographframe, GameManager.control.artefact_PhotographFrame_IsDirty, GameManager.control.hasArtefact_PhotographFrame)},
-                    {Artefacts.ClimberStatue0, new Artefact(alc.clean_statue0, alc.dirty_statue0, GameManager.control.artefact_Statue0_IsDirty, GameManager.control.hasArtefact_Statue0)}
-                };
+            List<ArtefactInfo> artefacts = new List<ArtefactInfo>() {
+                new ArtefactInfo(Artefacts.Hat1, alc.clean_hat1, alc.dirty_hat1, GameManager.control.artefact_Hat1_IsDirty, GameManager.control.hasArtefact_Hat1),
+                new ArtefactInfo(Artefacts.Hat2, alc.clean_hat2, alc.dirty_hat2, GameManager.control.artefact_Hat2_IsDirty, GameManager.control.hasArtefact_Hat2),
+                new ArtefactInfo(Artefacts.Helmet, alc.clean_helmet, alc.dirty_helmet, GameManager.control.artefact_Helmet_IsDirty, GameManager.control.hasArtefact_Helmet),
+                new ArtefactInfo(Artefacts.Shoe, alc.clean_shoe, alc.dirty_shoe, GameManager.control.artefact_Shoe_IsDirty, GameManager.control.hasArtefact_Shoe),
+                new ArtefactInfo(Artefacts.Shovel, alc.clean_shovel, alc.dirty_shovel, GameManager.control.artefact_Shovel_IsDirty, GameManager.control.hasArtefact_Shovel),
+                new ArtefactInfo(Artefacts.Sleepingbag, alc.clean_sleepingbag, alc.dirty_sleepingbag, GameManager.control.artefact_Sleepingbag_IsDirty, GameManager.control.hasArtefact_Sleepingbag),
+                new ArtefactInfo(Artefacts.Backpack, alc.clean_backpack, alc.dirty_backpack, GameManager.control.artefact_Backpack_IsDirty, GameManager.control.hasArtefact_Backpack),
+                new ArtefactInfo(Artefacts.Coffebox_1, alc.clean_coffeebox1, alc.dirty_coffeebox1, GameManager.control.artefact_Coffeebox1_IsDirty, GameManager.control.hasArtefact_Coffeebox1),
+                new ArtefactInfo(Artefacts.Coffebox_2, alc.clean_coffeebox2, alc.dirty_coffeebox2, GameManager.control.artefact_Coffeebox2_IsDirty, GameManager.control.hasArtefact_Coffeebox2),
+                new ArtefactInfo(Artefacts.Chalkbox_1, alc.clean_chalkbox1, alc.dirty_chalkbox1, GameManager.control.artefact_Chalkbox1_IsDirty, GameManager.control.hasArtefact_Chalkbox1),
+                new ArtefactInfo(Artefacts.Chalkbox_2, alc.clean_chalkbox2, alc.dirty_chalkbox2, GameManager.control.artefact_Chalkbox2_IsDirty, GameManager.control.hasArtefact_Chalkbox2),
+                new ArtefactInfo(Artefacts.ClimberStatue1, alc.clean_statue1, alc.dirty_statue1, GameManager.control.artefact_Statue1_IsDirty, GameManager.control.hasArtefact_Statue1),
+                new ArtefactInfo(Artefacts.ClimberStatue2, alc.clean_statue2, alc.dirty_statue2, GameManager.control.artefact_Statue2_IsDirty, GameManager.control.hasArtefact_Statue2),
+                new ArtefactInfo(Artefacts.ClimberStatue3, alc.clean_statue3, alc.dirty_statue3, GameManager.control.artefact_Statue3_IsDirty, GameManager.control.hasArtefact_Statue3),
+                new ArtefactInfo(Artefacts.Photograph_1, alc.clean_photograph1, alc.dirty_photograph1, GameManager.control.artefact_Photograph1_IsDirty, GameManager.control.hasArtefact_Photograph1),
+                new ArtefactInfo(Artefacts.Photograph_2, alc.clean_photograph2, alc.dirty_photograph2, GameManager.control.artefact_Photograph2_IsDirty, GameManager.control.hasArtefact_Photograph2),
+                new ArtefactInfo(Artefacts.Photograph_3, alc.clean_photograph3, alc.dirty_photograph3, GameManager.control.artefact_Photograph3_IsDirty, GameManager.control.hasArtefact_Photograph3),
+                new ArtefactInfo(Artefacts.Photograph_4, alc.clean_photograph4, alc.dirty_photograph4, GameManager.control.artefact_Photograph4_IsDirty, GameManager.control.hasArtefact_Photograph4),
+                new ArtefactInfo(Artefacts.PhotographFrame, alc.clean_photographframe, alc.dirty_photographframe, GameManager.control.artefact_PhotographFrame_IsDirty, GameManager.control.hasArtefact_PhotographFrame),
+                new ArtefactInfo(Artefacts.ClimberStatue0, alc.clean_statue0, alc.dirty_statue0, GameManager.control.artefact_Statue0_IsDirty, GameManager.control.hasArtefact_Statue0)
+            };
 
             // artefact loading
             // TODO: idols
 
-            foreach (Artefacts a in artefactsToGameObjects.Keys)
+            foreach (ArtefactInfo art in artefacts)
             {
-                Artefact art = artefactsToGameObjects[a];
                 if (art.hasArtefact)
                 {
                     if (art.isDirty)

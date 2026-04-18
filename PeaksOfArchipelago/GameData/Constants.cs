@@ -18,6 +18,7 @@ namespace PeaksOfArchipelago.GameData
         public const int TARopeIDOffset = 9000;
         public const int TAHoldsIDOffset = 10000;
         public const int AlpIdolIDOffset = 11000;
+        public const int MermaidIDOffset = 12000;
     }
 
     internal class ItemTypes
@@ -35,11 +36,16 @@ namespace PeaksOfArchipelago.GameData
             TATime = 9,
             TARope = 10,
             TAHolds = 11,
-            AlpIdol = 12
+            AlpIdol = 12,
+            Mermaid = 13
         }
         
         public static Types GetItemType(long itemID)
         {
+            if (itemID >= Offsets.MermaidIDOffset)
+            {
+                return Types.Mermaid;
+            }
             if (itemID >= Offsets.AlpIdolIDOffset)
                 return Types.AlpIdol;
             if (itemID >= Offsets.TAHoldsIDOffset)
@@ -167,6 +173,11 @@ namespace PeaksOfArchipelago.GameData
         internal static long GetTAHoldsLocationID(Peaks peak)
         {
             return (long)peak + Offsets.TAHoldsIDOffset;
+        }
+
+        internal static long GetMermaidLocationID(Mermaids mermaid)
+        {
+            return (long)mermaid + Offsets.MermaidIDOffset;
         }
     }
 
@@ -670,6 +681,27 @@ namespace PeaksOfArchipelago.GameData
         Sundown,
         Seeds,
         Gravity
+    }
+
+    public enum Mermaids
+    {
+        Mermaid1,
+        Mermaid2,
+        Mermaid3,
+        Mermaid4,
+        Mermaid5,
+        Mermaid6,
+        Mermaid7,
+        Goat1,
+        Goat2,
+        Goat3,
+        Goat4,
+        Goat5,
+        Eagle1,
+        Eagle2,
+        Eagle3,
+        Eagle4,
+        Eagle5,
     }
     public enum Books
     {

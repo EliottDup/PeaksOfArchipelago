@@ -35,12 +35,27 @@ namespace PeaksOfArchipelago.GameData
                     return new ToolItem(item);
                 case ItemTypes.Types.ExtraItem:
                     return new ExtraItem(item);
+                case ItemTypes.Types.AlpIdol:
+                    return new IdolItem(item);
                 default:
                     throw new NotImplementedException($"Item type {t} Should not exist");
             }
         }
 
         public abstract void Unlock(ISlotData slotData);
+    }
+
+    internal class IdolItem : ArchipelagoItem
+    {
+        public Idols idol;
+        public IdolItem(ItemInfo info) : base(info) {
+            idol = ItemIDs.GetIdolFromId(info.ItemId);
+        }
+
+        public override void Unlock(ISlotData slotData)
+        {
+            slotData.receiveIdol(idol);
+        }
     }
 
     internal class ExtraItem : ArchipelagoItem

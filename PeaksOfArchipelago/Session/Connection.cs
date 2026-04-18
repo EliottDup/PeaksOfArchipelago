@@ -396,6 +396,11 @@ namespace PeaksOfArchipelago.Session
             CompleteCheck(GetTAHoldsLocationID(peak));
         }
 
+        internal void CompleteMermaidLocation(Mermaids merm)
+        {
+            CompleteCheck(GetMermaidLocationID(merm));
+        }
+
         private void CompleteCheck(long locationID)
         {
             if (session == null)

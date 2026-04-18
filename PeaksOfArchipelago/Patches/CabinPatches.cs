@@ -44,6 +44,44 @@ namespace PeaksOfArchipelago.Patches
         }
     }
 
+    [HarmonyPatch(typeof(RopeCabinDescription))]
+    internal class RopeCabinPatches
+    {
+        private struct State
+        {
+            public bool p1;
+            public bool p2;
+            public bool p1d;
+            public bool p2d;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("Update")]
+        private static void UpdatePrefix(out State __state)
+        {
+            __state = new State();
+            __state.p1 = GameManager.control.alps_hasStatue_crimps_pt1;
+            __state.p2 = GameManager.control.alps_hasStatue_crimps_pt2;
+            __state.p1d = GameManager.control.alps_statue_crimps_IsDirty_pt1; 
+            __state.p2d = GameManager.control.alps_statue_crimps_IsDirty_pt2;
+
+            GameManager.control.alps_hasStatue_crimps_pt1 = true;
+            GameManager.control.alps_hasStatue_crimps_pt2 = true;
+            GameManager.control.alps_statue_crimps_IsDirty_pt1 = false;
+            GameManager.control.alps_statue_crimps_IsDirty_pt2 = false;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("Update")]
+        private static void UpdatePostfix(State __state)
+        {
+            GameManager.control.alps_hasStatue_crimps_pt1 = __state.p1;
+            GameManager.control.alps_hasStatue_crimps_pt2 = __state.p2;
+            GameManager.control.alps_statue_crimps_IsDirty_pt1 = __state.p1d;
+            GameManager.control.alps_statue_crimps_IsDirty_pt2 = __state.p2d;
+        }
+    }
+
     [HarmonyPatch(typeof(AlpsEvents))]
     internal class AlpsEventsPatches
     {

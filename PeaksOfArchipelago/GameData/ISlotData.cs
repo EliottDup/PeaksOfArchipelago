@@ -14,8 +14,6 @@ namespace PeaksOfArchipelago.GameData
         bool HasBook(Books book);
         bool ShowBook(Books book);
 
-        bool HasArtefact(Artefacts artefact);
-
         bool HasTool(Tools tool);
 
         bool HasPeak(Peaks peak);
@@ -41,5 +39,6 @@ namespace PeaksOfArchipelago.GameData
         Peaks BookPageToPeaks(int page, Books book);
         Color GetJournalPageColor(int v, Books b);
         int GetTotalExtraBirdSeedCount();
+        void receiveIdol(Idols idol);
     }
 }
