@@ -135,11 +135,11 @@ namespace PeaksOfArchipelago.Patches
     {
         [HarmonyPrefix]
         [HarmonyPatch(nameof(PlayerPrefs.HasKey))]
-        public static bool HasKeyPrefix(string key, ref bool result)
+        public static bool HasKeyPrefix(string key, ref bool __result)
         {
             if (key.Equals("Pin_AA_4") || key.Equals("Pin_AA_5"))
             {
-                result = false;
+                __result = false;
                 return false;
             }
             return true;
