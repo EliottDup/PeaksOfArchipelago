@@ -12,6 +12,7 @@ using UnityEngine;
 using static PeaksOfArchipelago.GameData.LocationIDs;
 using static PeaksOfArchipelago.GameData.ItemTypes;
 using Color = UnityEngine.Color;
+using PeaksOfArchipelago.MonoBehaviours;
 
 namespace PeaksOfArchipelago.Session
 {
@@ -309,18 +310,41 @@ namespace PeaksOfArchipelago.Session
 
         private void OnItemReceived(ItemInfo item)
         {
-            if (cabinHandler != null && cabinHandler.CollectItems([item]))
+            if (item.ItemName == "Trap")
             {
-                UnlockItem(item);
-
-                itemCount += 1;
-                session.DataStorage["ItemCount"] = itemCount;
-                return;
+                if (PeaksOfArchipelago.playerState == PeaksOfArchipelago.PlayerState.InPeak)
+                {
+                    if (TrapHandler.Instance == null)
+                    {
+                        logger.LogError("Error: Tried activating trap but handler is null??");
+                        return;
+                    }
+                    logger.LogInfo("Activating trap");
+                    TrapHandler.Instance?.StartRandomTrap();
+                }
+                else
+                {
+                    logger.LogInfo($"Trap received but player is not in peak!");
+                }
             }
-            uncollectedItems.Add(item);
+            else
+            {
+                uncollectedItems.Add(item);
+                logger.LogInfo($"Recieving Item: {item.ItemName}");
+            }
 
-            logger.LogInfo($"Recieving Item: {item.ItemName}");
-            // TODO: Notify player
+            //if (cabinHandler != null && cabinHandler.CollectItems([item]))
+            //{
+            //    UnlockItem(item);
+
+            //    itemCount += 1;
+            //    session.DataStorage["ItemCount"] = itemCount;
+            //    return;
+            //}
+            //uncollectedItems.Add(item);
+
+            //logger.LogInfo($"Recieving Item: {item.ItemName}");
+            //// TODO: Notify player
         }
 
         private void UnlockItem(ItemInfo item)

@@ -23,6 +23,8 @@ namespace PeaksOfArchipelago.UI
         private GameObject noDLCAlert;
         private bool showDLCAlert = false;
 
+        public GameObject trapDisplay;
+
         public UIManager()
         {
             logger = PeaksOfArchipelago.Logger;
@@ -30,7 +32,6 @@ namespace PeaksOfArchipelago.UI
 
         private void MakeUI()
         {
-
             this.canvas = GetBestCanvas();
 
             //Make ChatBox
@@ -45,6 +46,9 @@ namespace PeaksOfArchipelago.UI
 
             noDLCAlert = GameObject.Instantiate(PeaksOfAssets.DLCWarning, canvas.transform);
             noDLCAlert.SetActive(showDLCAlert);
+
+            // init traphandler
+            trapDisplay = GameObject.Instantiate(PeaksOfAssets.TrapDisplay, canvas.transform);
         }
 
         private Canvas GetBestCanvas()
@@ -107,6 +111,7 @@ namespace PeaksOfArchipelago.UI
         internal void OnSceneLoaded(Connection connection)
         {
             MakeUI();
+            scriptholder.AddComponent<TrapHandler>();
             if (connection != null)
             {
                 progressDisplay = scriptholder.AddComponent<ProgressDisplay>();

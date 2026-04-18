@@ -272,6 +272,7 @@
 		<Compile Include="MonoBehaviours\Notification.cs" />
 		<Compile Include="MonoBehaviours\Notificator.cs" />
 		<Compile Include="MonoBehaviours\ProgressDisplay.cs" />
+		<Compile Include="MonoBehaviours\TrapHandler.cs" />
 		<Compile Include="Patches\AchievementBlockPatches.cs" />
 		<Compile Include="Patches\CabinPatches.cs" />
 		<Compile Include="Patches\LocationDetectionPatches.cs" />
@@ -281,6 +282,9 @@
 		<Compile Include="Session\Connection.cs" />
 		<Compile Include="Session\Player.cs" />
 		<Compile Include="MonoBehaviours\ChatBox.cs" />
+		<Compile Include="Traps\InstantTrap.cs" />
+		<Compile Include="Traps\TimedTrap.cs" />
+		<Compile Include="Traps\Trap.cs" />
 		<Compile Include="UI\LoginUI.cs" />
 		<Compile Include="UI\UIManager.cs" />
 	</ItemGroup>
