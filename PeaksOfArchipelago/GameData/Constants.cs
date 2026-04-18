@@ -17,6 +17,7 @@ namespace PeaksOfArchipelago.GameData
         public const int TATimeIDOffset = 8000;
         public const int TARopeIDOffset = 9000;
         public const int TAHoldsIDOffset = 10000;
+        public const int AlpIdolIDOffset = 11000;
     }
 
     internal class ItemTypes
@@ -33,11 +34,14 @@ namespace PeaksOfArchipelago.GameData
             FreeSoloPeak = 8,
             TATime = 9,
             TARope = 10,
-            TAHolds = 11
+            TAHolds = 11,
+            AlpIdol = 12
         }
         
         public static Types GetItemType(long itemID)
         {
+            if (itemID >= Offsets.AlpIdolIDOffset)
+                return Types.AlpIdol;
             if (itemID >= Offsets.TAHoldsIDOffset)
                 return Types.TAHolds;
             if (itemID >= Offsets.TARopeIDOffset)
@@ -110,6 +114,11 @@ namespace PeaksOfArchipelago.GameData
         internal static ExtraItems GetExtraItemFromId(long itemId)
         {
             return (ExtraItems)(itemId - Offsets.ExtraItemIDOffset);
+        }
+
+        internal static Idols GetIdolFromId(long itemId)
+        {
+            return (Idols)(itemId - Offsets.AlpIdolIDOffset);
         }
     }
 
@@ -647,6 +656,20 @@ namespace PeaksOfArchipelago.GameData
         Alps_Edelweiss5,
         Alps_Edelweiss6,
         Alps_Edelweiss7
+    }
+
+    public enum Idols
+    {
+        Crimps,
+        Slopers,
+        Feathers,
+        Pitches,
+        Ice,
+        Pinches,
+        GreaterBalance,
+        Sundown,
+        Seeds,
+        Gravity
     }
     public enum Books
     {

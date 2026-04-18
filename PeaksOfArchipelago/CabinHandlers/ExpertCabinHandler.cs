@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace PeaksOfArchipelago.CabinHandlers
 {
-    internal class ExpertCabinHandler(ISlotData slotData, SessionSettings settings) : CabinHandler(slotData, settings)
+    internal class ExpertCabinHandler(ISlotData slotData) : CabinHandler(slotData)
     {
         public override bool CollectItems(List<ItemInfo> itemInfos)
         {

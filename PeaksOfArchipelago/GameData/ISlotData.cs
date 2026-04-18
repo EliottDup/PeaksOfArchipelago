@@ -20,6 +20,8 @@ namespace PeaksOfArchipelago.GameData
 
         bool HasPeak(Peaks peak);
 
+        bool HasIdol(Idols idol);
+
         int GetTotalRopeCount();
         int GetTotalCoffeeCount();
 

@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace PeaksOfArchipelago.CabinHandlers
 {
-    internal class BaseCabinHandler(ISlotData slotData, SessionSettings settings) : CabinHandler(slotData, settings)
+    internal class BaseCabinHandler(ISlotData slotData) : CabinHandler(slotData)
     {
         bool hasSpawnedInAPLogo = false;
         GameObject book1;
@@ -104,27 +104,6 @@ namespace PeaksOfArchipelago.CabinHandlers
                 else
                 {
                     logger.LogWarning("Alps Gateway not found!");
-                }
-            }
-            else
-            {
-                Dictionary<Artefacts, GameObject> idolsToGameObjects = new()
-                { // no partial loading of idol parts
-                    {Artefacts.Alps_Idol_crimpsPt1, alc.alps_clean_statue_crimps_complete},
-                    {Artefacts.Alps_Idol_slopersPt1, alc.alps_clean_statue_slopers_complete},
-                    {Artefacts.Alps_Idol_feathersPt1, alc.alps_clean_statue_feathers_complete},
-                    {Artefacts.Alps_Idol_pitchesPt1, alc.alps_clean_statue_pitches_complete},
-                    {Artefacts.Alps_Idol_icePt1, alc.alps_clean_statue_ice_complete},
-                    {Artefacts.Alps_Idol_pinchesPt1, alc.alps_clean_statue_pinches_complete},
-                    {Artefacts.Alps_Idol_greaterbalancePt1, alc.alps_clean_statue_greaterbalance_complete},
-                    {Artefacts.Alps_Idol_sundownPt1, alc.alps_clean_statue_sundown_complete},
-                    {Artefacts.Alps_Idol_seedsPt1, alc.alps_clean_statue_seeds_complete},
-                    {Artefacts.Alps_Idol_gravityPt1, alc.alps_clean_statue_gravity_complete},
-                };
-
-                foreach (Artefacts idol in idolsToGameObjects.Keys)
-                {
-                    idolsToGameObjects[idol].SetActive(slotData.HasArtefact(idol) && slotData.HasArtefact(idol+1));
                 }
             }
 
@@ -281,11 +260,12 @@ namespace PeaksOfArchipelago.CabinHandlers
                 };
 
             // artefact loading
+            // TODO: idols
 
             foreach (Artefacts a in artefactsToGameObjects.Keys)
             {
                 Artefact art = artefactsToGameObjects[a];
-                if ((settings.artefactItems && slotData.HasArtefact(a)) || (!settings.artefactItems && art.hasArtefact))
+                if (art.hasArtefact)
                 {
                     if (art.isDirty)
                     {
@@ -303,6 +283,25 @@ namespace PeaksOfArchipelago.CabinHandlers
                     art.cleanObject.SetActive(false);
                     art.dirtyObject.SetActive(false);
                 }
+            }
+
+            Dictionary<Idols, GameObject> idolsToGameObjects = new()
+                { // no partial loading of idol parts in normal cabin
+                    {Idols.Crimps, alc.alps_clean_statue_crimps_complete},
+                    {Idols.Slopers, alc.alps_clean_statue_slopers_complete},
+                    {Idols.Feathers, alc.alps_clean_statue_feathers_complete},
+                    {Idols.Pitches, alc.alps_clean_statue_pitches_complete},
+                    {Idols.Ice, alc.alps_clean_statue_ice_complete},
+                    {Idols.Pinches, alc.alps_clean_statue_pinches_complete},
+                    {Idols.GreaterBalance, alc.alps_clean_statue_greaterbalance_complete},
+                    {Idols.Sundown, alc.alps_clean_statue_sundown_complete},
+                    {Idols.Seeds, alc.alps_clean_statue_seeds_complete},
+                    {Idols.Gravity, alc.alps_clean_statue_gravity_complete},
+                };
+
+            foreach (Idols idol in idolsToGameObjects.Keys)
+            {
+                idolsToGameObjects[idol].SetActive(slotData.HasIdol(idol));
             }
         }
     }

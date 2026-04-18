@@ -17,6 +17,7 @@ namespace PeaksOfArchipelago.GameData
         private readonly HashSet<Peaks> unlockedPeaks = [];
         private readonly HashSet<Ropes> unlockedRopes = [];
         private readonly HashSet<Tools> unlockedTools = [];
+        private readonly HashSet<Idols> unlockedIdols = [];
         private readonly Dictionary<ExtraItems, int> extraItemCounts = [];
 
         public SlotData(SessionSettings settings)
@@ -126,6 +127,11 @@ namespace PeaksOfArchipelago.GameData
         public bool HasPeak(Peaks peak)
         {
             return unlockedPeaks.Contains(peak) || gameMode == SessionSettings.GameMode.BOOK_UNLOCK;
+        }
+
+        public bool HasIdol(Idols idol)
+        {
+            return unlockedIdols.Contains(idol);
         }
 
         public bool IsJournalPageUnlocked(int page, Books book)

@@ -18,22 +18,21 @@ namespace PeaksOfArchipelago.CabinHandlers
         protected ManualLogSource logger;
 
         protected ISlotData slotData;
-        protected SessionSettings settings;
 
-        public CabinHandler(ISlotData slotData, SessionSettings settings)
+        public CabinHandler(ISlotData slotData)
         {
             this.slotData = slotData;
             logger = PeaksOfArchipelago.Logger;
             this.settings = settings;
         }
 
-        public static CabinHandler New(Cabins cabin, ISlotData slotData, SessionSettings settings)
+        public static CabinHandler New(Cabins cabin, ISlotData slotData)
         {
             return cabin switch
             {
-                Cabins.Cabin => new BaseCabinHandler(slotData, settings),
-                Cabins.CabinExpert => new ExpertCabinHandler(slotData, settings),
-                Cabins.CabinAlps => new AlpsCabinHandler(slotData, settings),
+                Cabins.Cabin => new BaseCabinHandler(slotData),
+                Cabins.CabinExpert => new ExpertCabinHandler(slotData),
+                Cabins.CabinAlps => new AlpsCabinHandler(slotData),
                 _ => throw new NotImplementedException(),
             };
         }

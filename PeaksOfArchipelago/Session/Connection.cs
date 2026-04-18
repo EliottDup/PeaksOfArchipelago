@@ -44,8 +44,6 @@ namespace PeaksOfArchipelago.Session
 
         private bool hasWon;
         private Dictionary<long, ScoutedItemInfo> scoutedItems;
-            
-        private CabinHandler currentCabinHandler;
 
         private int itemCount = 0;
 
@@ -457,7 +455,7 @@ namespace PeaksOfArchipelago.Session
 
         internal void loadArtefacts()
         {
-            currentCabinHandler?.LoadArtefacts();
+            cabinHandler?.LoadArtefacts();
         }
 
         private void SetArtefactDirty(Artefacts artefact)
