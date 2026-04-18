@@ -157,6 +157,12 @@ namespace PeaksOfArchipelago.GameData
                     if (peak == Peaks.Eldenhorn) peak = Peaks.GreatGaol;
                     else if (peak == Peaks.GreatGaol) peak = Peaks.Eldenhorn;
                     return peak;
+                case Books.Essentials:
+                    return (Peaks)(page + 37);
+                case Books.AlpineGreats:
+                    return (Peaks)(page + 49);
+                case Books.ArduousArctic:
+                    return (Peaks)(page + 54);
             }
             return (Peaks)(-2);
         }

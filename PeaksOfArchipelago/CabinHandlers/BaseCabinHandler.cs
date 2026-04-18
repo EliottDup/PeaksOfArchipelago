@@ -83,8 +83,13 @@ namespace PeaksOfArchipelago.CabinHandlers
 
         public override void LoadProgress()
         {
-            // If not alps, disable ticket & suitcase
-            if (true /*Not Alps*/)
+            logger.LogInfo("Loading Base Cabin Progress...");
+
+
+            ArtefactLoaderCabin alc = GameObject.FindObjectOfType<ArtefactLoaderCabin>();
+
+            // If not alps ticket, disable ticket & suitcase
+            if (!slotData.HasTool(Tools.AlpsTicket))
             {
                 // Disable Alps Bed
                 // Enable Normal Bed
@@ -99,6 +104,27 @@ namespace PeaksOfArchipelago.CabinHandlers
                 else
                 {
                     logger.LogWarning("Alps Gateway not found!");
+                }
+            }
+            else
+            {
+                Dictionary<Artefacts, GameObject> idolsToGameObjects = new()
+                { // no partial loading of idol parts
+                    {Artefacts.Alps_Idol_crimpsPt1, alc.alps_clean_statue_crimps_complete},
+                    {Artefacts.Alps_Idol_slopersPt1, alc.alps_clean_statue_slopers_complete},
+                    {Artefacts.Alps_Idol_feathersPt1, alc.alps_clean_statue_feathers_complete},
+                    {Artefacts.Alps_Idol_pitchesPt1, alc.alps_clean_statue_pitches_complete},
+                    {Artefacts.Alps_Idol_icePt1, alc.alps_clean_statue_ice_complete},
+                    {Artefacts.Alps_Idol_pinchesPt1, alc.alps_clean_statue_pinches_complete},
+                    {Artefacts.Alps_Idol_greaterbalancePt1, alc.alps_clean_statue_greaterbalance_complete},
+                    {Artefacts.Alps_Idol_sundownPt1, alc.alps_clean_statue_sundown_complete},
+                    {Artefacts.Alps_Idol_seedsPt1, alc.alps_clean_statue_seeds_complete},
+                    {Artefacts.Alps_Idol_gravityPt1, alc.alps_clean_statue_gravity_complete},
+                };
+
+                foreach (Artefacts idol in idolsToGameObjects.Keys)
+                {
+                    idolsToGameObjects[idol].SetActive(slotData.HasArtefact(idol) && slotData.HasArtefact(idol+1));
                 }
             }
 
@@ -130,6 +156,11 @@ namespace PeaksOfArchipelago.CabinHandlers
             npcEvents.teaclothteacupObj.SetActive(!adv);
             ticketObject.gameObject.SetActive(slotData.ShowBook(Books.Expert));
 
+            // some general disabling
+            npcEvents.cabinMedal_1.SetActive(false);
+            npcEvents.cabinMedal_2.SetActive(false);
+            npcEvents.cabinMedal_3.SetActive(false);
+            npcEvents.cabinallArtefacts.SetActive(false);
             // Tools Showing / loading
 
             if (npcEvents.cabinRope)
@@ -141,6 +172,12 @@ namespace PeaksOfArchipelago.CabinHandlers
                 npcEvents.cabinPhonograph.SetActive(slotData.HasTool(Tools.Phonograph));
             }
             iceAxesObject.gameObject.SetActive(slotData.HasTool(Tools.IceAxes));
+            npcEvents.iceaxesInfo.SetActive(false);
+            if (npcEvents.cabinRopesUpgraded)
+            {
+                npcEvents.cabinRopesUpgraded.SetActive(slotData.HasTool(Tools.RopeLengthUpgrade));
+            }
+            // I don't know why this is enabled otherwise??
 
             // load pocketwatch
 
@@ -195,10 +232,13 @@ namespace PeaksOfArchipelago.CabinHandlers
             }
 
             // load pipe
-
             if (npcEvents.cabinPipe)
             {
                 npcEvents.cabinPipe.SetActive(slotData.HasTool(Tools.Pipe));
+            }
+            if (!slotData.HasTool(Tools.Pipe))
+            {
+                GameManager.control.isUsingPipe = false;
             }
 
             // load barometer

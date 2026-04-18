@@ -39,9 +39,45 @@ namespace PeaksOfArchipelago.Patches
                 __instance.cabinallArtefacts.SetActive(false);
                 GameManager.control.Save();
             }
+            Connection.Instance.ReloadCabin();
             yield return null;
         }
     }
+
+    [HarmonyPatch(typeof(AlpsEvents))]
+    internal class AlpsEventsPatches
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("CheckProgress")]
+        public static bool CabinEventDisabler()
+        {
+            PeaksOfArchipelago.Logger.LogInfo("Disabled Alps Cabin CheckProgress!");
+            return false;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("UnpackParcel")]
+        public static void UndoAllArtefactsEffects(ref IEnumerator __result, NPCEvents __instance)
+        {
+            __result = Wrapper(__result, __instance);
+        }
+
+        private static IEnumerator Wrapper(IEnumerator original, NPCEvents __instance)
+        {
+            while (original.MoveNext())
+            {
+                yield return original.Current;
+            }
+            if (__instance.eventName == "Alps_Medal1")
+            {
+                GameManager.control.alps_Medal1 = false;
+                GameManager.control.Save();
+            }
+            Connection.Instance.ReloadCabin();
+            yield return null;
+        }
+    }
+
 
     [HarmonyPatch(typeof(ArtefactLoaderCabin))]
     internal class ArtefactLoaderCabinPatches
@@ -83,6 +119,43 @@ namespace PeaksOfArchipelago.Patches
         public static void STEnablePostfix(bool __state)
         {
             GameManager.control.greatbulwark = __state;
+        }
+    }
+
+    ////TEMP
+    //[HarmonyPatch(typeof(GameObject))]
+    //internal class ObjectPatches
+    //{
+    //    [HarmonyPrefix]
+    //    [HarmonyPatch(nameof(GameObject.SetActive))]
+    //    public static bool SetActivePrefix(GameObject __instance, bool value)
+    //    {
+    //        if (__instance.name == "CabinStuff" && !value)
+    //        {
+    //            PeaksOfArchipelago.Logger.LogInfo(Environment.StackTrace);
+    //            PeaksOfArchipelago.Logger.LogInfo("Prevented Cabin4Map destruction!");
+    //            return false;
+    //        }
+    //        return true;
+    //    }
+    //}
+
+    [HarmonyPatch(typeof(TimeAttack_CheckScoreboard))]
+    internal class TimeAttackCheckScoreboardPatches
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("CheckOwned")]
+        public static bool CheckOwnedPrefix(TimeAttack_CheckScoreboard __instance)
+        {
+            if (__instance.isAlps)
+            {
+                if (!GameManager.control.pocketwatch)
+                {
+                    __instance.transform.parent.gameObject.SetActive(false);
+                }
+                return false;
+            }
+            return true;
         }
     }
 
@@ -407,6 +480,132 @@ namespace PeaksOfArchipelago.Patches
             int currentPage = __instance.currentPage;
 
             Books book = Books.Advanced;
+
+            backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 2, book);
+            frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 1, book);
+            rightPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 3, book);
+            leftPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
+        }
+    }
+
+    // Alps Patching (FEAR)
+    [HarmonyPatch(typeof(AlpsPeakSelection))]
+    internal class AlpsPeakSelectionPatches
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("OnMouseSpriteDown")]
+        static bool DisableClick(AlpsPeakSelection __instance)
+        {
+            Type type = __instance.GetType();
+
+            AlpsJournal journal = __instance.peakJournal;
+
+            Books book = journal.currentJournal switch {
+                0 => Books.Essentials,
+                1 => Books.AlpineGreats,
+                2 => Books.ArduousArctic,
+                _ => Books.Essentials
+            };
+
+            if ((__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage, book)) ||
+                (!__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage + 1, book)))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("OnMouseSpriteOver")]
+        public static void ColorHighLight(AlpsPeakSelection __instance)
+        {
+            Type type = __instance.GetType();
+
+            AlpsJournal journal = __instance.peakJournal;
+
+            MeshRenderer leftRenderer = journal.leftSelectOutlineOBJ.GetComponent<MeshRenderer>();
+            MeshRenderer rightRenderer = journal.rightSelectOutlineOBJ.GetComponent<MeshRenderer>();
+
+            Books book = journal.currentJournal switch
+            {
+                0 => Books.Essentials,
+                1 => Books.AlpineGreats,
+                2 => Books.ArduousArctic,
+                _ => Books.Essentials
+            };
+
+            if (__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage, book))
+                leftRenderer.material.color = new Color(2, 0, 0);
+            else
+                leftRenderer.material.color = new Color(1, 1, 1, 0.349f);
+
+            if (!__instance.leftPage && !Connection.Instance.slotData.IsJournalPageUnlocked(journal.currentPage + 1, book))
+                rightRenderer.material.color = new Color(2, 0, 0);
+            else
+                rightRenderer.material.color = new Color(1, 1, 1, 0.349f);
+        }
+    }
+
+    [HarmonyPatch(typeof(AlpsJournal))]
+    internal class AlpsPageColorationPatches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch("PageTurnSound")]
+        public static void PageTurnColoration(AlpsJournal __instance)
+        {
+            Animation anim = __instance.journalPageAnim;
+            AnimationClip left_anim = __instance.journalPage_TurnLeft;
+
+            Material leftPage = __instance.leftPage;
+            Material rightPage = __instance.rightPage;
+            Material frontPage = __instance.frontPage;
+            Material backPage = __instance.backPage;
+
+            int currentPage = __instance.currentPage;
+
+            Books book = __instance.currentJournal switch
+            {
+                0 => Books.Essentials,
+                1 => Books.AlpineGreats,
+                2 => Books.ArduousArctic,
+                _ => Books.Essentials
+            };
+
+
+            if (anim.clip == left_anim)
+            {
+                backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
+                frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage - 1, book);
+                rightPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 1, book);
+                leftPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage - 2, book);
+            }
+            else
+            {
+                backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 2, book);
+                frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 1, book);
+                rightPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 3, book);
+                leftPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 0, book);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("UpdatePage")]
+        public static void PageOpeningColor(AlpsJournal __instance)
+        {
+            Material leftPage = __instance.leftPage;
+            Material rightPage = __instance.rightPage;
+            Material frontPage = __instance.frontPage;
+            Material backPage = __instance.backPage;
+
+            int currentPage = __instance.currentPage;
+
+            Books book = __instance.currentJournal switch
+            {
+                0 => Books.Essentials,
+                1 => Books.AlpineGreats,
+                2 => Books.ArduousArctic,
+                _ => Books.Essentials
+            };
 
             backPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 2, book);
             frontPage.color = Connection.Instance.slotData.GetJournalPageColor(currentPage + 1, book);

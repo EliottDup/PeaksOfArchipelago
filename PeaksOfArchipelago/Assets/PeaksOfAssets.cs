@@ -25,6 +25,8 @@ namespace PeaksOfArchipelago.Assets
         public static GameObject TrapDisplay { get; private set; }
         public static GameObject TrapTimer { get; private set; }
 
+        public static GameObject DLCWarning { get; private set; }
+
         public static void LoadAssets()
         {
             if (loaded) return;
@@ -48,6 +50,8 @@ namespace PeaksOfArchipelago.Assets
 
             TrapDisplay = assetBundle.LoadAsset<GameObject>("TrapDisplay");
             TrapTimer = assetBundle.LoadAsset<GameObject>("TrapTimer");
+
+            DLCWarning = assetBundle.LoadAsset<GameObject>("NoDLCAlert");
 
             PeaksOfArchipelago.Logger.LogInfo("Assets Loaded");
             loaded = true;

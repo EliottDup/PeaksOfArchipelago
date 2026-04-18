@@ -106,6 +106,7 @@ namespace PeaksOfArchipelago.MonoBehaviours
             if (nameObject == null)
             {
                 Logger.LogError("Couldn't find book name text field");
+                return;
             }
             nameObject.GetComponent<Text>().text = Mappings.GetBookName(book);
             Peaks[] peaksForBook = [.. Mappings.GetBookPeaks(book)];

@@ -168,7 +168,10 @@ namespace PeaksOfArchipelago.GameData
             { Books.Fundamentals, "Fundamentals" },
             { Books.Intermediate, "Intermediate" },
             { Books.Advanced, "Advanced" },
-            { Books.Expert, "Expert" }
+            { Books.Expert, "Expert" },
+            { Books.Essentials, "Essentials" },
+            { Books.AlpineGreats, "Alpine Greats" },
+            { Books.ArduousArctic, "Arduous & Arctic" }
         };
 
         private static readonly Dictionary<Books, List<Peaks>> BookPeakMappings = new Dictionary<Books, List<Peaks>>()
@@ -217,6 +220,38 @@ namespace PeaksOfArchipelago.GameData
             { Books.Expert, new List<Peaks>(){ 
                 Peaks.GreatBulwark,
                 Peaks.SolemnTempest
+            } },
+            { Books.Essentials, new List<Peaks>()
+            {
+                Peaks.TutorTower,
+                Peaks.StougrBoulder,
+                Peaks.MarasArch,
+                Peaks.GrainneSpire,
+                Peaks.GreatBokTree,
+                Peaks.Treppenwald,
+                Peaks.CastleoftheSwanKing,
+                Peaks.SeasideTribune,
+                Peaks.IvoryGranites,
+                Peaks.OldRekkja,
+                Peaks.Quietude,
+                Peaks.EljunsFolly
+            } },
+            { Books.AlpineGreats, new List<Peaks>()
+            {
+                Peaks.EinvaldFalls,
+                Peaks.AlmattrDam,
+                Peaks.Dunderhorn,
+                Peaks.MhorDruim,
+                Peaks.WelkinPass
+            } },
+            { Books.ArduousArctic, new List<Peaks>()
+            {
+                Peaks.SeigrCraeg,
+                Peaks.UllrsChasm,
+                Peaks.GreatSilf,
+                Peaks.ToweringVisir,
+                Peaks.EldrisWall,
+                Peaks.MountMhorgorm
             } }
         };
 
@@ -310,6 +345,79 @@ namespace PeaksOfArchipelago.GameData
             }},
             {Peaks.GreatBulwark, new List<long>(){
                 LocationIDs.GetArtefactLocationID(Artefacts.ClimberStatue3)
+            }},
+            {Peaks.MarasArch, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Gentiana1),
+            }},
+            {Peaks.GrainneSpire, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_crimpsPt1),
+            }},
+            {Peaks.GreatBokTree, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_crimpsPt2),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Edelweiss2),
+            }},
+            {Peaks.Treppenwald, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Gentiana2),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_seedsPt1),
+            }},
+            {Peaks.CastleoftheSwanKing, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Edelweiss3),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_slopersPt1),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_sundownPt1),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_pitchesPt1),
+            }},
+            {Peaks.SeasideTribune, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_pinchesPt2),
+            }},
+            {Peaks.IvoryGranites, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Edelweiss4),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_gravityPt2),
+            }},
+            {Peaks.OldRekkja, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_slopersPt2),
+            }},
+            {Peaks.Quietude, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Gentiana4),
+            }},
+            {Peaks.EljunsFolly, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Gentiana3),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_pitchesPt2),
+            }},
+            {Peaks.EinvaldFalls, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Gentiana5),
+            }},
+            {Peaks.AlmattrDam, new List<long>(){}},
+            {Peaks.Dunderhorn, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Edelweiss7),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_sundownPt2),
+            }},
+            {Peaks.MhorDruim, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Gentiana6),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_feathersPt1),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_icePt1),
+            }},
+            {Peaks.WelkinPass, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Edelweiss6),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_feathersPt2),
+            }},
+            {Peaks.SeigrCraeg, new List<long>(){}},
+            {Peaks.UllrsChasm, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_greaterbalancePt2),
+            }},
+            {Peaks.GreatSilf, new List<long>(){}},
+            {Peaks.ToweringVisir, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Edelweiss1),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Gentiana7),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_greaterbalancePt1),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_pinchesPt1),
+            }},
+            {Peaks.EldrisWall, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Edelweiss5),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_icePt2),
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_seedsPt2),
+            }},
+            {Peaks.MountMhorgorm, new List<long>(){
+                LocationIDs.GetArtefactLocationID(Artefacts.Alps_Idol_gravityPt1),
             }},
         };
 
@@ -480,7 +588,8 @@ namespace PeaksOfArchipelago.GameData
         Lamp,
         leftHand,
         RightHand,
-        IceAxes
+        IceAxes,
+        AlpsTicket
     }
     public enum Artefacts
     {
@@ -503,14 +612,51 @@ namespace PeaksOfArchipelago.GameData
         Photograph_3,
         Photograph_4,
         PhotographFrame,
-        ClimberStatue0
+        ClimberStatue0,
+        Alps_Idol_crimpsPt1,
+        Alps_Idol_crimpsPt2,
+        Alps_Idol_slopersPt1,
+        Alps_Idol_slopersPt2,
+        Alps_Idol_feathersPt1,
+        Alps_Idol_feathersPt2,
+        Alps_Idol_pitchesPt1,
+        Alps_Idol_pitchesPt2,
+        Alps_Idol_icePt1,
+        Alps_Idol_icePt2,
+        Alps_Idol_pinchesPt1,
+        Alps_Idol_pinchesPt2,
+        Alps_Idol_greaterbalancePt1,
+        Alps_Idol_greaterbalancePt2,
+        Alps_Idol_sundownPt1,
+        Alps_Idol_sundownPt2,
+        Alps_Idol_seedsPt1,
+        Alps_Idol_seedsPt2,
+        Alps_Idol_gravityPt1,
+        Alps_Idol_gravityPt2,
+        Alps_Gentiana1,
+        Alps_Gentiana2,
+        Alps_Gentiana3,
+        Alps_Gentiana4,
+        Alps_Gentiana5,
+        Alps_Gentiana6,
+        Alps_Gentiana7,
+        Alps_Edelweiss1,
+        Alps_Edelweiss2,
+        Alps_Edelweiss3,
+        Alps_Edelweiss4,
+        Alps_Edelweiss5,
+        Alps_Edelweiss6,
+        Alps_Edelweiss7
     }
     public enum Books
     {
         Fundamentals,
         Intermediate,
         Advanced,
-        Expert
+        Expert,
+        Essentials,
+        AlpineGreats,
+        ArduousArctic
     }
     public enum BirdSeeds
     {

@@ -33,7 +33,7 @@
             EXPERT = 8,
         }
 
-        public const int SETTINGSVER = 1;
+        public const int SETTINGSVER = 2;
 
         public bool deathLinkEnabled = false;
         public RopeUnlockMode ropeUnlockMode = RopeUnlockMode.NORMAL;
@@ -44,7 +44,7 @@
         public bool includeFreeSolo = false;
         public bool includeTimeAttack = false;
         public Peaks targetPeak;
-        public bool artefactItems;
+        public bool enableDLC = false;
         public int version = 0;
 
         public SessionSettings(bool deathLinkEnabled, RopeUnlockMode ropeUnlockMode, Goal goal, GameMode gameMode, int booksEnabled, bool excludeST)
@@ -73,7 +73,7 @@
             includeFreeSolo = LoadIntFromDict(optionsDict, "includeFreeSolo", false) == 1;
             includeTimeAttack = LoadIntFromDict(optionsDict, "includeTimeAttack", false) == 1;
             targetPeak = (Peaks)LoadIntFromDict(optionsDict, "peakGoal", 36);
-            artefactItems = LoadIntFromDict(optionsDict, "artefactItems", true) == 1;
+            enableDLC = LoadIntFromDict(optionsDict, "enableDlc", false) == 1;
             version = LoadIntFromDict(optionsDict, "settingsVer", 0);
             if (version < SETTINGSVER)
             {
@@ -101,14 +101,5 @@
             PeaksOfArchipelago.Logger.LogWarning($"{v} not found, defaulting to {defaultValue}");
             return Convert.ToInt32(defaultValue);
         }
-
-        public bool IsBookEnabled(Book book)
-        {
-            return true;
-            return (booksEnabled & (int)book) != 0;
-        }
-
-        
-
     }
 }

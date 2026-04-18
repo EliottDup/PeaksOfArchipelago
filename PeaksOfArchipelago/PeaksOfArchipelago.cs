@@ -21,6 +21,7 @@ namespace PeaksOfArchipelago
         public static PlayerState playerState { get; private set; } = PlayerState.InMainMenu;
 
         public event EventHandler<GameData.Cabins> OnEnterCabin;
+        public event EventHandler OnExitCabin;
 
         private Harmony harmony;
         private Connection connection;
@@ -28,6 +29,8 @@ namespace PeaksOfArchipelago
         public ConfigEntry<string> Username;
         public ConfigEntry<string> ServerIP;
         public ConfigEntry<string> Password;
+
+        public bool hasDLCInstalled = false;
 
         public ConfigEntry<bool> hasSeenProgressScreenTutorial;
         public enum PlayerState
@@ -91,6 +94,7 @@ namespace PeaksOfArchipelago
             {
                 case 0: //name: "TitleSceen"
                     playerState = PlayerState.InMainMenu;
+                    OnExitCabin?.Invoke(this, EventArgs.Empty);
                     break;
 
                 case 1: // name: "Cabin"
@@ -110,8 +114,24 @@ namespace PeaksOfArchipelago
 
                 default:
                     playerState = PlayerState.InPeak;
+                    OnExitCabin?.Invoke(this, EventArgs.Empty);
                     break;
             }
+        }
+
+        internal void OnConnectionSuccesful(SessionSettings settings)
+        {
+            CheckGameVersion versionChecker = GameObject.FindObjectOfType<CheckGameVersion>();
+            if (versionChecker == null)
+            {
+                Logger.LogError("Couldn't find version checker object in scene!");
+            }
+            else if (versionChecker.CheckGOGDLCInstall() || versionChecker.CheckDLCInstall())
+            {
+                hasDLCInstalled = true;
+                Logger.LogInfo("DLC detected!");
+            }
+            ui.SetDLCWarning(!hasDLCInstalled && settings.enableDLC);
         }
 
         public void SaveUserCredentials(string username, string uri, string password)
