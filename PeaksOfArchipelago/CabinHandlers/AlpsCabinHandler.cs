@@ -25,7 +25,7 @@ namespace PeaksOfArchipelago.CabinHandlers
 
             alpsEvents.itemDisplay_MedalTitle.text = "- Archipelago Item Delivery -";
             alpsEvents.itemDisplay_MedalDescription.text = $"You have received:\n {itemInfos[0].ItemName}";
-            // TODO: Transpiler to stop the text from being overridden again
+
             for (int i = 1; i < itemInfos.Count; i++)
             {
                 alpsEvents.itemDisplay_MedalDescription.text += $", {itemInfos[i].ItemName}";
