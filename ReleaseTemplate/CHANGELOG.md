@@ -1,3 +1,9 @@
+## [2.2.1] - 2026-04-22
+
+### Added
+
+- Debug data, has no effect when playing, but might give some more helpful info when crashes occur.
+
 ## [2.2.0] - 2026-04-20 -- The DLC Update
 
 ### Added
