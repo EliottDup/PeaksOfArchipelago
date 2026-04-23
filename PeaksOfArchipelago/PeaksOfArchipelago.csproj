@@ -21,6 +21,9 @@
 			https://nuget.samboy.dev/v3/index.json
 		</RestoreAdditionalProjectSources>
 		<Configurations>Dev;Release</Configurations>
+		<Deterministic>true</Deterministic>
+		<DeterministicSourcePaths>true</DeterministicSourcePaths>
+		<PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=PeaksOfArchipelago/</PathMap>
 	</PropertyGroup>
 
 	<Import Project="Paths.props" Condition="Exists('Paths.props')" />

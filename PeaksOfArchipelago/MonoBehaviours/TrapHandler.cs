@@ -50,7 +50,7 @@ namespace PeaksOfArchipelago.MonoBehaviours
             logger.LogInfo("Trap handler initialising");
 
             oilLamp = FindObjectOfType<OilLamp>();
-            hunter = GameObject.Find("Seabird_Hunter")?.GetComponent<Bird>();
+            hunter = GameObject.Find("SeaBird_Hunter")?.GetComponent<Bird>();
             crow = GameObject.Find("CrowBird_Hunter")?.GetComponent<Bird>();
             peakEntry = FindObjectOfType<EnterPeakScene>();
             holds = GameObject.FindGameObjectsWithTag("Climbable");
@@ -90,7 +90,8 @@ namespace PeaksOfArchipelago.MonoBehaviours
             {
                 hunter.gameObject.SetActive(false);
                 crow.gameObject.SetActive(false);
-            }, 30f);
+            }, 30f,
+            () => hunter != null && crow != null);
 
             Trap gravity = new TimedTrap("Feeling heavy", "How much porridge did ye have for breakfast", () =>
             {
