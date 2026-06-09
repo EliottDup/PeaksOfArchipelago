@@ -265,16 +265,23 @@ namespace PeaksOfArchipelago.Patches
                 return;
             }
             Peaks peak = ItemTypes.PeakfromStamper(__instance.summitStamper.peakNames);
+            int peakNumber = __instance.peakNumber;
 
-            if (__instance.timer < timeAttackDefaultData.times[(int)peak])
+            if (__instance.summitStamper.isCategory2) peakNumber += 20;
+            else if (__instance.summitStamper.isCategory3) peakNumber += 30;
+            else if (__instance.summitStamper.isAlps1) peakNumber += 35;
+            else if (__instance.summitStamper.isAlps2) peakNumber += 47;
+            else if (__instance.summitStamper.isAlps3) peakNumber += 52; 
+
+            if (__instance.timer < timeAttackDefaultData.times[peakNumber])
             {
                 Connection.Instance.CompleteTimePBLocation(peak);
             }
-            if (__instance.ropesUsed <= timeAttackDefaultData.ropes[(int)peak])
+            if (__instance.ropesUsed <= timeAttackDefaultData.ropes[peakNumber])
             {
                 Connection.Instance.CompleteRopePBLocation(peak);
             }
-            if (__instance.holdsMade < timeAttackDefaultData.holds[(int)peak])
+            if (__instance.holdsMade < timeAttackDefaultData.holds[peakNumber])
             {
                 Connection.Instance.CompleteHoldPBLocation(peak);
             }
