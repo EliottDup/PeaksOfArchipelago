@@ -151,6 +151,7 @@ namespace PeaksOfArchipelago.Patches
         public static void StartPrefix(out int __state)
         {
             __state = GameManager.control.ropesCollected;
+            GameManager.control.ropesCollected = 0; // If you have 42 or more ropes, the game won't spawn any more. We'll set our ropes back to what it should be again in the postfix
         }
         
         [HarmonyPostfix]
